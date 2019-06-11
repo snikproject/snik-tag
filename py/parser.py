@@ -2,7 +2,7 @@ from bs4 import BeautifulSoup
 import sys
 import re
 
-with open ("document.xml") as fp:
+with open ("../benchmark/document.xml") as fp:
     soup = BeautifulSoup(fp, features="lxml")
 
 #fp = sys.argv[1]
@@ -20,5 +20,6 @@ for tag in soup.find_all(string=re.compile("nur")):
 #soup.find(string=re.compile("Test"))
 #print(soup("w:b"))
 
-for tag in soup.find_all("w:t"):
-    print(tag)
+for tag in soup.find_all("w:b"):
+    a=tag.parent
+    print(a.text)
