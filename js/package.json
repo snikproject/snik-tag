@@ -1,0 +1,18 @@
+{
+  "name": "snik-tag",
+  "version": "0.0.0",
+  "description": "SNIK Tag",
+  "main": "test.js",
+  "scripts": {
+    "test": "node --experimental-modules test.mjs"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/IMISE/snik-tag.git"
+  },
+  "bugs": { "url": "https://github.com/IMISE/snik-tag/issues"},
+  "homepage": "https://github.com/IMISE/snik-tag#readme",
+  "devDependencies": {
+    "docx4js": "^3.1.31"
+  }
+}
