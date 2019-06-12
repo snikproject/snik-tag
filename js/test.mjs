@@ -8,7 +8,8 @@ docx4js.load("../benchmark/input.docx").then(docx=>
 	const content = docx.officeDocument.content("w\\:b");
 	for(let i=0; i<content.length; i++)
 	{
-		console.log(Object.getOwnPropertyNames(content[i].));
+		//console.log(Object.getOwnPropertyNames(content[i]));
+		console.log(content[i]);
 		break;
 	}
 	//docx.save("output.docx")
