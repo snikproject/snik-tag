@@ -91,9 +91,9 @@ public class Main
 					System.out.println(text);
 				});
 		}
-			 */
-			MODEL.write(System.out,"Turtle");
+			 */			
 		}
+		MODEL.write(System.out,"Turtle");
 	}
 }
 
