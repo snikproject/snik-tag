@@ -3,6 +3,9 @@
 Semi-automatic extraction of RDF triples from text based on the SNIK meta model.
 Support authors of medical informatics textbooks.
 
+## Java
+Uses project lombok and may require [setup for your IDE](https://projectlombok.org/setup/overview).
+
 ## Input
 A .docx word document where meta model subtop classes are annotated using formatting as **Role**, *Entity Type* and <u>Function</u>.
 
