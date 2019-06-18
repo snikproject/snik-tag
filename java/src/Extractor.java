@@ -1,6 +1,8 @@
 import java.io.File;
 import java.io.StringWriter;
 import java.math.BigInteger;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import javax.xml.bind.JAXBException;
 import org.apache.commons.text.WordUtils;
@@ -22,8 +24,11 @@ import org.docx4j.wml.Text;
 public class Extractor
 {
 	static final Model MODEL = ModelFactory.createDefaultModel();
-	static final String BB2 = "http://www.snik.eu/ontology/bb2/";
-	static final String META = "http://www.snik.eu/ontology/meta/";
+//	static final String BB2 = "http://www.snik.eu/ontology/bb2/";
+//	static final String META = "http://www.snik.eu/ontology/meta/";
+	static final String BB2 = "bb2:";
+	static final String META = "meta:";
+	
 	static final Resource ENTITY_TYPE = MODEL.createResource(META+"EntityType"); 
 	static final Resource FUNCTION = MODEL.createResource(META+"Function");
 	static final Resource ROLE = MODEL.createResource(META+"Role");
@@ -43,10 +48,10 @@ public class Extractor
 
 	public static void main(String[] args) throws Docx4JException, JAXBException
 	{
-		System.out.println(extract(new File("../benchmark/input.docx")));
+		System.out.println(extract(new File("../benchmark/input.docx")).toString().replaceAll("\\), ", "\\),\n"));
 	}
 
-		public static String extract(File docxFile) throws Docx4JException, JAXBException
+		public static Collection<SnikClass> extract(File docxFile) throws Docx4JException, JAXBException
 	{		
 		MODEL.setNsPrefix("bb2",BB2);
 		MODEL.setNsPrefix("meta",META);
@@ -73,6 +78,8 @@ public class Extractor
 
 		Object[][] tagClasses = {{"w:b","Entity Type",ENTITY_TYPE},{"w:i","Role",ROLE},{"w:u","Function",FUNCTION}};
 
+		var classes = new ArrayList<SnikClass>();
+		
 		for(var tc: tagClasses)
 		{
 			String tag = (String)tc[0];
@@ -95,18 +102,19 @@ public class Extractor
 				run.getContent().add(commentRef);
 				commentRef.setId(BigInteger.valueOf(commentId));				
 
-				Model model = ModelFactory.createDefaultModel();
-				Resource r = model.createResource(labelToUri(name),(Resource)tc[2]);
-				r.addLiteral(RDFS.label, MODEL.createLiteral(name, "en"));					
-				MODEL.add(model);				
+				classes.add(new SnikClass(name,labelToUri(name),((Resource)tc[2]).getURI()));
+//				Model model = ModelFactory.createDefaultModel();
+//				Resource r = model.createResource(labelToUri(name),(Resource)tc[2]);
+//				r.addLiteral(RDFS.label, MODEL.createLiteral(name, "en"));					
+//				MODEL.add(model);				
 			}
-
 		}
 
-		Docx4J.save(wordMLPackage, new File("test.docx"));
-		var writer = new StringWriter();
-		MODEL.write(writer,"Turtle");
-		return writer.toString();
+//		Docx4J.save(wordMLPackage, new File("test.docx"));
+//		var writer = new StringWriter();
+//		MODEL.write(writer,"Turtle");
+//		return writer.toString();
+		return classes;
 	}
 }
 
