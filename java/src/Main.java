@@ -66,14 +66,13 @@ public class Main extends Application
 			{
 				rdfTab.setClosable(false);
 				rdfTab.setText("RDF");
-				rdfTab.setContent(rdfText);
-				tabPane.getTabs().add(rdfTab);
+				rdfTab.setContent(rdfText);			
 			}
 			Tab tab = new Tab();
 			{
 				tab.setClosable(false);
-				tab.setText("RDF");
-				tab.setContent(rdfText);
+				tab.setText("Klassen");
+				
 			}
 			tabPane.getTabs().addAll(rdfTab,tab);
 			pane.getChildren().add(tabPane);
