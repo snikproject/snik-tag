@@ -1,4 +1,7 @@
+package eu.snik.tag;
 import java.io.File;
+import java.util.Collection;
+import java.util.Collections;
 import javafx.application.Application;
 import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.geometry.Pos;
@@ -12,6 +15,7 @@ import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.control.cell.TextFieldTableCell;
 import javafx.scene.layout.VBox;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
@@ -21,63 +25,93 @@ public class Main extends Application
 {
 	final TextArea rdfText = new TextArea("Ihr extrahierter Text");
 	final TableView tableView = tableView();
-	
+
+	Collection<Clazz> classes = Collections.emptyList();
+
+	void update()
+	{
+		rdfText.setText(classes.toString());
+	}
+
 	@SneakyThrows
 	void openDocx(File file)
 	{
-		var classes = Extractor.extract(file);
-		
-		rdfText.setText(classes.toString());
+		classes = Extractor.extract(file);
+		update();
 		tableView.getItems().clear();
 		tableView.getItems().addAll(classes);
 	}
 
 
-	TableView tableView()
+	TableView<Clazz> tableView()
 	{
-		var tableView = new TableView<>();
-		
-		var nameColumn = new TableColumn<>("Name");
-		nameColumn.setCellValueFactory(new PropertyValueFactory<>("name"));
-		nameColumn.setMinWidth(300);
+		var tableView = new TableView<Clazz>();
+		tableView.setEditable(true);		
 
-		var uriColumn = new TableColumn<>("URI");
-		uriColumn.setCellValueFactory(new PropertyValueFactory<>("uri"));
-		uriColumn.setMinWidth(300);
-		
-		var subtopColumn = new TableColumn<>("Type");
-		subtopColumn.setCellValueFactory(new PropertyValueFactory<>("subtop"));
-		subtopColumn.setMinWidth(300);
-		
-		var removeCol = new TableColumn<>("Entfernen");
-		removeCol.setCellValueFactory(param -> new ReadOnlyObjectWrapper<>(param.getValue()));
-		removeCol.setCellFactory(param -> new TableCell<Object,Object>() {
-		    private final Button deleteButton = new Button("X");
-
-		    @Override
-		    protected void updateItem(Object person, boolean empty) {
-		        super.updateItem(person, empty);
-
-		        if (person == null) {
-		            setGraphic(null);
-		            return;
-		        }
-
-		        setGraphic(deleteButton);
-		        deleteButton.setOnAction(
-		            event -> getTableView().getItems().remove(person)
-		        );
-		    }
+		var labelCol = new TableColumn<Clazz,String>("Label");
+		labelCol.setCellValueFactory(new PropertyValueFactory<>("label"));
+		labelCol.setCellFactory(TextFieldTableCell.<Clazz>forTableColumn());
+		labelCol.setMinWidth(300);
+		labelCol.setOnEditCommit(e->
+		{
+			e.getRowValue().setLabel(e.getNewValue());
+			update();
 		});
+
+		var localNameCol = new TableColumn<Clazz,String>("Local Name");
+		localNameCol.setCellValueFactory(new PropertyValueFactory<>("localName"));
+		localNameCol.setMinWidth(300);
+		localNameCol.setOnEditCommit(e->
+		{
+			e.getRowValue().setLocalName(e.getNewValue());
+			update();
+		});
+
+
+		var subtopCol = new TableColumn<Clazz,Subtop>("Type");
+		subtopCol.setCellValueFactory(new PropertyValueFactory<>("subtop"));
+		subtopCol.setMinWidth(300);
+
+		var relationCol = new TableColumn<Clazz,Object>("Type");
 		
-		tableView.getColumns().addAll(nameColumn,uriColumn,subtopColumn,removeCol);
-		
+		var removeCol = new TableColumn<Clazz,Clazz>("Entfernen");
+		removeCol.setCellValueFactory(param -> new ReadOnlyObjectWrapper<>(param.getValue()));
+
+		removeCol.setCellFactory(param -> new TableCell<Clazz,Clazz>()
+		{
+			final Button deleteButton = new Button("X");
+
+			@Override
+			protected void updateItem(Clazz clazz, boolean empty)
+			{
+				super.updateItem(clazz, empty);
+
+				if (clazz == null) {
+					setGraphic(null);
+					return;
+				}
+
+				setGraphic(deleteButton);
+				deleteButton.setOnAction(
+						event -> 
+						{
+							getTableView().getItems().remove(clazz);
+							classes.remove(clazz);
+							update();
+						}
+						);
+			}
+		});
+
+		tableView.getColumns().addAll(labelCol,localNameCol,subtopCol,removeCol);
+
 		return tableView;
 	}
 
 
 	@Override
-	public void start(Stage stage) {
+	public void start(Stage stage)
+	{		
 		String javaVersion = System.getProperty("java.version");
 		String javafxVersion = System.getProperty("javafx.version");		
 
@@ -96,7 +130,7 @@ public class Main extends Application
 
 
 		pane.getChildren().add(openButton);
-		
+
 		rdfText.setMinSize(300, 500);		
 
 		openButton.setOnAction(e->
@@ -129,11 +163,12 @@ public class Main extends Application
 			}
 			tabPane.getTabs().addAll(rdfTab,tab);
 			pane.getChildren().add(tabPane);
-		}		
+		}
+		openDocx(new File("../benchmark/input.docx"));
 	}
 
 	public static void main(String[] args) {
-		launch();
+		launch();		
 	}
 
 }

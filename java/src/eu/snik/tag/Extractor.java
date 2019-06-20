@@ -1,3 +1,4 @@
+package eu.snik.tag;
 import java.io.File;
 import java.io.StringWriter;
 import java.math.BigInteger;
@@ -23,38 +24,38 @@ import org.docx4j.wml.Text;
 
 public class Extractor
 {
-	static final Model MODEL = ModelFactory.createDefaultModel();
-//	static final String BB2 = "http://www.snik.eu/ontology/bb2/";
-//	static final String META = "http://www.snik.eu/ontology/meta/";
-	static final String BB2 = "bb2:";
-	static final String META = "meta:";
+//	static final Model MODEL = ModelFactory.createDefaultModel();
+//	static final String BB2 = "bb2:";
+//	static final String META = "meta:";
+	{
+//	MODEL.setNsPrefix("bb2",BB2);
+//	MODEL.setNsPrefix("meta",META);
+	}
 	
-	static final Resource ENTITY_TYPE = MODEL.createResource(META+"EntityType"); 
-	static final Resource FUNCTION = MODEL.createResource(META+"Function");
-	static final Resource ROLE = MODEL.createResource(META+"Role");
-	
+//	static final Resource ENTITY_TYPE = MODEL.createResource(META+"EntityType"); 
+//	static final Resource FUNCTION = MODEL.createResource(META+"Function");
+//	static final Resource ROLE = MODEL.createResource(META+"Role");
+//	
  static ObjectFactory factory = Context.getWmlObjectFactory();
  static int commentId = 10000;
 
-	static String labelToUri(String label)
+	static String labelToLocalName(String label)
 	{
-		return BB2+WordUtils.capitalizeFully(label).replaceAll(" ","");
+		return WordUtils.capitalizeFully(label).replaceAll(" ","");
 	}
 
-	static String labelToTriple(String label)
-	{
-		return labelToUri(label)+" rdfs:label "+'"'+label.trim()+'"'+"@en.";
-	}
+//	static String labelToTriple(String label)
+//	{
+//		return labelToLocalName(label)+" rdfs:label "+'"'+label.trim()+'"'+"@en.";
+//	}
 
 	public static void main(String[] args) throws Docx4JException, JAXBException
 	{
 		System.out.println(extract(new File("../benchmark/input.docx")).toString().replaceAll("\\), ", "\\),\n"));
 	}
 
-		public static Collection<SnikClass> extract(File docxFile) throws Docx4JException, JAXBException
+		public static Collection<Clazz> extract(File docxFile) throws Docx4JException, JAXBException
 	{		
-		MODEL.setNsPrefix("bb2",BB2);
-		MODEL.setNsPrefix("meta",META);
 
 		var wordMLPackage =	Docx4J.load(docxFile);
 
@@ -76,9 +77,9 @@ public class Extractor
 //		}
 		
 
-		Object[][] tagClasses = {{"w:b","Entity Type",ENTITY_TYPE},{"w:i","Role",ROLE},{"w:u","Function",FUNCTION}};
+		Object[][] tagClasses = {{"w:b","Entity Type",Subtop.ENTITY_TYPE},{"w:i","Role",Subtop.ROLE},{"w:u","Function",Subtop.FUNCTION}};
 
-		var classes = new ArrayList<SnikClass>();
+		var classes = new ArrayList<Clazz>();
 		
 		for(var tc: tagClasses)
 		{
@@ -97,12 +98,11 @@ public class Extractor
 				Text commentText = factory.createText();
 				commentText.setValue("this is a comment for "+name);
 				comment.getContent().add(commentText);
-				
 				CommentReference commentRef = factory.createRCommentReference();
 				run.getContent().add(commentRef);
 				commentRef.setId(BigInteger.valueOf(commentId));				
 
-				classes.add(new SnikClass(name,labelToUri(name),((Resource)tc[2]).getURI()));
+				classes.add(new Clazz(name,labelToLocalName(name),((Subtop)tc[2])));
 //				Model model = ModelFactory.createDefaultModel();
 //				Resource r = model.createResource(labelToUri(name),(Resource)tc[2]);
 //				r.addLiteral(RDFS.label, MODEL.createLiteral(name, "en"));					
