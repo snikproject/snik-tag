@@ -1,21 +1,21 @@
 package eu.snik.tag;
 import java.io.File;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
-import java.util.Collections;
+import java.util.stream.Collectors;
 import javafx.application.Application;
-import javafx.beans.property.ReadOnlyObjectWrapper;
+import javafx.beans.value.ChangeListener;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
+import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
-import javafx.scene.control.TableCell;
-import javafx.scene.control.TableColumn;
-import javafx.scene.control.TableView;
 import javafx.scene.control.TextArea;
-import javafx.scene.control.cell.PropertyValueFactory;
-import javafx.scene.control.cell.TextFieldTableCell;
 import javafx.scene.layout.VBox;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
@@ -24,89 +24,66 @@ import lombok.SneakyThrows;
 public class Main extends Application
 {
 	final TextArea rdfText = new TextArea("Ihr extrahierter Text");
-	final TableView tableView = tableView();
 
-	Collection<Clazz> classes = Collections.emptyList();
+	final ObservableList<Clazz> classes = FXCollections.observableArrayList();
+
+	final ClassTableView tableView = new ClassTableView(classes, this::update);
+
+	ComboBox<Clazz> subjectBox = new ComboBox<>();
+	ComboBox<Clazz> objectBox = new ComboBox<>();
+	ComboBox<Relation> predicateBox = new ComboBox<>();
+	Button addButton = new Button("Verbindung hinzufügen");
+	{
+		subjectBox.setPromptText("Subjekt auswählen");
+		objectBox.setPromptText("Objekt auswählen");
+		predicateBox.setPromptText("Verbindung auswählen");
+
+		ChangeListener<Clazz> classListener = (ov,old,neww)->
+		{
+			if(objectBox.getValue()==null||subjectBox.getValue()==null)
+			{
+				predicateBox.getItems().clear();
+				return;
+			}
+			predicateBox.setItems(FXCollections.observableArrayList(
+					Arrays
+					.stream(Relation.values())
+					.filter(r->r.domain==subjectBox.getValue().subtop&&r.range==objectBox.getValue().subtop)
+					.collect(Collectors.toList())
+					));
+		};
+
+		subjectBox.valueProperty().addListener(classListener);
+		objectBox.valueProperty().addListener(classListener);
+		
+		addButton.setOnAction(e->
+		{
+			if(subjectBox.getValue()==null||objectBox.getValue()==null||predicateBox.getValue()==null) {return;}
+			subjectBox.getValue().addTriple(predicateBox.getValue(), objectBox.getValue());
+			subjectBox.setValue(null);
+			objectBox.setValue(null);
+			predicateBox.setValue(null);
+		});
+	}
 
 	void update()
 	{
 		rdfText.setText(classes.toString());
+		subjectBox.setItems(classes);
+		objectBox.setItems(classes);		
 	}
 
 	@SneakyThrows
 	void openDocx(File file)
 	{
-		classes = Extractor.extract(file);
+		classes.clear();
+		classes.addAll(Extractor.extract(file));
 		update();
 		tableView.getItems().clear();
 		tableView.getItems().addAll(classes);
 	}
 
 
-	TableView<Clazz> tableView()
-	{
-		var tableView = new TableView<Clazz>();
-		tableView.setEditable(true);		
-
-		var labelCol = new TableColumn<Clazz,String>("Label");
-		labelCol.setCellValueFactory(new PropertyValueFactory<>("label"));
-		labelCol.setCellFactory(TextFieldTableCell.<Clazz>forTableColumn());
-		labelCol.setMinWidth(300);
-		labelCol.setOnEditCommit(e->
-		{
-			e.getRowValue().setLabel(e.getNewValue());
-			update();
-		});
-
-		var localNameCol = new TableColumn<Clazz,String>("Local Name");
-		localNameCol.setCellValueFactory(new PropertyValueFactory<>("localName"));
-		localNameCol.setMinWidth(300);
-		localNameCol.setOnEditCommit(e->
-		{
-			e.getRowValue().setLocalName(e.getNewValue());
-			update();
-		});
-
-
-		var subtopCol = new TableColumn<Clazz,Subtop>("Type");
-		subtopCol.setCellValueFactory(new PropertyValueFactory<>("subtop"));
-		subtopCol.setMinWidth(300);
-
-		var relationCol = new TableColumn<Clazz,Object>("Type");
-		
-		var removeCol = new TableColumn<Clazz,Clazz>("Entfernen");
-		removeCol.setCellValueFactory(param -> new ReadOnlyObjectWrapper<>(param.getValue()));
-
-		removeCol.setCellFactory(param -> new TableCell<Clazz,Clazz>()
-		{
-			final Button deleteButton = new Button("X");
-
-			@Override
-			protected void updateItem(Clazz clazz, boolean empty)
-			{
-				super.updateItem(clazz, empty);
-
-				if (clazz == null) {
-					setGraphic(null);
-					return;
-				}
-
-				setGraphic(deleteButton);
-				deleteButton.setOnAction(
-						event -> 
-						{
-							getTableView().getItems().remove(clazz);
-							classes.remove(clazz);
-							update();
-						}
-						);
-			}
-		});
-
-		tableView.getColumns().addAll(labelCol,localNameCol,subtopCol,removeCol);
-
-		return tableView;
-	}
 
 
 	@Override
@@ -143,10 +120,17 @@ public class Main extends Application
 		var relationPane = new VBox();
 		{
 			relationPane.setAlignment(Pos.CENTER);
-			Label l = new Label("Ziehen Sie bitte zwei Klassen in die Felder, wählen Sie die passende Relation aus und bestätigen.");
-			relationPane.getChildren().addAll(l);
+			Label l = new Label("Wählen Sie bitte zwei Klassen und eine passende Relation aus.");			
+
+			relationPane.getChildren().addAll(l,subjectBox,objectBox,predicateBox,addButton);
 		}
 
+		Tab tableTab = new Tab();
+		{
+			tableTab.setClosable(false);
+			tableTab.setText("Klassen");
+			tableTab.setContent(tableView);
+		}
 		{
 			TabPane tabPane = new TabPane();
 			Tab rdfTab = new Tab();
@@ -155,13 +139,14 @@ public class Main extends Application
 				rdfTab.setText("RDF");
 				rdfTab.setContent(rdfText);			
 			}
-			Tab tab = new Tab();
+			Tab relationTab = new Tab();
 			{
-				tab.setClosable(false);
-				tab.setText("Klassen");
-				tab.setContent(tableView);
+				relationTab.setClosable(false);
+				relationTab.setText("Verbindungen");
+				relationTab.setContent(relationPane);
 			}
-			tabPane.getTabs().addAll(rdfTab,tab);
+
+			tabPane.getTabs().addAll(tableTab,rdfTab,relationTab);
 			pane.getChildren().add(tabPane);
 		}
 		openDocx(new File("../benchmark/input.docx"));

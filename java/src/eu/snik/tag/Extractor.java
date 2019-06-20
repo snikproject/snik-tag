@@ -1,16 +1,11 @@
 package eu.snik.tag;
 import java.io.File;
-import java.io.StringWriter;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import javax.xml.bind.JAXBException;
 import org.apache.commons.text.WordUtils;
-import org.apache.jena.rdf.model.Model;
-import org.apache.jena.rdf.model.ModelFactory;
-import org.apache.jena.rdf.model.Resource;
-import org.apache.jena.vocabulary.RDFS;
 import org.docx4j.Docx4J;
 import org.docx4j.TextUtils;
 import org.docx4j.jaxb.Context;
@@ -77,7 +72,7 @@ public class Extractor
 //		}
 		
 
-		Object[][] tagClasses = {{"w:b","Entity Type",Subtop.ENTITY_TYPE},{"w:i","Role",Subtop.ROLE},{"w:u","Function",Subtop.FUNCTION}};
+		Object[][] tagClasses = {{"w:i","Entity Type",Subtop.ENTITY_TYPE},{"w:b","Role",Subtop.ROLE},{"w:u","Function",Subtop.FUNCTION}};
 
 		var classes = new ArrayList<Clazz>();
 		
