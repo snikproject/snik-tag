@@ -20,7 +20,7 @@
 				<artifactId>javafx-maven-plugin</artifactId>
 				<version>0.0.2</version>
 				<configuration>
-					<mainClass>eu.snik.tag.Main</mainClass>
+					<mainClass>eu.snik.tag.gui.Main</mainClass>
 				</configuration>
 			</plugin>
 		</plugins>

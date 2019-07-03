@@ -1,7 +1,6 @@
-package eu.snik.tag;
+package eu.snik.tag.gui;
 
 import java.io.File;
-import eu.snik.tag.util.ExceptionAlert;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Menu;

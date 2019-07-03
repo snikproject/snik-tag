@@ -1,6 +1,9 @@
-package eu.snik.tag;
+package eu.snik.tag.gui;
 
 import java.util.Collection;
+import eu.snik.tag.Clazz;
+import eu.snik.tag.Subtop;
+import eu.snik.tag.Triple;
 import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.scene.control.Button;
 import javafx.scene.control.TableCell;

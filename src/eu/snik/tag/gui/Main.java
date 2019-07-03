@@ -1,7 +1,10 @@
-package eu.snik.tag;
+package eu.snik.tag.gui;
 import java.io.File;
 import java.util.Arrays;
 import java.util.stream.Collectors;
+import eu.snik.tag.Clazz;
+import eu.snik.tag.Extractor;
+import eu.snik.tag.Relation;
 import javafx.application.Application;
 import javafx.beans.value.ChangeListener;
 import javafx.collections.FXCollections;

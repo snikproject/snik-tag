@@ -1,4 +1,4 @@
-package eu.snik.tag.util;
+package eu.snik.tag.gui;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;

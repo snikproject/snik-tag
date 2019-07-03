@@ -15,22 +15,22 @@ import lombok.Setter;
 @EqualsAndHashCode
 public class Clazz
 { 
-		String label;
-		String localName;
-		Subtop subtop;		
-		
-		final transient Model model = ModelFactory.createDefaultModel();
-				
-		@EqualsAndHashCode.Exclude
-		final Set<Triple> triples = new HashSet<>();
-		
-		public Set<Triple> getTriples() {return Collections.unmodifiableSet(triples);}
-		public void addTriple(Relation predicate,Clazz object) {triples.add(new Triple(this,predicate,object));}
+	public String label;
+	public String localName;
+	public Subtop subtop;		
 
-		@Override
-		public String toString()
-		{		
-			return label+','+localName+','+subtop;
-		}
+	final transient Model model = ModelFactory.createDefaultModel();
+
+	@EqualsAndHashCode.Exclude
+	final Set<Triple> triples = new HashSet<>();
+
+	public Set<Triple> getTriples() {return Collections.unmodifiableSet(triples);}
+	public void addTriple(Relation predicate,Clazz object) {triples.add(new Triple(this,predicate,object));}
+
+	@Override
+	public String toString()
+	{		
+		return label+','+localName+','+subtop;
+	}
 
 }
