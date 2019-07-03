@@ -96,7 +96,7 @@ public class Main extends Application
 			Scene scene = new Scene(pane, 1600, 1000);
 			scene.getStylesheets().add(getClass().getResource("main.css").toExternalForm());
 			stage.setScene(scene);
-			stage.setFullScreen(true);
+			stage.setMaximized(true);
 			stage.show();
 		}		
 		pane.getChildren().add(MainMenuBar.create(this));
@@ -137,7 +137,7 @@ public class Main extends Application
 			tabPane.getTabs().addAll(tableTab,rdfTab,relationTab);
 			pane.getChildren().add(tabPane);
 		}
-		openDocx(new File("../benchmark/input.docx"));
+		openDocx(new File("benchmark/input.docx"));
 	}
 
 	public static void main(String[] args) {
