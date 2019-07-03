@@ -48,6 +48,17 @@ public class Extractor
 	{
 		System.out.println(extract(new File("../benchmark/input.docx")).toString().replaceAll("\\), ", "\\),\n"));
 	}
+	
+	public static String extractText(File docxFile) throws Docx4JException, JAXBException
+{		
+
+	var wordMLPackage =	Docx4J.load(docxFile);
+
+	var doc = wordMLPackage.getMainDocumentPart();
+	return TextUtils.getText(doc.getContents());
+	//return doc.getContents()
+}
+
 
 		public static Collection<Clazz> extract(File docxFile) throws Docx4JException, JAXBException
 	{		
@@ -79,7 +90,7 @@ public class Extractor
 		for(var tc: tagClasses)
 		{
 			String tag = (String)tc[0];
-			String clazz = (String)tc[1];
+			//String clazz = (String)tc[1];
 			var runs = (List<R>)(List<?>)doc.getJAXBNodesViaXPath("//w:r[w:rPr/"+tag+"]", false);
 
 			for(R run: runs)

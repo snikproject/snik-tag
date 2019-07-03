@@ -1,20 +1,13 @@
 package eu.snik.tag.gui;
 import java.io.File;
-import java.util.Arrays;
-import java.util.stream.Collectors;
 import eu.snik.tag.Clazz;
 import eu.snik.tag.Extractor;
-import eu.snik.tag.Relation;
 import javafx.application.Application;
-import javafx.beans.value.ChangeListener;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.Scene;
-import javafx.scene.control.Button;
-import javafx.scene.control.ComboBox;
-import javafx.scene.control.Label;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
 import javafx.scene.control.TabPane.TabDragPolicy;
@@ -29,6 +22,11 @@ public class Main extends Application
 {
 	final TextArea rdfText = new TextArea("Ihr extrahierter Text");
 	final TextArea docxPane = new TextArea("Hier kommt das DOCX hin");
+	{
+		docxPane.setWrapText(true);
+		docxPane.setMinSize(900, 1000);
+		}
+	
 	final Pane textPane = new HBox(); 
 
 	final ObservableList<Clazz> classes = FXCollections.observableArrayList();
@@ -49,6 +47,7 @@ public class Main extends Application
 	{
 		classes.clear();
 		classes.addAll(Extractor.extract(file));
+		docxPane.setText(Extractor.extractText(file));
 		update();
 		tableView.getItems().clear();
 		tableView.getItems().addAll(classes);
