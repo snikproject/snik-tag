@@ -1,0 +1,3 @@
+.mnemonic-underline {
+    -fx-stroke: -fx-text-fill;
+}

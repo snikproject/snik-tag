@@ -1,8 +1,6 @@
 package eu.snik.tag;
 import java.io.File;
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.stream.Collectors;
 import javafx.application.Application;
 import javafx.beans.value.ChangeListener;
@@ -15,9 +13,9 @@ import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
+import javafx.scene.control.TabPane.TabDragPolicy;
 import javafx.scene.control.TextArea;
 import javafx.scene.layout.VBox;
-import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import lombok.SneakyThrows;
 
@@ -28,6 +26,8 @@ public class Main extends Application
 	final ObservableList<Clazz> classes = FXCollections.observableArrayList();
 
 	final ClassTableView tableView = new ClassTableView(classes, this::update);
+	
+	Stage stage;
 
 	ComboBox<Clazz> subjectBox = new ComboBox<>();
 	ComboBox<Clazz> objectBox = new ComboBox<>();
@@ -82,40 +82,27 @@ public class Main extends Application
 		tableView.getItems().clear();
 		tableView.getItems().addAll(classes);
 	}
-
-
-
+ 
 
 	@Override
 	public void start(Stage stage)
 	{		
-		String javaVersion = System.getProperty("java.version");
-		String javafxVersion = System.getProperty("javafx.version");		
-
+		this.stage=stage;	
+		stage.setTitle("SNIK Tag");
+		
 		var pane = new VBox();
 		{
-			pane.setAlignment(Pos.CENTER);
+			pane.setAlignment(Pos.TOP_CENTER);
 			Scene scene = new Scene(pane, 1600, 1000);
+			scene.getStylesheets().add(getClass().getResource("main.css").toExternalForm());
 			stage.setScene(scene);
+			stage.setFullScreen(true);
 			stage.show();
-		}
-		pane.getChildren().add(new Label(javafxVersion + ", running on Java " + javaVersion + "."));
+		}		
+		pane.getChildren().add(MainMenuBar.create(this));
 
-		var openChooser = new FileChooser();		
-		openChooser.setTitle(".docx Datei öffnen");
-		var openButton = new Button(".docx Datei öffnen");
-
-
-		pane.getChildren().add(openButton);
 
 		rdfText.setMinSize(300, 500);		
-
-		openButton.setOnAction(e->
-		{
-			File file = openChooser.showOpenDialog(stage);
-			if(file!=null) {openDocx(file);}
-		});
-
 
 		var relationPane = new VBox();
 		{
@@ -133,6 +120,7 @@ public class Main extends Application
 		}
 		{
 			TabPane tabPane = new TabPane();
+			tabPane.setTabDragPolicy(TabDragPolicy.REORDER);
 			Tab rdfTab = new Tab();
 			{
 				rdfTab.setClosable(false);
