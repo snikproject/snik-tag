@@ -10,6 +10,7 @@ import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyCodeCombination;
 import javafx.scene.input.KeyCombination;
 import javafx.stage.FileChooser;
+import javafx.stage.FileChooser.ExtensionFilter;
 
 public class MainMenuBar
 {
@@ -23,7 +24,8 @@ public class MainMenuBar
 			MenuItem openItem = new MenuItem("D_OCX Datei Öffnen");
 			fileMenu.getItems().add(openItem);
 			openItem.setAccelerator(new KeyCodeCombination(KeyCode.O,KeyCombination.CONTROL_DOWN));
-			var openChooser = new FileChooser();		
+			var openChooser = new FileChooser();
+			openChooser.getExtensionFilters().add(new ExtensionFilter("DOCX", "*.docx"));
 			openItem.setOnAction(e->
 			{
 				try
