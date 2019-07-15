@@ -17,7 +17,6 @@ import org.docx4j.wml.R.CommentReference;
 import org.docx4j.wml.Text;
 import lombok.extern.java.Log;
 
-@Log
 public class Extractor
 {
 	//	static final Model MODEL = ModelFactory.createDefaultModel();
@@ -120,7 +119,7 @@ public class Extractor
 		//		var writer = new StringWriter();
 		//		MODEL.write(writer,"Turtle");
 		//		return writer.toString();
-		log.info(classes.size()+" classes extracted.");
+		System.out.println(classes.size()+" classes extracted.");
 		return classes;
 	}
 }
