@@ -15,30 +15,33 @@ import javafx.scene.control.TextArea;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
+import javafx.scene.web.HTMLEditor;
 import javafx.stage.Stage;
 import lombok.SneakyThrows;
 
 public class Main extends Application
 {
 	final TextArea rdfText = new TextArea("Ihr extrahierter Text");
-	final TextArea docxPane = new TextArea("Hier kommt das DOCX hin");
+//	final TextArea docxPane = new TextArea("Hier kommt das DOCX hin");
+	final HTMLEditor docx = new HTMLEditor();
 	{
-		docxPane.setWrapText(true);
-		docxPane.setMinSize(900, 1000);
+//		docxPane.setWrapText(true);
+		docx.setMinSize(900, 1000);
+		docx.setMaxSize(Double.MAX_VALUE,Double.MAX_VALUE);
 		}
 	
 	final Pane textPane = new HBox(); 
 
 	final ObservableList<Clazz> classes = FXCollections.observableArrayList();
 
-	final ClassTableView tableView = new ClassTableView(classes, this::update);
+	final ClassTablePane tableView = new ClassTablePane(classes, this::update);
 
 	Stage stage;
 
 	public void update()
 	{
 		rdfText.setText(classes.toString());
-		tableView.refresh();
+		//tableView.refresh();
 //		relationPane.setClasses(classes);
 	}
 
@@ -47,11 +50,12 @@ public class Main extends Application
 	{
 		classes.clear();
 		classes.addAll(Extractor.extract(file));
-		docxPane.setText(Extractor.extractText(file));
+//		docx.setText(Extractor.extractText(file));
+		docx.setHtmlText(Extractor.extractHtml(file));
 		update();
-		tableView.getItems().clear();
-		tableView.getItems().addAll(classes);
-	}
+//		tableView.getItems().clear();
+//		tableView.getItems().addAll(classes);
+ }
 
 
 	class UnclosableTab extends Tab
@@ -82,7 +86,8 @@ public class Main extends Application
 		pane.getChildren().add(MainMenuBar.create(this));
 
 		rdfText.setMinSize(300, 500);			
-		textPane.getChildren().addAll(docxPane,new RelationPane(classes,this::update));
+		textPane.getChildren().addAll(docx,new RelationPane(classes,this::update));
+		docx.autosize();
 		
 		{
 			TabPane tabPane = new TabPane();

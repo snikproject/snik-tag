@@ -5,19 +5,42 @@ import eu.snik.tag.Clazz;
 import eu.snik.tag.Subtop;
 import eu.snik.tag.Triple;
 import javafx.beans.property.ReadOnlyObjectWrapper;
+import javafx.collections.ObservableList;
+import javafx.collections.transformation.FilteredList;
 import javafx.scene.control.Button;
 import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
+import javafx.scene.control.TextField;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.control.cell.TextFieldTableCell;
+import javafx.scene.layout.VBox;
 
-public class ClassTableView extends TableView<Clazz>
+public class ClassTablePane extends VBox
 {
 
-	public ClassTableView(Collection<Clazz> classes, Runnable update)
+	private TextField filterField = new TextField();
+
+	public ClassTablePane(final ObservableList<Clazz> classes,final Runnable update)
 	{
-		this.setEditable(true);		
+		var table = new TableView();		
+		table.setEditable(true);
+		table.setMinHeight(1000);
+		this.getChildren().addAll(filterField,table);
+
+		final var filteredClasses = new FilteredList<Clazz>(classes);
+		table.setItems(filteredClasses);
+		//this.getItems().addAll(filteredClasses);
+
+		filterField.textProperty().addListener((observable, oldValue, newValue) ->
+		{
+			filteredClasses.setPredicate(clazz ->
+			{
+				if (newValue == null || newValue.isEmpty()) {return true;}
+				String rowText = clazz.label+" "+clazz.localName+" "+clazz.subtop.name().replace('_',' ');
+				return rowText.toLowerCase().contains(newValue.toLowerCase());
+			});
+		});
 
 		var labelCol = new TableColumn<Clazz,String>("Label");
 		labelCol.setCellValueFactory(new PropertyValueFactory<>("label"));
@@ -64,7 +87,7 @@ public class ClassTableView extends TableView<Clazz>
 				deleteButton.setOnAction(
 						event -> 
 						{
-							getTableView().getItems().remove(clazz);
+							//getTableView().getItems().remove(clazz);
 							classes.remove(clazz);
 							update.run();
 						}
@@ -76,7 +99,7 @@ public class ClassTableView extends TableView<Clazz>
 		relationCol.setCellValueFactory(new PropertyValueFactory<>("triples"));
 		relationCol.setMinWidth(300);		
 
-		this.getColumns().addAll(labelCol,localNameCol,subtopCol,removeCol,relationCol);
+		table.getColumns().addAll(labelCol,localNameCol,subtopCol,removeCol,relationCol);
 	}
 
 }
