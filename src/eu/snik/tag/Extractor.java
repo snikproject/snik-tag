@@ -1,8 +1,8 @@
 package eu.snik.tag;
 import java.io.File;
 import java.math.BigInteger;
-import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
 import javax.xml.bind.JAXBException;
 import org.apache.commons.text.WordUtils;
@@ -15,8 +15,9 @@ import org.docx4j.wml.ObjectFactory;
 import org.docx4j.wml.R;
 import org.docx4j.wml.R.CommentReference;
 import org.docx4j.wml.Text;
+import lombok.extern.java.Log;
 
-
+@Log
 public class Extractor
 {
 	//	static final Model MODEL = ModelFactory.createDefaultModel();
@@ -84,7 +85,7 @@ public class Extractor
 
 		Object[][] tagClasses = {{"w:i","Entity Type",Subtop.ENTITY_TYPE},{"w:b","Role",Subtop.ROLE},{"w:u","Function",Subtop.FUNCTION}};
 
-		var classes = new ArrayList<Clazz>();
+		var classes = new HashSet<Clazz>();
 
 		for(var tc: tagClasses)
 		{
@@ -119,6 +120,7 @@ public class Extractor
 		//		var writer = new StringWriter();
 		//		MODEL.write(writer,"Turtle");
 		//		return writer.toString();
+		log.info(classes.size()+" classes extracted.");
 		return classes;
 	}
 }
