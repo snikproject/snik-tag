@@ -48,18 +48,6 @@ public class Extractor
 	{
 		System.out.println(extract(new File("../benchmark/input.docx")).toString().replaceAll("\\), ", "\\),\n"));
 	}
-
-	public static String extractHtml(File docxFile) throws Docx4JException, JAXBException
-	{
-		String text = extractText(docxFile);
-		var classes = extract(docxFile);
-		String html = "<html><body>"+text+"</body></html>";
-		for(var clazz: classes)
-		{
-			html = html.replace(clazz.label, clazz.subtop.htmlTagOpen+clazz.label+clazz.subtop.htmlTagClosed);
-		}
-		return html;
-	}
 	
 	public static String extractText(File docxFile) throws Docx4JException, JAXBException
 	{		
