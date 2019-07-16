@@ -25,7 +25,7 @@ public class ClassTextArea extends HTMLEditor
 		refresh();
 	}
 
-	private void refresh()
+	public void refresh()
 	{
 		String html = "<html><body contentEditable=\"false\">"+text+"</body></html>";
 		for(var clazz: classes)

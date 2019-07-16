@@ -12,6 +12,7 @@ import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
+import javafx.scene.control.cell.ComboBoxTableCell;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.control.cell.TextFieldTableCell;
 import javafx.scene.layout.VBox;
@@ -54,6 +55,7 @@ public class ClassTable extends VBox
 
 		var localNameCol = new TableColumn<Clazz,String>("Local Name");
 		localNameCol.setCellValueFactory(new PropertyValueFactory<>("localName"));
+		localNameCol.setCellFactory(TextFieldTableCell.<Clazz>forTableColumn());
 		localNameCol.setMinWidth(300);
 		localNameCol.setOnEditCommit(e->
 		{
@@ -64,7 +66,14 @@ public class ClassTable extends VBox
 
 		var subtopCol = new TableColumn<Clazz,Subtop>("Type");
 		subtopCol.setCellValueFactory(new PropertyValueFactory<>("subtop"));
-		subtopCol.setMinWidth(300);		
+		subtopCol.setCellFactory(ComboBoxTableCell.forTableColumn(Subtop.values()));
+		subtopCol.setMinWidth(300);
+		subtopCol.setOnEditCommit(e->
+		{
+			e.getRowValue().setSubtop(e.getNewValue());
+			update.run();
+		});
+
 
 		var removeCol = new TableColumn<Clazz,Clazz>("Entfernen");
 		removeCol.setCellValueFactory(param -> new ReadOnlyObjectWrapper<>(param.getValue()));

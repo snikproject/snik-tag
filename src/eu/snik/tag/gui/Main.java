@@ -37,6 +37,7 @@ public class Main extends Application
 	public void update()
 	{
 		rdfText.setText(classes.toString());
+		textArea.refresh();
 	}
 
 	@SneakyThrows
