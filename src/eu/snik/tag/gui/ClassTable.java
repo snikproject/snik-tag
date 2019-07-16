@@ -16,12 +16,12 @@ import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.control.cell.TextFieldTableCell;
 import javafx.scene.layout.VBox;
 
-public class ClassTablePane extends VBox
+public class ClassTable extends VBox
 {
 
 	private TextField filterField = new TextField();
 
-	public ClassTablePane(final ObservableList<Clazz> classes,final Runnable update)
+	public ClassTable(final ObservableList<Clazz> classes,final Runnable update)
 	{
 		var table = new TableView();		
 		table.setEditable(true);

@@ -30,7 +30,7 @@ public class Main extends Application
 	ClassTextArea textArea = new ClassTextArea(classes);
 
 
-	final ClassTablePane tableView = new ClassTablePane(classes, this::update);
+	final ClassTable tableView = new ClassTable(classes, this::update);
 
 	Stage stage;
 
