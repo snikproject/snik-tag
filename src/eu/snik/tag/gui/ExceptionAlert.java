@@ -8,6 +8,7 @@ import javafx.scene.control.TextArea;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Priority;
 
+/** Shows an exception to the user. */
 public class ExceptionAlert extends Alert
 {
 	

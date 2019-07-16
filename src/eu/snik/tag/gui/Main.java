@@ -17,27 +17,29 @@ import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import lombok.SneakyThrows;
 
+/** GUI entry point. Run with Maven via javafx:run. */
 public class Main extends Application
 {
-	final Pane textPane = new HBox(); 
+	public final ObservableList<Clazz> classes = FXCollections.observableArrayList();
+	
+	private final Pane textPane = new HBox();
 
-	final ObservableList<Clazz> classes = FXCollections.observableArrayList();
+	private final RDFArea rdfText = new RDFArea(classes);
 
-	final RDFArea rdfText = new RDFArea(classes);
+	private ClassTextArea textArea = new ClassTextArea(classes);
 
-	ClassTextArea textArea = new ClassTextArea(classes);
+	private final ClassTable tableView = new ClassTable(classes, this::refresh);
 
+	public Stage stage;
 
-	final ClassTable tableView = new ClassTable(classes, this::update);
-
-	Stage stage;
-
-	public void update()
+	/** Refresh the different visualizations of the RDF classes. Use after classes are modified.*/
+	public void refresh()
 	{		
 		textArea.refresh();
 		rdfText.refresh();
 	}
 
+	/** @param file DOCX file with tagged entity types (italic), roles (bold) and functions (function).*/
 	@SneakyThrows
 	void openDocx(File file)
 	{
@@ -45,11 +47,10 @@ public class Main extends Application
 		classes.addAll(Extractor.extract(file));
 		textArea.setText(Extractor.extractText(file));
 		
-		update();		
+		refresh();		
 	}
 
-
-	class UnclosableTab extends Tab
+	private class UnclosableTab extends Tab
 	{
 		UnclosableTab(String text, Node content)
 		{
@@ -58,7 +59,7 @@ public class Main extends Application
 		}
 	}
 
-
+	/** Setup the GUI and load an example tagged DOCX file. Called automatically with "mvn javafx:run".*/
 	@Override
 	public void start(Stage stage)
 	{		
@@ -77,7 +78,7 @@ public class Main extends Application
 		pane.getChildren().add(MainMenuBar.create(this));
 
 		rdfText.setMinSize(300, 500);			
-		textPane.getChildren().addAll(textArea,new RelationPane(classes,this::update));		
+		textPane.getChildren().addAll(textArea,new RelationPane(classes,this::refresh));		
 		{
 			TabPane tabPane = new TabPane();
 			tabPane.setTabDragPolicy(TabDragPolicy.REORDER);			
@@ -86,15 +87,13 @@ public class Main extends Application
 					new UnclosableTab("Text", textPane),
 					new UnclosableTab("Klassen", tableView),
 					new UnclosableTab("RDF", rdfText),
-					new UnclosableTab("Verbindungen", new RelationPane(classes,this::update)));
+					new UnclosableTab("Verbindungen", new RelationPane(classes,this::refresh)));
 
 			pane.getChildren().add(tabPane);
 		}
 		openDocx(new File("benchmark/input.docx"));
 	}
 
-	public static void main(String[] args) {
-		launch();		
-	}
+	public static void main(String[] args) {launch();} // Running this directly may fail. Use "mvn javafx:run" instead. 
 
 }

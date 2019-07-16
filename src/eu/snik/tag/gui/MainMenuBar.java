@@ -17,6 +17,7 @@ import javafx.stage.FileChooser.ExtensionFilter;
 import lombok.SneakyThrows;
 import lombok.extern.java.Log;
 
+/** File and Help menu. */
 @Log
 public class MainMenuBar
 {

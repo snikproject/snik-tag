@@ -13,16 +13,20 @@ import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.layout.VBox;
 
+/** Lets the user add relations that are allowed by the meta model between any two classes.
+ * Two instances of relation pane are used in different tabs (alone and together with the text).
+ * There are subtop combinations with no viable relation in that direction. */
 public class RelationPane extends VBox
 {
-	final ComboBox<Clazz> subjectBox = new ComboBox<>();
-	final ComboBox<Clazz> objectBox = new ComboBox<>();
-	final ComboBox<Relation> predicateBox = new ComboBox<>();
-
-//	void setClasses(Collection<Clazz> classes)
-//	{
-//	}
+	private final ComboBox<Clazz> subjectBox = new ComboBox<>();
+	private final ComboBox<Clazz> objectBox = new ComboBox<>();
+	private final ComboBox<Relation> predicateBox = new ComboBox<>();
 	
+	/** 
+	 * @param classes selected classes that are removed will automatically be deselected. Added classes are automatically added.
+	 * Modified classes are not updated.  
+	 * @param addCallback will be called when the user adds a new relation. No parameters.
+	 */ 
 	RelationPane(ObservableList<Clazz> classes, Runnable addCallback)
 	{
 		setAlignment(Pos.CENTER);

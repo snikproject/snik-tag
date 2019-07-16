@@ -4,12 +4,14 @@ import org.apache.jena.rdf.model.ResourceFactory;
 import org.apache.jena.rdf.model.Statement;
 import lombok.EqualsAndHashCode;
 
+/** A triple connecting two SNIK classes using a meta model relation.*/
 @EqualsAndHashCode
 public class Triple
 {
 	final Clazz subject,object;
 	final Relation predicate;
-	
+
+	/**@throws IllegalArgumentException if domain or range of the predicate are violated by the subtop of the subject or object, respectively.	 */
 	public Triple(Clazz subject, Relation predicate, Clazz object) throws IllegalArgumentException
 	{		
 		if(predicate.domain!=subject.subtop) {throw new IllegalArgumentException("Domain of "+predicate+" is "+predicate.domain+" but subject subtop is "+subject.subtop);}
@@ -26,6 +28,7 @@ public class Triple
 		return '('+subject.localName+", "+predicate+", "+object.localName+')';
 	}
 	
+	/** @return create a statement that represents this triple. */
 	public Statement statement()
 	{
 		return ResourceFactory.createStatement(subject.resource(), predicate.property, object.resource());

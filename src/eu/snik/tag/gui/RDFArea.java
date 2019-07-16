@@ -9,6 +9,7 @@ import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 import javafx.scene.control.TextArea;
 
+/** Displays all extracted RDF classes and relations as RDF turtle. */
 public class RDFArea extends TextArea
 {
 	final ObservableList<Clazz> classes;
@@ -20,6 +21,8 @@ public class RDFArea extends TextArea
 		this.setEditable(false);
 	}
 
+		/** @param classes SNIK classes with triples
+	@return a Jena model of all triples with the classes as subjects. */
 	public static Model rdfModel(Collection<Clazz> classes)
 	{
 		Model model = ModelFactory.createDefaultModel();

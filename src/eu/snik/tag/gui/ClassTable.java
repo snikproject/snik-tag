@@ -17,14 +17,18 @@ import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.control.cell.TextFieldTableCell;
 import javafx.scene.layout.VBox;
 
+/** Table of RDF classes with a filter search bar. */
 public class ClassTable extends VBox
 {
 
 	private TextField filterField = new TextField();
 
+		/** @param classes may still be empty at constructor call time
+	 * @param update	 callback that is run when the user changes a class.
+	 * This is necessary because an observable list's change listeners only fire when a class is added or removed, not changed.*/
 	public ClassTable(final ObservableList<Clazz> classes,final Runnable update)
 	{
-		var table = new TableView();		
+		var table = new TableView<Clazz>();		
 		table.setEditable(true);
 		table.setMinHeight(1000);
 		this.getChildren().addAll(filterField,table);
