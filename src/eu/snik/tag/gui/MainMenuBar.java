@@ -1,7 +1,9 @@
 package eu.snik.tag.gui;
 
+import java.awt.Desktop;
 import java.io.File;
 import java.io.FileWriter;
+import java.net.URI;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Menu;
@@ -12,7 +14,10 @@ import javafx.scene.input.KeyCodeCombination;
 import javafx.scene.input.KeyCombination;
 import javafx.stage.FileChooser;
 import javafx.stage.FileChooser.ExtensionFilter;
+import lombok.SneakyThrows;
+import lombok.extern.java.Log;
 
+@Log
 public class MainMenuBar
 {
 	private MainMenuBar() {};
@@ -34,7 +39,7 @@ public class MainMenuBar
 			}
 			catch(Exception ex) {new ExceptionAlert(ex).show();}
 		});
-	
+
 		MenuItem saveRdfItem = new MenuItem("_RDF Turtle Datei Exportieren");
 		fileMenu.getItems().add(saveRdfItem);
 		saveRdfItem.setAccelerator(new KeyCodeCombination(KeyCode.R,KeyCombination.CONTROL_DOWN));
@@ -57,20 +62,41 @@ public class MainMenuBar
 		return fileMenu;
 	}
 
-	public static MenuBar create(Main main)
+	@SneakyThrows
+	static Menu helpMenu()
 	{
-		Menu fileMenu = fileMenu(main);
-
 		Menu helpMenu = new Menu("_Hilfe");
+
 		MenuItem aboutItem = new MenuItem("Ü_ber");		
 		Alert aboutAlert = new Alert(AlertType.INFORMATION);
 		aboutItem.setOnAction(e->aboutAlert.show());
 		aboutAlert.setTitle("Über");
 		aboutAlert.setHeaderText("SNIK Tag 0.0.1");
-		aboutAlert.setContentText("JavaFX "+ System.getProperty("javafx.version") + ", running on Java " + System.getProperty("java.version") + ".");		
-		helpMenu.getItems().add(aboutItem);
+		aboutAlert.setContentText("JavaFX "+ System.getProperty("javafx.version") + ", running on Java " + System.getProperty("java.version") + ".");				
 
-		return new MenuBar(fileMenu,helpMenu);			
+		MenuItem reportItem = new MenuItem("Report Bug or Enhancement");		
+		reportItem.setOnAction(event->
+		{
+			if(!(Desktop.isDesktopSupported()&&Desktop.getDesktop().isSupported(Desktop.Action.BROWSE)))
+			{
+				new Alert(AlertType.WARNING, "Cannot open Website, not supported.").show();;
+				log.warning("Cannot open Website, not supported.");
+				return;
+			};
+			// Using the JavaFX thread for desktop hangs the program.
+			new Thread(()->{
+			try{Desktop.getDesktop().browse(new URI("https://github.com/IMISE/snik-tag/issues"));} catch (Exception e) {throw new RuntimeException(e);}
+			}).start();;
+		});
+
+		helpMenu.getItems().addAll(aboutItem,reportItem);
+
+		return helpMenu;
+	}
+
+	public static MenuBar create(Main main)
+	{
+		return new MenuBar(fileMenu(main),helpMenu());			
 	}
 
 }
