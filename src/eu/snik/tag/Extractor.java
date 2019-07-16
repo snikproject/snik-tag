@@ -82,7 +82,7 @@ public class Extractor
 		//		}
 
 
-		Object[][] tagClasses = {{"w:i","Entity Type",Subtop.ENTITY_TYPE},{"w:b","Role",Subtop.ROLE},{"w:u","Function",Subtop.FUNCTION}};
+		Object[][] tagClasses = {{"w:i","Entity Type",Subtop.EntityType},{"w:b","Role",Subtop.Role},{"w:u","Function",Subtop.Function}};
 
 		var classes = new HashSet<Clazz>();
 

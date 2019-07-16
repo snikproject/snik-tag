@@ -11,7 +11,6 @@ import javafx.scene.Scene;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
 import javafx.scene.control.TabPane.TabDragPolicy;
-import javafx.scene.control.TextArea;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
@@ -20,12 +19,11 @@ import lombok.SneakyThrows;
 
 public class Main extends Application
 {
-	final TextArea rdfText = new TextArea("Ihr extrahierter Text");
-	//	final TextArea docxPane = new TextArea("Hier kommt das DOCX hin");
-
 	final Pane textPane = new HBox(); 
 
 	final ObservableList<Clazz> classes = FXCollections.observableArrayList();
+
+	final RDFArea rdfText = new RDFArea(classes);
 
 	ClassTextArea textArea = new ClassTextArea(classes);
 
@@ -35,9 +33,9 @@ public class Main extends Application
 	Stage stage;
 
 	public void update()
-	{
-		rdfText.setText(classes.toString());
+	{		
 		textArea.refresh();
+		rdfText.refresh();
 	}
 
 	@SneakyThrows

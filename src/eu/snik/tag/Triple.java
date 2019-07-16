@@ -1,5 +1,7 @@
 package eu.snik.tag;
 
+import org.apache.jena.rdf.model.ResourceFactory;
+import org.apache.jena.rdf.model.Statement;
 import lombok.EqualsAndHashCode;
 
 @EqualsAndHashCode
@@ -22,5 +24,10 @@ public class Triple
 	public String toString()
 	{		
 		return '('+subject.localName+", "+predicate+", "+object.localName+')';
+	}
+	
+	public Statement statement()
+	{
+		return ResourceFactory.createStatement(subject.resource(), predicate.property, object.resource());
 	}
 }
