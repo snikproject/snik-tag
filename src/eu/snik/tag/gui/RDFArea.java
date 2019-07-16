@@ -1,6 +1,7 @@
 package eu.snik.tag.gui;
 
 import java.io.StringWriter;
+import java.util.Collection;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.ModelFactory;
 import eu.snik.tag.Clazz;
@@ -19,12 +20,17 @@ public class RDFArea extends TextArea
 		this.setEditable(false);
 	}
 
-	public void refresh()
+	public static Model rdfModel(Collection<Clazz> classes)
 	{
 		Model model = ModelFactory.createDefaultModel();
 		classes.stream().map(Clazz::rdfModel).forEach(model::add);
+		return model;
+	}
+	
+	public void refresh()
+	{
 		var writer = new StringWriter();
-		model.write(writer,"Turtle");
+		RDFArea.rdfModel(classes).write(writer,"Turtle");
 		setText(writer.toString());
 	}
 
