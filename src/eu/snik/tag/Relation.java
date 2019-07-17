@@ -13,8 +13,8 @@ public enum Relation
 	isResponsibleForEntityType(Role,EntityType),approvesEntityType(Role,EntityType),
 		
 	isResponsibleForRole(Role,Role),roleComponent(Role,Role),
-	FunctionComponent(Function,Function),
-	EntityTypeComponent(EntityType,EntityType),isBasedOn(EntityType,EntityType);	
+	functionComponent(Function,Function),
+	entityTypeComponent(EntityType,EntityType),isBasedOn(EntityType,EntityType);	
 	
 	
 	public final Subtop domain,range;
