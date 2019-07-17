@@ -72,4 +72,7 @@ public class RelationPane extends VBox
 		getChildren().addAll(l,subjectBox,objectBox,predicateBox,addButton);
 	}
 
+	public void setSubject(Clazz first)	{subjectBox.setValue(first);}
+	public void setObject(Clazz first)	{objectBox.setValue(first);}
+
 }

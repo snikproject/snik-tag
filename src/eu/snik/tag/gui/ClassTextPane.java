@@ -1,6 +1,7 @@
 package eu.snik.tag.gui;
 
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -11,6 +12,8 @@ import eu.snik.tag.Clazz;
 import javafx.application.Platform;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
+import javafx.scene.input.MouseButton;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontPosture;
 import javafx.scene.text.FontWeight;
@@ -22,12 +25,16 @@ public class ClassTextPane extends TextFlow
 {
 
 	final ObservableList<Clazz> classes;
+	private final Map<Clazz,Text> texts = new HashMap<>();
+	private final RelationPane relationPane;
 	String text;
 
-	/** @param classes added or removed classes will automatically be shown. */
-	public ClassTextPane(ObservableList<Clazz> classes)
+	/** @param classes added or removed classes will automatically be shown. 
+	 * @param relationPane */
+	public ClassTextPane(ObservableList<Clazz> classes, RelationPane relationPane)
 	{
 		this.classes=classes;
+		this.relationPane=relationPane;
 		this.	setMinSize(900, 1000);
 		classes.addListener((ListChangeListener<Clazz>)(c)->{refresh();});
 	}
@@ -61,19 +68,25 @@ public class ClassTextPane extends TextFlow
 
 			if(pos>0) {getChildren().add(new Text(restText.substring(0, pos)));}
 			
-			Text clazzText = new Text(restText.substring(pos,pos+first.label.length()));
+			Text classText = new Text(restText.substring(pos,pos+first.label.length()));
+			classText.addEventHandler(MouseEvent.MOUSE_CLICKED, (e)->
+			{
+				if(e.getButton()==MouseButton.PRIMARY) {relationPane.setSubject(first);}
+				else																																				{relationPane.setObject(first);}
+			});
 			switch(first.subtop)
 			{
-				case Role: 						clazzText.setFont(Font.font("Helvetica",FontWeight.BOLD,15));break;
-				case Function:			clazzText.setFont(Font.font("Helvetica",FontPosture.ITALIC,15));break;
-				case EntityType:	clazzText.setFont(Font.font(15));clazzText.setUnderline(true); break;
+				case Role: 						classText.setFont(Font.font("Helvetica",FontWeight.BOLD,15));break;
+				case Function:			classText.setFont(Font.font("Helvetica",FontPosture.ITALIC,15));break;
+				case EntityType:	classText.setFont(Font.font(15));classText.setUnderline(true); break;
 			}
-			getChildren().add(clazzText);
+			getChildren().add(classText);
+			texts.put(first, classText);
 
 			restText = restText.substring(pos+first.label.length());
 
 		}
-		if(!restText.isBlank()) {getChildren().add(new Text(restText));}
+		if(restText!=null&&!restText.isBlank()) {getChildren().add(new Text(restText));}
 	}
 
 }
