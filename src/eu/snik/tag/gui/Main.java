@@ -26,7 +26,7 @@ public class Main extends Application
 
 	private final RDFArea rdfText = new RDFArea(classes);
 
-	private ClassTextArea textArea = new ClassTextArea(classes);
+	private ClassTextPane textArea = new ClassTextPane(classes);
 
 	private final ClassTable tableView = new ClassTable(classes, this::refresh);
 
@@ -77,7 +77,8 @@ public class Main extends Application
 		}		
 		pane.getChildren().add(MainMenuBar.create(this));
 
-		rdfText.setMinSize(300, 500);			
+		rdfText.setMinSize(300, 500);
+		textArea.setMaxWidth(1000);
 		textPane.getChildren().addAll(textArea,new RelationPane(classes,this::refresh));		
 		{
 			TabPane tabPane = new TabPane();

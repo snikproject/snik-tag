@@ -6,14 +6,15 @@ import javafx.collections.ObservableList;
 import javafx.scene.web.HTMLEditor;
 
 /** Uneditable HTML text area with the DOCX text and highlighted classes.*/
-public class ClassTextArea extends HTMLEditor
+@Deprecated
+public class ClassHtmlArea extends HTMLEditor
 {
 	
 	final ObservableList<Clazz> classes;
 	String text;
 
 	/** @param classes added or removed classes will automatically be shown. */
-	public ClassTextArea(ObservableList<Clazz> classes)
+	public ClassHtmlArea(ObservableList<Clazz> classes)
 	{
 		this.setDisable(true);
 		this.classes=classes;
