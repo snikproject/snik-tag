@@ -1,3 +1,17 @@
-.mnemonic-underline {
-    -fx-stroke: -fx-text-fill;
+.mnemonic-underline {-fx-stroke: -fx-text-fill;}
+
+.text-context		{-fx-font-size: 13pt;}
+.text-class			{-fx-font-size: 14pt; }
+
+*
+{
+ -entity-type-fill: darkred;
+ -function-fill: darkgreen;
+ -role-fill: darkblue;
 }
+
+.text-entity-type	{-fx-font-style: italic; -fx-fill: -entity-type-fill;}
+.text-function		{-fx-underline: true; -fx-fill: -function-fill;}
+.text-role			{-fx-font-weight: bold; -fx-fill: -role-fill;}
+
+.highlighted		{-fx-fill: black;}

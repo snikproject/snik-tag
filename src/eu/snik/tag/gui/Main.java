@@ -8,6 +8,7 @@ import javafx.collections.ObservableList;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.Scene;
+import javafx.scene.control.SplitPane;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
 import javafx.scene.control.TabPane.TabDragPolicy;
@@ -22,7 +23,7 @@ public class Main extends Application
 {
 	public final ObservableList<Clazz> classes = FXCollections.observableArrayList();
 	
-	private final Pane textPane = new HBox();
+	private final SplitPane textPane = new SplitPane();
 
 	private final RDFArea rdfText = new RDFArea(classes);
 
@@ -79,8 +80,8 @@ public class Main extends Application
 		pane.getChildren().add(MainMenuBar.create(this));
 
 		rdfText.setMinSize(300, 500);
-		textArea.setMaxWidth(1000);
-		textPane.getChildren().addAll(textArea,textRelationPane);		
+		textArea.prefHeight(Double.MAX_VALUE); // goal is to fill parent vertically, does not work fully though
+		textPane.getItems().addAll(textArea,textRelationPane);		
 		{
 			TabPane tabPane = new TabPane();
 			tabPane.setTabDragPolicy(TabDragPolicy.REORDER);			

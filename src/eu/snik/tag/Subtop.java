@@ -9,18 +9,18 @@ import lombok.AllArgsConstructor;
 public enum Subtop
 {
 	Role("b"), Function("u"), EntityType("i");
-	
+
 	public final String htmlTagOpen;
 	public final String htmlTagClosed;
-	
+
 	/**	Not-model-backed Jena resource for the subtop. */
 	public final Resource resource;
-	
+
 	private Subtop(String htmlTagName)
 	{
 		this.htmlTagOpen = "<"+htmlTagName+">";
 		this.htmlTagClosed = "</"+htmlTagName+">";
 		this.resource=ResourceFactory.createResource(Snik.META+this.name());
 	}
-	
-	};
+
+};
