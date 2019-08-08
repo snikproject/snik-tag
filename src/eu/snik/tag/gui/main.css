@@ -15,3 +15,6 @@
 .text-role			{-fx-font-weight: bold; -fx-fill: -role-fill;}
 
 .highlighted		{-fx-fill: black;}
+
+.subject		{-fx-border-style: dashed; -fx-border-color: yellow; -fx-stroke:gold}
+.object			{-fx-border-style: dashed; -fx-border-color: yellow; -fx-stroke:firebrick}

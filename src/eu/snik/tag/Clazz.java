@@ -19,7 +19,7 @@ import lombok.Setter;
 @AllArgsConstructor
 @EqualsAndHashCode
 public class Clazz
-{ 
+{
 	/** rdfs:label*/
 	public String label;
 	/** the URI part after the prefix*/

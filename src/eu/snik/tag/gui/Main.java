@@ -81,6 +81,9 @@ public class Main extends Application
 
 		rdfText.setMinSize(300, 500);
 		textArea.prefHeight(Double.MAX_VALUE); // goal is to fill parent vertically, does not work fully though
+		textPane.setPrefWidth(Double.MAX_VALUE);
+		textRelationPane.setMinWidth(400);
+		textRelationPane.setMaxWidth(500);
 		textPane.getItems().addAll(textArea,textRelationPane);		
 		{
 			TabPane tabPane = new TabPane();

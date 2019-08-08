@@ -1,6 +1,8 @@
 package eu.snik.tag.gui;
 
 import java.util.Arrays;
+import java.util.function.BiConsumer;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 import eu.snik.tag.Clazz;
 import eu.snik.tag.Relation;
@@ -22,6 +24,24 @@ public class RelationPane extends VBox
 	private final ComboBox<Clazz> objectBox = new ComboBox<>();
 	private final ComboBox<Relation> predicateBox = new ComboBox<>();
 	
+	public ClassTextPane classTextPane = null;
+	
+	
+	void determinePredicates()
+	{
+		if(objectBox.getValue()==null||subjectBox.getValue()==null)
+		{
+			predicateBox.getItems().clear();
+			return;
+		}
+		predicateBox.setItems(FXCollections.observableArrayList(
+				Arrays
+				.stream(Relation.values())
+				.filter(r->r.domain==subjectBox.getValue().subtop&&r.range==objectBox.getValue().subtop)
+				.collect(Collectors.toList())
+				));
+	}
+	
 	/** 
 	 * @param classes selected classes that are removed will automatically be deselected. Added classes are automatically added.
 	 * Modified classes are not updated.  
@@ -41,23 +61,17 @@ public class RelationPane extends VBox
 			objectBox.setPromptText("Objekt auswählen");
 			predicateBox.setPromptText("Verbindung auswählen");
 
-			ChangeListener<Clazz> classListener = (ov,old,neww)->
+			subjectBox.valueProperty().addListener((ov,old,neww)->
 			{
-				if(objectBox.getValue()==null||subjectBox.getValue()==null)
-				{
-					predicateBox.getItems().clear();
-					return;
-				}
-				predicateBox.setItems(FXCollections.observableArrayList(
-						Arrays
-						.stream(Relation.values())
-						.filter(r->r.domain==subjectBox.getValue().subtop&&r.range==objectBox.getValue().subtop)
-						.collect(Collectors.toList())
-						));
-			};
+				determinePredicates();
+				classTextPane.setSubject(neww, this);
+			});
 			
-			subjectBox.valueProperty().addListener(classListener);
-			objectBox.valueProperty().addListener(classListener);
+			objectBox.valueProperty().addListener((ov,old,neww)->
+			{
+				determinePredicates();
+				classTextPane.setObject(neww, this);
+			});
 
 			addButton.setOnAction(e->
 			{

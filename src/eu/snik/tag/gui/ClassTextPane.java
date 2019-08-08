@@ -1,13 +1,14 @@
 package eu.snik.tag.gui;
 
 import java.util.Comparator;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
+import org.apache.jena.ext.com.google.common.collect.LinkedListMultimap;
+import org.apache.jena.ext.com.google.common.collect.Multimap;
 import eu.snik.tag.Clazz;
 import eu.snik.tag.Subtop;
 import javafx.application.Platform;
@@ -27,6 +28,36 @@ public class ClassTextPane extends ScrollPane
 	//private final Map<Clazz,Text> texts = new HashMap<>(); needs to be multi map but is it actually needed?
 	private final RelationPane relationPane;
 	private final TextFlow flow = new TextFlow();
+	
+	private Clazz subject = null;
+	private Clazz object = null;
+
+	Multimap<Clazz, Text> texts = LinkedListMultimap.create();
+
+
+	public void highlightSubject(Clazz clazz)
+	{
+		if(subject!=null)
+		{
+			texts.get(subject).forEach(f->f.getStyleClass().remove("subject"));
+		}
+		subject = clazz;
+
+		texts.get(subject).forEach(f->f.getStyleClass().add("subject"));
+		System.out.println(texts.get(subject).stream().map(t->t.getStyleClass()).collect(Collectors.toSet()));
+	}
+
+	public void highlightObject(Clazz clazz)
+	{
+		if(object!=null)
+		{
+			texts.get(object).forEach(f->f.getStyleClass().remove("object"));
+		}
+		object = clazz;
+
+		texts.get(object).forEach(f->f.getStyleClass().add("object"));
+		System.out.println(texts.get(object).stream().map(t->t.getStyleClass()).collect(Collectors.toSet()));
+	}
 
 	private String text;
 
@@ -39,7 +70,8 @@ public class ClassTextPane extends ScrollPane
 		this.setHbarPolicy(ScrollBarPolicy.NEVER);
 		this.classes=classes;
 		this.relationPane=relationPane;
-		this.	setMinWidth(700);		
+		this.relationPane.classTextPane=this;
+		this.setMinWidth(700);		
 		flow.prefWidthProperty().bind(this.widthProperty());
 		classes.addListener((ListChangeListener<Clazz>)(c)->{refresh();});
 	}
@@ -53,11 +85,11 @@ public class ClassTextPane extends ScrollPane
 
 	private final Map<Subtop,String> cssClass = Map.of
 			(
-			Subtop.EntityType,"-entity-type-fill: red;", // entity type as subject can only connect to itself
-			Subtop.Function,"-entity-type-fill: red; -function-fill: lightgreen;",
-			Subtop.Role,"-entity-type-fill: red; -function-fill: green; -role-fill: blue;" // role can go everywhere
-			); 
-	
+					Subtop.EntityType,"-entity-type-fill: red;", // entity type as subject can only connect to itself
+					Subtop.Function,"-entity-type-fill: red; -function-fill: lightgreen;",
+					Subtop.Role,"-entity-type-fill: red; -function-fill: green; -role-fill: blue;" // role can go everywhere
+					); 
+
 	public void highlightObjectCandidates(Clazz subject)
 	{		
 		var reset = "-entity-type-fill: darkred; -function-fill: darkgreen; -role-fill: darkblue;";
@@ -65,6 +97,21 @@ public class ClassTextPane extends ScrollPane
 		// applying the style to the flow or the scroll pane does not work
 		// ~420 children in test case, in case of performance problems optimize this
 		flow.getChildren().stream().forEach(t->{t.setStyle(cssClass.get(subject.subtop));});
+	}
+	
+	void setSubject(Clazz clazz, Object caller)
+	{
+		if(this.subject==clazz) {return;}
+		if(caller!=relationPane) {relationPane.setSubject(clazz);} // prevent infinite loop
+		highlightObjectCandidates(clazz);
+		highlightSubject(clazz);
+	}
+	
+	void setObject(Clazz clazz, Object caller)
+	{
+		if(this.object==clazz) {return;}
+		if(caller!=relationPane) {relationPane.setObject(clazz);} // prevent infinite loop
+		highlightObject(clazz);
 	}
 
 	/** Call when a class has changed its label. Also called automatically when a class is removed or added. */
@@ -76,13 +123,13 @@ public class ClassTextPane extends ScrollPane
 		Set<Clazz> restClasses = new HashSet<>(classes);
 
 		Map<Clazz,Integer> indices;
-		int count = 0;
 		while(restText!=null&&!restText.isEmpty())
 		{
 			final String restTextFinal = restText;
 			indices = restClasses.stream().collect(Collectors.toMap(c->c,c->restTextFinal.indexOf(c.getLabel())));
 			restClasses.retainAll(indices.entrySet().stream().filter(e->e.getValue()>-1).map(Entry::getKey).collect(Collectors.toSet()));
-			Optional<Clazz> firstOpt = restClasses.stream().min(Comparator.comparing(indices::get));
+		 // minimize position, maximize label length if tied. for example choose "hospital's" over "hospital"
+			Optional<Clazz> firstOpt = restClasses.stream().min(Comparator.comparing(indices::get).thenComparing(c->-((Clazz)c).label.length()));
 			if(firstOpt.isEmpty()) {break;}
 			Clazz first = firstOpt.get();			
 			int pos = indices.get(first);
@@ -97,11 +144,18 @@ public class ClassTextPane extends ScrollPane
 			}
 
 			Text classText = new Text(restText.substring(pos,pos+first.label.length()));
+			texts.put(first, classText);
 			classText.getStyleClass().add("text-class");
 			classText.addEventHandler(MouseEvent.MOUSE_CLICKED, (e)->
-			{
-				if(e.getButton()==MouseButton.PRIMARY) {relationPane.setSubject(first);highlightObjectCandidates(first);}
-				else																																				{relationPane.setObject(first);}
+			{				
+				if(e.getButton()==MouseButton.PRIMARY)
+				{
+					setSubject(first,this);
+				}
+				else
+				{
+					setObject(first,this);
+				}
 			});
 			switch(first.subtop)
 			{
@@ -111,7 +165,7 @@ public class ClassTextPane extends ScrollPane
 			}
 			flow.getChildren().add(classText);
 			//texts.put(first, classText);
-			count++;
+			//System.out.println(restText);
 			restText = restText.substring(pos+first.label.length());
 		}
 		if(restText!=null&&!restText.isBlank()) {getChildren().add(new Text(restText));}		

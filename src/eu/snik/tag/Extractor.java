@@ -32,7 +32,7 @@ public class Extractor
 	{
 		System.out.println(extract(new File("../benchmark/input.docx")).toString().replaceAll("\\), ", "\\),\n"));
 	}
-	
+
 	/** @return 	the complete text from the DOCX file without any formatting */
 	public static String extractText(File docxFile) throws Docx4JException, JAXBException
 	{		
@@ -52,32 +52,56 @@ public class Extractor
 		Object[][] tagClasses = {{"w:i","Entity Type",Subtop.EntityType},{"w:b","Role",Subtop.Role},{"w:u","Function",Subtop.Function}};
 
 		var classes = new HashSet<Clazz>();
-
+		var processedRuns = new HashSet<R>();
+		var processedLabels = new HashSet<String>();
+		var warnings = new HashSet<String>(); // prevent the same warning from showing multiple times
+		
 		for(var tc: tagClasses)
 		{
 			String tag = (String)tc[0];
 			//String clazz = (String)tc[1];
 			var runs = (List<R>)(List<?>)doc.getJAXBNodesViaXPath("//w:r[w:rPr/"+tag+"]", false);
+			runs.removeAll(processedRuns); // we cannot handle overlapping tags right now			
+			
+			processedRuns.addAll(runs);
 
 			for(R run: runs)
 			{
-				String name = TextUtils.getText(run).replaceAll("[^A-Za-z0-9 ]", "");
-				if(name.length()<3) continue;
+				String text = TextUtils.getText(run).trim();
+				if(text.contains("strategic decisions")) System.out.println(text);
+				String label = text;//.replaceAll("[^A-Za-z0-9 ]", ""); // removing non-alphanumerical characters leads to missing matches in the text tab
 
+				String filterLabel = label.replaceAll("[^A-Za-z0-9 ]", ""); 
+				if(filterLabel.length()<4&&!filterLabel.matches("[A-Z]{3}")) {continue;} // abbreviations with 3 letters are OK
+				if(filterLabel.length()<3) {continue;} // abbreviations
+				
+				/*
 				Comment comment = factory.createCommentsComment();
 				comments.add(comment);
 				comment.setId(BigInteger.valueOf(++commentId));
 				Text commentText = factory.createText();
-				commentText.setValue("this is a comment for "+name);
+				commentText.setValue("this is a comment for "+label);
 				comment.getContent().add(commentText);
 				CommentReference commentRef = factory.createRCommentReference();
 				run.getContent().add(commentRef);
 				commentRef.setId(BigInteger.valueOf(commentId));				
-
-				classes.add(new Clazz(name,labelToLocalName(name),((Subtop)tc[2])));
+				 */
+				Clazz clazz = new Clazz(label,labelToLocalName(label),((Subtop)tc[2]));
+				if(processedLabels.contains(label))
+				{
+					classes.stream().filter(c->c.subtop!=clazz.subtop).findAny().ifPresent(c->
+					{
+						warnings.add("Typenkonflikt. Klasse \""+label+"\" ist getagged als sowohl "+c.subtop+" als auch "+clazz.subtop+". "
+					+"Ignoriere "+clazz.subtop+". Bitte beheben Sie den Konflikt im Dokument.");
+					});					
+					continue;
+				}
+				classes.add(clazz);
+				processedLabels.add(label);
 			}
-		}
-
+		}		
+		
+		System.err.println(warnings.stream().reduce("", (a,b)->a+"\n"+b));
 		System.out.println(classes.size()+" classes extracted.");
 		return classes;
 	}

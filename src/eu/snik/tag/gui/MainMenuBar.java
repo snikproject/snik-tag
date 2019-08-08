@@ -103,7 +103,6 @@ public class MainMenuBar
 		}).start();
 	}
 
-
 	@SneakyThrows
 	static Menu helpMenu()
 	{
