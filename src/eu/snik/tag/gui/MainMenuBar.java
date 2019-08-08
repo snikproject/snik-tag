@@ -3,7 +3,9 @@ package eu.snik.tag.gui;
 import java.awt.Desktop;
 import java.io.File;
 import java.io.FileWriter;
+import java.io.InputStream;
 import java.net.URI;
+import java.util.Properties;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Menu;
@@ -12,6 +14,7 @@ import javafx.scene.control.MenuItem;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyCodeCombination;
 import javafx.scene.input.KeyCombination;
+import javafx.scene.layout.Region;
 import javafx.stage.FileChooser;
 import javafx.stage.FileChooser.ExtensionFilter;
 import lombok.SneakyThrows;
@@ -64,16 +67,32 @@ public class MainMenuBar
 	}
 
 	@SneakyThrows
+	static MenuItem about()
+	{
+		MenuItem about = new MenuItem("Ü_ber");
+		Properties git = new Properties();
+		git.load(MainMenuBar.class.getClassLoader().getResourceAsStream("git.properties"));
+
+		Alert alert = new Alert(AlertType.INFORMATION);
+		alert.getDialogPane().setMinHeight(Region.USE_PREF_SIZE);
+		alert.getDialogPane().setMinWidth(1000);
+		about.setOnAction(e->alert.show());
+		alert.setTitle("Über");
+		alert.setHeaderText("SNIK Tag "+git.getProperty("git.build.version"));
+		alert.setContentText("JavaFX "+ System.getProperty("javafx.version") + ", running on Java " + System.getProperty("java.version") + ".\n"+
+		"Built "+git.getProperty("git.build.time")+"\n"+
+		"Commited "+git.getProperty("git.commit.time")+" ID "+git.getProperty("git.commit.id")+"\n"+
+		"Commit Message "+git.getProperty("git.commit.message.short")+"\n"+
+		"Committer "+git.getProperty("git.build.user.name")+" "+git.getProperty("git.build.user.email")+"\n"+
+		"Nearest Tag "+git.getProperty("git.closest.tag.name")
+		);
+		return about;
+	}
+
+	@SneakyThrows
 	static Menu helpMenu()
 	{
 		Menu helpMenu = new Menu("_Hilfe");
-
-		MenuItem aboutItem = new MenuItem("Ü_ber");		
-		Alert aboutAlert = new Alert(AlertType.INFORMATION);
-		aboutItem.setOnAction(e->aboutAlert.show());
-		aboutAlert.setTitle("Über");
-		aboutAlert.setHeaderText("SNIK Tag 0.0.1");
-		aboutAlert.setContentText("JavaFX "+ System.getProperty("javafx.version") + ", running on Java " + System.getProperty("java.version") + ".");				
 
 		MenuItem reportItem = new MenuItem("Report Bug or Enhancement");		
 		reportItem.setOnAction(event->
@@ -86,11 +105,11 @@ public class MainMenuBar
 			};
 			// Using the JavaFX thread for desktop hangs the program.
 			new Thread(()->{
-			try{Desktop.getDesktop().browse(new URI("https://github.com/IMISE/snik-tag/issues"));} catch (Exception e) {throw new RuntimeException(e);}
+				try{Desktop.getDesktop().browse(new URI("https://github.com/IMISE/snik-tag/issues"));} catch (Exception e) {throw new RuntimeException(e);}
 			}).start();;
 		});
 
-		helpMenu.getItems().addAll(aboutItem,reportItem);
+		helpMenu.getItems().addAll(about(),reportItem);
 
 		return helpMenu;
 	}
