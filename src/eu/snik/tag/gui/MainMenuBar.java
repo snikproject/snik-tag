@@ -80,36 +80,42 @@ public class MainMenuBar
 		alert.setTitle("Über");
 		alert.setHeaderText("SNIK Tag "+git.getProperty("git.build.version"));
 		alert.setContentText("JavaFX "+ System.getProperty("javafx.version") + ", running on Java " + System.getProperty("java.version") + ".\n"+
-		"Built "+git.getProperty("git.build.time")+"\n"+
-		"Commited "+git.getProperty("git.commit.time")+" ID "+git.getProperty("git.commit.id")+"\n"+
-		"Commit Message "+git.getProperty("git.commit.message.short")+"\n"+
-		"Committer "+git.getProperty("git.build.user.name")+" "+git.getProperty("git.build.user.email")+"\n"+
-		"Nearest Tag "+git.getProperty("git.closest.tag.name")
-		);
+				"Built "+git.getProperty("git.build.time")+"\n"+
+				"Commited "+git.getProperty("git.commit.time")+" ID "+git.getProperty("git.commit.id")+"\n"+
+				"Commit Message "+git.getProperty("git.commit.message.short")+"\n"+
+				"Committer "+git.getProperty("git.build.user.name")+" "+git.getProperty("git.build.user.email")+"\n"+
+				"Nearest Tag "+git.getProperty("git.closest.tag.name")
+				);
 		return about;
 	}
+
+	static void browse(String uri)
+	{
+		if(!(Desktop.isDesktopSupported()&&Desktop.getDesktop().isSupported(Desktop.Action.BROWSE)))
+		{
+			new Alert(AlertType.WARNING, "Kann Website nicht öffnen, nicht unterstützt.").show();;
+			log.warning("Cannot open Website, not supported.");
+			return;
+		};
+		// Using the JavaFX thread for desktop hangs the program.
+		new Thread(()->{
+			try{Desktop.getDesktop().browse(new URI(uri));} catch (Exception e) {throw new RuntimeException(e);}
+		}).start();
+	}
+
 
 	@SneakyThrows
 	static Menu helpMenu()
 	{
 		Menu helpMenu = new Menu("_Hilfe");
 
-		MenuItem reportItem = new MenuItem("Report Bug or Enhancement");		
-		reportItem.setOnAction(event->
-		{
-			if(!(Desktop.isDesktopSupported()&&Desktop.getDesktop().isSupported(Desktop.Action.BROWSE)))
-			{
-				new Alert(AlertType.WARNING, "Cannot open Website, not supported.").show();;
-				log.warning("Cannot open Website, not supported.");
-				return;
-			};
-			// Using the JavaFX thread for desktop hangs the program.
-			new Thread(()->{
-				try{Desktop.getDesktop().browse(new URI("https://github.com/IMISE/snik-tag/issues"));} catch (Exception e) {throw new RuntimeException(e);}
-			}).start();;
-		});
+		MenuItem helpItem = new MenuItem("_Hilfe");
+		helpItem.setOnAction(event->{browse("https://imise.github.io/snik-tag/");});
 
-		helpMenu.getItems().addAll(about(),reportItem);
+		MenuItem reportItem = new MenuItem("Bug oder Vorschlag melden");		
+		reportItem.setOnAction(event->{browse("https://github.com/IMISE/snik-tag/issues");});
+
+		helpMenu.getItems().addAll(helpItem,reportItem,about());
 
 		return helpMenu;
 	}
