@@ -92,8 +92,7 @@ public class Main extends Application
 			tabPane.getTabs().addAll(
 					new UnclosableTab("Text", textPane),
 					new UnclosableTab("Klassen", tableView),
-					new UnclosableTab("RDF", rdfText),
-					new UnclosableTab("Verbindungen", new RelationPane(classes,this::refresh)));
+					new UnclosableTab("RDF", rdfText));
 
 			pane.getChildren().add(tabPane);
 		}
