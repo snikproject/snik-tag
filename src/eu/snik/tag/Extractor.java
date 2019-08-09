@@ -5,6 +5,7 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import javax.xml.bind.JAXBException;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.text.WordUtils;
 import org.docx4j.Docx4J;
 import org.docx4j.TextUtils;
@@ -59,7 +60,6 @@ public class Extractor
 		for(var tc: tagClasses)
 		{
 			String tag = (String)tc[0];
-			//String clazz = (String)tc[1];
 			var runs = (List<R>)(List<?>)doc.getJAXBNodesViaXPath("//w:r[w:rPr/"+tag+"]", false);
 			runs.removeAll(processedRuns); // we cannot handle overlapping tags right now			
 			
@@ -67,8 +67,8 @@ public class Extractor
 
 			for(R run: runs)
 			{
-				String text = TextUtils.getText(run).trim();
-				if(text.contains("strategic decisions")) System.out.println(text);
+				
+				String text = StringUtils.strip(TextUtils.getText(run),"., ");
 				String label = text;//.replaceAll("[^A-Za-z0-9 ]", ""); // removing non-alphanumerical characters leads to missing matches in the text tab
 
 				String filterLabel = label.replaceAll("[^A-Za-z0-9 ]", ""); 
