@@ -1,6 +1,8 @@
 package eu.snik.tag;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.Set;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.ModelFactory;
@@ -16,17 +18,24 @@ import lombok.Setter;
 /** An RDF class following the SNIK meta model. Fields can be modified. */
 @Getter // used by cell PropertyValueFactory 
 @Setter
-@AllArgsConstructor
 @EqualsAndHashCode
 public class Clazz
 {
 	/** rdfs:label*/
-	public String label;
+	public final Set<String> labels = new LinkedHashSet<>();
 	/** the URI part after the prefix*/
 	public String localName;
 	/** whether the class is a function, role or entity type.*/
 	public Subtop subtop;
 
+	public Clazz(String label, String localName, Subtop subtop)
+	{
+		this.labels.add(label);
+		if(Math.random()>0.5) this.labels.add("schm"+label.substring(1)); // testing
+		this.localName=localName;
+		this.subtop=subtop;
+	}
+	
 	@EqualsAndHashCode.Exclude
 	final Set<Triple> triples = new HashSet<>();
 
@@ -42,10 +51,21 @@ public class Clazz
 		triples.add(new Triple(this,predicate,object));
 	}
 
+	public String labelString()
+	{
+		return labels.stream().reduce((a,b)->a+"; "+b).get();
+	}
+	
+	public void setLabels(String semicolonSep)
+	{
+		labels.clear();
+		Arrays.asList(semicolonSep.split("[; ]*"));
+	}
+	
 	@Override
 	public String toString()
-	{		
-		return label+", "+subtop;
+	{
+		return labelString()+", "+subtop;
 		//return label+','+localName+','+subtop; // Too technical for users. If needed in detail more often, encapsulate this where the simple form is needed, e.g. in the relation pane.  
 	}
 
@@ -56,6 +76,7 @@ public class Clazz
 		var model = ModelFactory.createDefaultModel();
 		Resource clazz = model.createResource(Snik.BB2+localName, OWL.Class);
 		model.add(clazz, RDFS.subClassOf, subtop.resource);
+		for(String label: labels ) {model.add(clazz, RDFS.label, model.createLiteral(label, "en"));}
 
 		for(Triple triple: triples)
 		{

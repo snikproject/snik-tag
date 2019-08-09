@@ -71,7 +71,7 @@ public class Extractor
 				String text = StringUtils.strip(TextUtils.getText(run),"., ");
 				String label = text;//.replaceAll("[^A-Za-z0-9 ]", ""); // removing non-alphanumerical characters leads to missing matches in the text tab
 
-				String filterLabel = label.replaceAll("[^A-Za-z0-9 ]", ""); 
+				String filterLabel = label.replaceAll("[^A-Za-z0-9 ]", "").replaceAll("(the)|(and)|(or)",""); 
 				if(filterLabel.length()<4&&!filterLabel.matches("[A-Z]{3}")) {continue;} // abbreviations with 3 letters are OK
 				if(filterLabel.length()<3) {continue;} // abbreviations
 				

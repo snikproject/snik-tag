@@ -3,12 +3,11 @@ package eu.snik.tag.gui;
 import java.util.Comparator;
 import java.util.HashSet;
 import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 import org.apache.jena.ext.com.google.common.collect.LinkedListMultimap;
 import org.apache.jena.ext.com.google.common.collect.Multimap;
+import org.javatuples.Triplet;
 import eu.snik.tag.Clazz;
 import eu.snik.tag.Subtop;
 import javafx.application.Platform;
@@ -113,7 +112,8 @@ public class ClassTextPane extends ScrollPane
 		if(caller!=relationPane) {relationPane.setObject(clazz);} // prevent infinite loop
 		highlightObject(clazz);
 	}
-
+ 
+	
 	/** Call when a class has changed its label. Also called automatically when a class is removed or added. */
 	public void refresh()
 	{
@@ -122,17 +122,27 @@ public class ClassTextPane extends ScrollPane
 		String restText = text;
 		Set<Clazz> restClasses = new HashSet<>(classes);
 
-		Map<Clazz,Integer> indices;
 		while(restText!=null&&!restText.isEmpty())
 		{
 			final String restTextFinal = restText;
-			indices = restClasses.stream().collect(Collectors.toMap(c->c,c->restTextFinal.indexOf(c.getLabel())));
-			restClasses.retainAll(indices.entrySet().stream().filter(e->e.getValue()>-1).map(Entry::getKey).collect(Collectors.toSet()));
+
+			var minOpt = restClasses.stream().flatMap(c->(c.labels.stream()
+				.map(l->new Triplet<Clazz,Integer,Integer>(c,restTextFinal.indexOf(l),l.length()))))
+					.filter(t->t.getValue1()!=-1) // only with labels found in the text
+				.min(Comparator.comparing(t->((Triplet<Clazz,Integer,Integer>)t).getValue1()) // minimize position
+						.thenComparing(t->-((Triplet<Clazz,Integer,Integer>)t).getValue2()) // tiebreaker: maximize label length 
+						);
+						
+			
+			//restClasses.retainAll(indices.entrySet().stream().filter(e->e.getValue()>-1).map(Entry::getKey).collect(Collectors.toSet()));
 		 // minimize position, maximize label length if tied. for example choose "hospital's" over "hospital"
-			Optional<Clazz> firstOpt = restClasses.stream().min(Comparator.comparing(indices::get).thenComparing(c->-((Clazz)c).label.length()));
-			if(firstOpt.isEmpty()) {break;}
-			Clazz first = firstOpt.get();			
-			int pos = indices.get(first);
+			//Optional<Clazz> firstOpt = restClasses.stream().min(Comparator.comparing(indices::get).thenComparing(c->-((Clazz)c).label.length()));
+			if(minOpt.isEmpty()) {break;}
+			var min = minOpt.get();
+			var clazz = min.getValue0();
+			int pos = min.getValue1();
+			int labelLength = min.getValue2(); 
+			
 
 			if(pos>0)
 			{
@@ -143,21 +153,21 @@ public class ClassTextPane extends ScrollPane
 				flow.getChildren().add(context);
 			}
 
-			Text classText = new Text(restText.substring(pos,pos+first.label.length()));
-			texts.put(first, classText);
+			Text classText = new Text(restText.substring(pos,pos+labelLength));
+			texts.put(clazz, classText);
 			classText.getStyleClass().add("text-class");
 			classText.addEventHandler(MouseEvent.MOUSE_CLICKED, (e)->
 			{				
 				if(e.getButton()==MouseButton.PRIMARY)
 				{
-					setSubject(first,this);
+					setSubject(clazz,this);
 				}
 				else
 				{
-					setObject(first,this);
+					setObject(clazz,this);
 				}
 			});
-			switch(first.subtop)
+			switch(clazz.subtop)
 			{
 				case Role: 						classText.getStyleClass().add("text-role");break;
 				case Function:			classText.getStyleClass().add("text-function");break;
@@ -166,7 +176,7 @@ public class ClassTextPane extends ScrollPane
 			flow.getChildren().add(classText);
 			//texts.put(first, classText);
 			//System.out.println(restText);
-			restText = restText.substring(pos+first.label.length());
+			restText = restText.substring(pos+labelLength);
 		}
 		if(restText!=null&&!restText.isBlank()) {getChildren().add(new Text(restText));}		
 	}

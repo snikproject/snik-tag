@@ -1,6 +1,7 @@
 package eu.snik.tag.gui;
 
 import java.util.Collection;
+import java.util.Set;
 import eu.snik.tag.Clazz;
 import eu.snik.tag.Subtop;
 import eu.snik.tag.Triple;
@@ -42,18 +43,19 @@ public class ClassTable extends VBox
 			filteredClasses.setPredicate(clazz ->
 			{
 				if (newValue == null || newValue.isEmpty()) {return true;}
-				String rowText = clazz.label+" "+clazz.localName+" "+clazz.subtop.name().replace('_',' ');
+				String rowText = clazz.labelString()+" "+clazz.localName+" "+clazz.subtop.name().replace('_',' ');
 				return rowText.toLowerCase().contains(newValue.toLowerCase());
 			});
 		});
 
-		var labelCol = new TableColumn<Clazz,String>("Label");
-		labelCol.setCellValueFactory(new PropertyValueFactory<>("label"));
-		labelCol.setCellFactory(TextFieldTableCell.<Clazz>forTableColumn());
+		var labelCol = new TableColumn<Clazz,Set<String>>("Label");
+		labelCol.setCellValueFactory(new PropertyValueFactory<>("labels"));
+		//labelCol.setCellFactory(TextFieldTableCell.<Clazz>forTableColumn());
 		labelCol.setMinWidth(300);
 		labelCol.setOnEditCommit(e->
 		{
-			e.getRowValue().setLabel(e.getNewValue());
+			e.getRowValue().labels.addAll(e.getNewValue());
+			//e.getRowValue().setLabels(e.getNewValue());
 			update.run();;
 		});
 
