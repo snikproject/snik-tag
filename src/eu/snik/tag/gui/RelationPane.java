@@ -1,12 +1,9 @@
 package eu.snik.tag.gui;
 
 import java.util.Arrays;
-import java.util.function.BiConsumer;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 import eu.snik.tag.Clazz;
 import eu.snik.tag.Relation;
-import javafx.beans.value.ChangeListener;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.geometry.Pos;
@@ -41,7 +38,7 @@ public class RelationPane extends VBox
 				.collect(Collectors.toList())
 				));
 	}
-	
+		
 	/** 
 	 * @param classes selected classes that are removed will automatically be deselected. Added classes are automatically added.
 	 * Modified classes are not updated.  

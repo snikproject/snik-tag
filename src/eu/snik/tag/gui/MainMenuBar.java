@@ -3,11 +3,11 @@ package eu.snik.tag.gui;
 import java.awt.Desktop;
 import java.io.File;
 import java.io.FileWriter;
-import java.io.InputStream;
 import java.net.URI;
 import java.util.Properties;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
+import javafx.scene.control.CheckMenuItem;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuBar;
 import javafx.scene.control.MenuItem;
@@ -65,6 +65,16 @@ public class MainMenuBar
 		});
 		return fileMenu;
 	}
+	
+//	static Menu optionsMenu()
+//	{
+//		Menu optionsMenu = new Menu("_Optionen");
+//		MenuItem developerItem = new CheckMenuItem("Developer Mode");		
+//		
+//		optionsMenu.getItems().addAll(developerItem);
+//		return optionsMenu;
+//	}
+
 
 	@SneakyThrows
 	static MenuItem about()

@@ -45,7 +45,8 @@ public class Clazz
 	@Override
 	public String toString()
 	{		
-		return label+','+localName+','+subtop;
+		return label+", "+subtop;
+		//return label+','+localName+','+subtop; // Too technical for users. If needed in detail more often, encapsulate this where the simple form is needed, e.g. in the relation pane.  
 	}
 
 	/** The RDF model is not cached because local name, label and subtop may all be edited by the user.
