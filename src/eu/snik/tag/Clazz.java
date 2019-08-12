@@ -10,6 +10,7 @@ import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.rdf.model.ResourceFactory;
 import org.apache.jena.vocabulary.OWL;
 import org.apache.jena.vocabulary.RDFS;
+import eu.snik.tag.gui.CollectionStringConverter;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -53,15 +54,9 @@ public class Clazz
 
 	public String labelString()
 	{
-		return labels.stream().reduce((a,b)->a+"; "+b).get();
+		return CollectionStringConverter.INSTANCE.toString(labels);
 	}
-	
-	public void setLabels(String semicolonSep)
-	{
-		labels.clear();
-		Arrays.asList(semicolonSep.split("[; ]*"));
-	}
-	
+
 	@Override
 	public String toString()
 	{

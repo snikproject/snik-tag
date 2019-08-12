@@ -17,6 +17,7 @@ import javafx.scene.control.cell.ComboBoxTableCell;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.control.cell.TextFieldTableCell;
 import javafx.scene.layout.VBox;
+import javafx.util.Callback;
 
 /** Table of RDF classes with a filter search bar. */
 public class ClassTable extends VBox
@@ -50,13 +51,14 @@ public class ClassTable extends VBox
 
 		var labelCol = new TableColumn<Clazz,Set<String>>("Label");
 		labelCol.setCellValueFactory(new PropertyValueFactory<>("labels"));
-		//labelCol.setCellFactory(TextFieldTableCell.<Clazz>forTableColumn());
+		labelCol.setCellFactory(TextFieldTableCell.<Clazz,Set<String>>forTableColumn(CollectionStringConverter.INSTANCE));
+		
 		labelCol.setMinWidth(300);
 		labelCol.setOnEditCommit(e->
 		{
+			e.getRowValue().labels.clear();
 			e.getRowValue().labels.addAll(e.getNewValue());
-			//e.getRowValue().setLabels(e.getNewValue());
-			update.run();;
+			update.run();
 		});
 
 		var localNameCol = new TableColumn<Clazz,String>("Local Name");

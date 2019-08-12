@@ -18,3 +18,5 @@
 
 .subject		{-fx-border-style: dashed; -fx-border-color: yellow; -fx-stroke:gold}
 .object			{-fx-border-style: dashed; -fx-border-color: yellow; -fx-stroke:firebrick}
+
+.heading {-fx-font-size: 18pt;}
