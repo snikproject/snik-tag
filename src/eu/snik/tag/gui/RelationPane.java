@@ -23,7 +23,7 @@ public class RelationPane extends VBox
 	
 	public ClassTextPane classTextPane = null;
 	
-	
+
 	void determinePredicates()
 	{
 		if(objectBox.getValue()==null||subjectBox.getValue()==null)

@@ -27,7 +27,7 @@ public class ClassTextPane extends ScrollPane
 	//private final Map<Clazz,Text> texts = new HashMap<>(); needs to be multi map but is it actually needed?
 	private final RelationPane relationPane;
 	private final TextFlow flow = new TextFlow();
-	
+
 	private Clazz subject = null;
 	private Clazz object = null;
 
@@ -43,7 +43,7 @@ public class ClassTextPane extends ScrollPane
 		subject = clazz;
 
 		texts.get(subject).forEach(f->f.getStyleClass().add("subject"));
-		System.out.println(texts.get(subject).stream().map(t->t.getStyleClass()).collect(Collectors.toSet()));
+		//System.out.println(texts.get(subject).stream().map(t->t.getStyleClass()).collect(Collectors.toSet()));
 	}
 
 	public void highlightObject(Clazz clazz)
@@ -55,7 +55,7 @@ public class ClassTextPane extends ScrollPane
 		object = clazz;
 
 		texts.get(object).forEach(f->f.getStyleClass().add("object"));
-		System.out.println(texts.get(object).stream().map(t->t.getStyleClass()).collect(Collectors.toSet()));
+		//System.out.println(texts.get(object).stream().map(t->t.getStyleClass()).collect(Collectors.toSet()));
 	}
 
 	private String text;
@@ -93,27 +93,31 @@ public class ClassTextPane extends ScrollPane
 	{		
 		var reset = "-entity-type-fill: darkred; -function-fill: darkgreen; -role-fill: darkblue;";
 		flow.getChildren().stream().forEach(t->{t.setStyle(reset);});
+		if(subject==null) {return;} // occurs when resetting after an added triple
 		// applying the style to the flow or the scroll pane does not work
 		// ~420 children in test case, in case of performance problems optimize this
-		flow.getChildren().stream().forEach(t->{t.setStyle(cssClass.get(subject.subtop));});
+		flow.getChildren().stream().forEach(t->
+		{
+			t.setStyle(cssClass.get(subject.subtop));
+		});
 	}
-	
+
 	void setSubject(Clazz clazz, Object caller)
 	{
-		if(this.subject==clazz) {return;}
+		if(this.subject==clazz) {return;} // no change
 		if(caller!=relationPane) {relationPane.setSubject(clazz);} // prevent infinite loop
 		highlightObjectCandidates(clazz);
 		highlightSubject(clazz);
 	}
-	
+
 	void setObject(Clazz clazz, Object caller)
 	{
 		if(this.object==clazz) {return;}
 		if(caller!=relationPane) {relationPane.setObject(clazz);} // prevent infinite loop
 		highlightObject(clazz);
 	}
- 
-	
+
+
 	/** Call when a class has changed its label. Also called automatically when a class is removed or added. */
 	public void refresh()
 	{
@@ -127,22 +131,22 @@ public class ClassTextPane extends ScrollPane
 			final String restTextFinal = restText;
 
 			var minOpt = restClasses.stream().flatMap(c->(c.labels.stream()
-				.map(l->new Triplet<Clazz,Integer,Integer>(c,restTextFinal.indexOf(l),l.length()))))
+					.map(l->new Triplet<Clazz,Integer,Integer>(c,restTextFinal.indexOf(l),l.length()))))
 					.filter(t->t.getValue1()!=-1) // only with labels found in the text
-				.min(Comparator.comparing(t->((Triplet<Clazz,Integer,Integer>)t).getValue1()) // minimize position
-						.thenComparing(t->-((Triplet<Clazz,Integer,Integer>)t).getValue2()) // tiebreaker: maximize label length 
-						);
-						
-			
+					.min(Comparator.comparing(t->((Triplet<Clazz,Integer,Integer>)t).getValue1()) // minimize position
+							.thenComparing(t->-((Triplet<Clazz,Integer,Integer>)t).getValue2()) // tiebreaker: maximize label length 
+							);
+
+
 			//restClasses.retainAll(indices.entrySet().stream().filter(e->e.getValue()>-1).map(Entry::getKey).collect(Collectors.toSet()));
-		 // minimize position, maximize label length if tied. for example choose "hospital's" over "hospital"
+			// minimize position, maximize label length if tied. for example choose "hospital's" over "hospital"
 			//Optional<Clazz> firstOpt = restClasses.stream().min(Comparator.comparing(indices::get).thenComparing(c->-((Clazz)c).label.length()));
 			if(minOpt.isEmpty()) {break;}
 			var min = minOpt.get();
 			var clazz = min.getValue0();
 			int pos = min.getValue1();
 			int labelLength = min.getValue2(); 
-			
+
 
 			if(pos>0)
 			{

@@ -3,6 +3,7 @@ import java.io.File;
 import java.math.BigInteger;
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
 import javax.xml.bind.JAXBException;
 import org.apache.commons.lang3.StringUtils;
@@ -25,7 +26,7 @@ public class Extractor
 
 	private static String labelToLocalName(String label)
 	{
-		return WordUtils.capitalizeFully(label).replaceAll(" ","");
+		return WordUtils.capitalizeFully(label).replaceAll("[^A-Za-z0-9]","");
 	}
 
 	/** Test script that loads an example file and prints the result to the console.*/
@@ -52,7 +53,7 @@ public class Extractor
 
 		Object[][] tagClasses = {{"w:i","Entity Type",Subtop.EntityType},{"w:b","Role",Subtop.Role},{"w:u","Function",Subtop.Function}};
 
-		var classes = new HashSet<Clazz>();
+		var classes = new LinkedHashSet<Clazz>();
 		var processedRuns = new HashSet<R>();
 		var processedLabels = new HashSet<String>();
 		var warnings = new HashSet<String>(); // prevent the same warning from showing multiple times
