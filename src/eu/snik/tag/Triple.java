@@ -8,8 +8,9 @@ import lombok.EqualsAndHashCode;
 @EqualsAndHashCode
 public class Triple
 {
-	final Clazz subject,object;
-	final Relation predicate;
+	public final	Clazz subject;
+	public 				Clazz object; // needs to be changed on merge
+	public final Relation predicate;
 
 	/**@throws IllegalArgumentException if domain or range of the predicate are violated by the subtop of the subject or object, respectively.	 */
 	public Triple(Clazz subject, Relation predicate, Clazz object) throws IllegalArgumentException

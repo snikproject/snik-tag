@@ -1,5 +1,4 @@
 package eu.snik.tag;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
@@ -11,15 +10,12 @@ import org.apache.jena.rdf.model.ResourceFactory;
 import org.apache.jena.vocabulary.OWL;
 import org.apache.jena.vocabulary.RDFS;
 import eu.snik.tag.gui.CollectionStringConverter;
-import lombok.AllArgsConstructor;
-import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
 
 /** An RDF class following the SNIK meta model. Fields can be modified. */
 @Getter // used by cell PropertyValueFactory 
 @Setter
-@EqualsAndHashCode
 public class Clazz
 {
 	/** rdfs:label*/
@@ -37,7 +33,19 @@ public class Clazz
 		this.subtop=subtop;
 	}
 	
-	@EqualsAndHashCode.Exclude
+	@Override
+	public boolean equals(Object obj)
+	{
+		if(!(obj instanceof Clazz)) {return false;}
+		return (((Clazz)(obj)).localName).equals(this.localName);
+	}
+	
+	@Override
+	public int hashCode()
+	{
+		return localName.hashCode();
+	}
+	
 	final Set<Triple> triples = new HashSet<>();
 
 	/** an unmodifiable copy of the triples */
