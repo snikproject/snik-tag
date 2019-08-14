@@ -178,11 +178,13 @@ public class ClassTextPane extends ScrollPane
 				case EntityType:	classText.getStyleClass().add("text-entity-type");break;
 			}
 			flow.getChildren().add(classText);
-			//texts.put(first, classText);
-			//System.out.println(restText);
+			//texts.put(first, classText);			
 			restText = restText.substring(pos+labelLength);
 		}
-		if(restText!=null&&!restText.isBlank()) {getChildren().add(new Text(restText));}		
+		
+		Text rest = new Text(restText);
+		rest.getStyleClass().add("text-class");
+		if(restText!=null&&!restText.isBlank()) {flow.getChildren().add(rest);}		
 	}
 
 }
