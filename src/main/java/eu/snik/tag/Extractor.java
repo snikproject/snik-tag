@@ -1,27 +1,23 @@
 package eu.snik.tag;
-import java.io.File;
 import java.io.InputStream;
-import java.math.BigInteger;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
-import java.util.Optional;
+import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.text.WordUtils;
+import org.apache.jena.rdfxml.xmlinput.states.StartStateRDForDescription;
 import org.docx4j.Docx4J;
 import org.docx4j.TextUtils;
 import org.docx4j.jaxb.Context;
 import org.docx4j.openpackaging.exceptions.Docx4JException;
 import org.docx4j.wml.Comments.Comment;
+import org.docx4j.wml.ContentAccessor;
 import org.docx4j.wml.ObjectFactory;
 import org.docx4j.wml.R;
-import org.docx4j.wml.R.CommentReference;
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import org.docx4j.wml.Text;
 
 /** Extracts SNIK classes from a tagged DOCX file. */
 public class Extractor
@@ -42,13 +38,51 @@ public class Extractor
 	}
 	*/
 
+	/** from https://stackoverflow.com/questions/19676282/docx4j-find-and-replace */
+	static List<Object> getAllElementsFromObject(Object obj, Class<?> toSearch) {
+    List<Object> result = new ArrayList<Object>();
+    if (obj instanceof JAXBElement) obj = ((JAXBElement<?>) obj).getValue();
+
+    if (obj.getClass().equals(toSearch))
+        result.add(obj);
+    else if (obj instanceof ContentAccessor) {
+        List<?> children = ((ContentAccessor) obj).getContent();
+        for (Object child : children) {
+            result.addAll(getAllElementsFromObject(child, toSearch));
+        }
+    }
+    return result;
+}
+	
 	/** @return 	the complete text from the DOCX file without any formatting */
 	public static String extractText(InputStream in) throws Docx4JException, JAXBException
 	{		
 		var wordMLPackage =	Docx4J.load(in);
 
 		var doc = wordMLPackage.getMainDocumentPart();
-		return TextUtils.getText(doc.getContents());
+		var parts = new ArrayList<String>();
+		
+	   List<Object> texts = getAllElementsFromObject(doc, org.docx4j.wml.Text.class);
+     for (Object t : texts) {
+        org.docx4j.wml.Text content = (org.docx4j.wml.Text) t;
+        parts.add(content.getValue());
+     }
+     return parts.stream().reduce((a,b)->
+     {    	 
+    	 if((a.endsWith(" ")||b.startsWith(" "))||
+    			(b.startsWith("."))||
+    			(b.startsWith(","))||
+    			(b.startsWith(";"))||
+    			(b.startsWith("’"))||
+    			(a.endsWith("(")||b.startsWith(")"))
+    			 )
+    	 {return a+b;}
+    	 
+    	 if(a.endsWith(",")||a.endsWith(".")) {return a+(b.startsWith(" ")?b:(" "+b));}
+    	 
+    	 return a+'\n'+b;
+     }).get();
+		//return TextUtils.getText(doc.getContents());
 	}
 
 	/**	@return all classes extracted from the tagged parts of the DOCX document*/
