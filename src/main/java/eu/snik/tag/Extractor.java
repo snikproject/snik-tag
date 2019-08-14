@@ -51,28 +51,6 @@ public class Extractor
 		return TextUtils.getText(doc.getContents());
 	}
 
-	enum TextPartType {NORMAL, HEADING, CLASS}
-
-	@AllArgsConstructor(access = AccessLevel.PRIVATE)
-	public static class TaggedText
-	{
-		TextPartType type;		
-		String text;		
-		Optional<Clazz> clazz;
-
-		@Override public String toString() {return text.toString();}		
-
-		public static TaggedText createNormal(String text) {return new TaggedText(TextPartType.NORMAL,text,Optional.empty());}
-		public static TaggedText createHeading(String text) {return new TaggedText(TextPartType.NORMAL,text,Optional.empty());}
-		public static TaggedText createClass(String text, Clazz clazz) {return new TaggedText(TextPartType.CLASS,text,Optional.of(clazz));}
-
-		public static String allText(Collection<TaggedText> taggedTexts)
-		{
-			return taggedTexts.stream().map(TaggedText::toString).reduce("", String::concat);
-		};
-	}
-
-
 	/**	@return all classes extracted from the tagged parts of the DOCX document*/
 	public static Collection<Clazz> extract(InputStream in) throws Docx4JException, JAXBException
 	{		
@@ -86,7 +64,6 @@ public class Extractor
 		var processedRuns = new HashSet<R>();
 		var processedLabels = new HashSet<String>();
 		var warnings = new HashSet<String>(); // prevent the same warning from showing multiple times
-		var taggedTexts  = new LinkedHashSet<TaggedText>();
 
 		for(var tc: tagClasses)
 		{
