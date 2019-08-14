@@ -1,5 +1,6 @@
 package eu.snik.tag.gui;
 import java.io.File;
+import java.io.FileInputStream;
 import eu.snik.tag.Clazz;
 import eu.snik.tag.Extractor;
 import javafx.application.Application;
@@ -46,8 +47,8 @@ public class Main extends Application
 	void openDocx(File file)
 	{
 		classes.clear();
-		classes.addAll(Extractor.extract(file));
-		textArea.setText(Extractor.extractText(file));
+		classes.addAll(Extractor.extract(new FileInputStream(file)));
+		textArea.setText(Extractor.extractText(new FileInputStream(file)));
 		
 		refresh();		
 	}
@@ -96,7 +97,7 @@ public class Main extends Application
 
 			pane.getChildren().add(tabPane);
 		}
-		openDocx(new File("benchmark/input.docx"));
+		openDocx(new File("src/main/resources/eu/snik/tag/benchmark.docx")); // use resource after finished refactoring  
 	}
 
 	public static void main(String[] args) {launch();} // Running this directly may fail. Use "mvn javafx:run" instead. 
