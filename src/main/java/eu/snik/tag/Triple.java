@@ -1,12 +1,12 @@
 package eu.snik.tag;
 
+import java.io.Serializable;
 import org.apache.jena.rdf.model.ResourceFactory;
 import org.apache.jena.rdf.model.Statement;
 import lombok.EqualsAndHashCode;
 
 /** A triple connecting two SNIK classes using a meta model relation.*/
-@EqualsAndHashCode
-public class Triple
+public class Triple implements Serializable
 {
 	public final	Clazz subject;
 	public 				Clazz object; // needs to be changed on merge
@@ -34,4 +34,5 @@ public class Triple
 	{
 		return ResourceFactory.createStatement(subject.resource(), predicate.property, object.resource());
 	}
+	
 }

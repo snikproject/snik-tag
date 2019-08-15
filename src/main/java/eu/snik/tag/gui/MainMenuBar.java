@@ -2,12 +2,12 @@ package eu.snik.tag.gui;
 
 import java.awt.Desktop;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileWriter;
 import java.net.URI;
 import java.util.Properties;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
-import javafx.scene.control.CheckMenuItem;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuBar;
 import javafx.scene.control.MenuItem;
@@ -29,12 +29,13 @@ public class MainMenuBar
 	static Menu fileMenu(Main main)
 	{
 		Menu fileMenu = new Menu("_Datei");
-		MenuItem openItem = new MenuItem("D_OCX Datei Öffnen");
-		fileMenu.getItems().add(openItem);
-		openItem.setAccelerator(new KeyCodeCombination(KeyCode.O,KeyCombination.CONTROL_DOWN));
+		{
+		MenuItem openDocxItem = new MenuItem("_DOCX Datei Öffnen");
+		fileMenu.getItems().add(openDocxItem);
+		openDocxItem.setAccelerator(new KeyCodeCombination(KeyCode.D,KeyCombination.CONTROL_DOWN));
 		var openChooser = new FileChooser();
 		openChooser.getExtensionFilters().add(new ExtensionFilter("DOCX", "*.docx"));
-		openItem.setOnAction(e->
+		openDocxItem.setOnAction(e->
 		{
 			try
 			{
@@ -43,7 +44,43 @@ public class MainMenuBar
 			}
 			catch(Exception ex) {new ExceptionAlert(ex).show();}
 		});
+		}
+		{
+		MenuItem openTaggedItem = new MenuItem("Ann_otierte Datei Öffnen");
+		fileMenu.getItems().add(openTaggedItem);
+		openTaggedItem.setAccelerator(new KeyCodeCombination(KeyCode.O,KeyCombination.CONTROL_DOWN));
+		var openChooser = new FileChooser();
+		openChooser.getExtensionFilters().add(new ExtensionFilter("SNIKT", "*.snikt"));
+		openTaggedItem.setOnAction(e->
+		{
+			try
+			{
+				File file = openChooser.showOpenDialog(main.stage);
+				if(file!=null) {main.openSnikt(new FileInputStream(file));}
+			}
+			catch(Exception ex) {new ExceptionAlert(ex).show();}
+		});
+		}
 
+		{
+		MenuItem saveTaggedItem = new MenuItem("Annotierte Datei _Speichern");
+		fileMenu.getItems().add(saveTaggedItem);
+		saveTaggedItem.setAccelerator(new KeyCodeCombination(KeyCode.S,KeyCombination.CONTROL_DOWN));
+		var saveChooser = new FileChooser();
+		saveChooser.getExtensionFilters().add(new ExtensionFilter("SNIKT", "*.snikt"));
+		saveTaggedItem.setOnAction(e->
+		{
+			try
+			{
+				File f = saveChooser.showSaveDialog(main.stage);
+				if(!f.getName().contains(".")) {f = new File(f.getAbsolutePath() + ".snikt");}
+				
+				if(f!=null) {main.saveSnikt(f);}
+			}
+			catch(Exception ex) {new ExceptionAlert(ex).show();}
+		});
+		}
+		
 		MenuItem saveRdfItem = new MenuItem("_RDF Turtle Datei Exportieren");
 		fileMenu.getItems().add(saveRdfItem);
 		saveRdfItem.setAccelerator(new KeyCodeCombination(KeyCode.R,KeyCombination.CONTROL_DOWN));

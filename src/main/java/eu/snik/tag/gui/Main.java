@@ -1,8 +1,14 @@
 package eu.snik.tag.gui;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.InputStream;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.util.ArrayList;
 import eu.snik.tag.Clazz;
 import eu.snik.tag.Extractor;
+import eu.snik.tag.State;
 import javafx.application.Application;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -13,8 +19,6 @@ import javafx.scene.control.SplitPane;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
 import javafx.scene.control.TabPane.TabDragPolicy;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import lombok.SneakyThrows;
@@ -22,8 +26,10 @@ import lombok.SneakyThrows;
 /** GUI entry point. Run with Maven via javafx:run. */
 public class Main extends Application
 {
-	public final ObservableList<Clazz> classes = FXCollections.observableArrayList();
-	
+	private String text = "";
+
+	public final ObservableList<Clazz> classes = FXCollections.observableArrayList();	
+
 	private final SplitPane textPane = new SplitPane();
 
 	private final RDFArea rdfText = new RDFArea(classes);
@@ -48,8 +54,9 @@ public class Main extends Application
 	{
 		classes.clear();
 		classes.addAll(Extractor.extract(new FileInputStream(file)));
-		textArea.setText(Extractor.extractText(new FileInputStream(file)));
-		
+		this.text = Extractor.extractText(new FileInputStream(file));
+		textArea.setText(this.text);
+
 		refresh();		
 	}
 
@@ -101,5 +108,21 @@ public class Main extends Application
 	}
 
 	public static void main(String[] args) {launch();} // Running this directly may fail. Use "mvn javafx:run" instead. 
+
+	public void openSnikt(InputStream in)
+	{
+		State state = new State(in); 
+		textArea.setText(state.text);
+		classes.clear();
+		classes.addAll(state.classes);
+		refresh();		
+	}
+
+	@SneakyThrows
+	public void saveSnikt(File f)
+	{
+		new State(this.text,this.classes).save(new FileOutputStream(f));		
+	}
+
 
 }

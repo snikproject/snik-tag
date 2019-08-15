@@ -1,7 +1,9 @@
 package eu.snik.tag;
+import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.Set;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.ModelFactory;
@@ -11,12 +13,13 @@ import org.apache.jena.vocabulary.OWL;
 import org.apache.jena.vocabulary.RDFS;
 import eu.snik.tag.gui.CollectionStringConverter;
 import lombok.Getter;
+import lombok.NonNull;
 import lombok.Setter;
 
 /** An RDF class following the SNIK meta model. Fields can be modified. */
 @Getter // used by cell PropertyValueFactory 
 @Setter
-public class Clazz
+public class Clazz implements Serializable
 {
 	/** rdfs:label*/
 	public final Set<String> labels = new LinkedHashSet<>();
@@ -25,7 +28,7 @@ public class Clazz
 	/** whether the class is a function, role or entity type.*/
 	public Subtop subtop;
 
-	public Clazz(String label, String localName, Subtop subtop)
+	public Clazz(@NonNull String label,@NonNull String localName,@NonNull Subtop subtop)
 	{
 		this.labels.add(label);
 		if(Math.random()>0.5) this.labels.add("schm"+label.substring(1)); // testing
@@ -46,10 +49,11 @@ public class Clazz
 		return localName.hashCode();
 	}
 	
-	final Set<Triple> triples = new HashSet<>();
+	// Set would be better but for some reason State.load throws an error then when calling hashCode of Clazz where localName is null 
+	final List<Triple> triples = new ArrayList<>();
 
 	/** an unmodifiable copy of the triples */
-	public Set<Triple> getTriples() {return Collections.unmodifiableSet(triples);}
+	public List<Triple> getTriples() {return Collections.unmodifiableList(triples);}
 
 	/** Add a SNIK meta model conforming triple.
 	  @param predicate a SNIK meta model relation  
