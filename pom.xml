@@ -5,22 +5,48 @@
 	<groupId>snik-tag</groupId>
 	<artifactId>snik-tag</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
+	<properties>
+		<lombok.version>1.18.2</lombok.version>
+		<maven.compiler.source>1.10</maven.compiler.source>
+		<maven.compiler.target>1.10</maven.compiler.target>
+	</properties>
 	<build>
-		<sourceDirectory>src</sourceDirectory>
+		<sourceDirectory>src/main/java</sourceDirectory>
 		<plugins>
 			<plugin>
 				<artifactId>maven-compiler-plugin</artifactId>
 				<version>3.8.0</version>
 				<configuration>
-					<release>12</release>
+					<source>${maven.compiler.source}</source>
+					<target>${maven.compiler.target}</target>
+					<!-- If you remove annotationProcessorPaths, it will not process SneakyThrows as a module 
+						and abort with "unreported exception java.io.IOException" -->
+					<annotationProcessorPaths>
+						<path>
+							<groupId>org.projectlombok</groupId>
+							<artifactId>lombok</artifactId>
+							<version>${lombok.version}</version>
+						</path>
+					</annotationProcessorPaths>
 				</configuration>
 			</plugin>
 			<plugin>
 				<groupId>org.openjfx</groupId>
 				<artifactId>javafx-maven-plugin</artifactId>
-				<version>0.0.2</version>
+				<version>0.0.3</version>
 				<configuration>
 					<mainClass>eu.snik.tag.gui.Main</mainClass>
+					<!-- If you remove annotationProcessorPaths as a module, it will not process SneakyThrows 
+						and abort with "unreported exception java.io.IOException" -->
+					<!-- 
+					<annotationProcessorPaths>
+						<path>
+							<groupId>org.projectlombok</groupId>
+							<artifactId>lombok</artifactId>
+							<version>${lombok.version}</version>
+						</path>
+					</annotationProcessorPaths>
+					 -->					
 				</configuration>
 			</plugin>
 			<plugin>
@@ -106,13 +132,19 @@
 		<dependency>
 			<groupId>org.projectlombok</groupId>
 			<artifactId>lombok</artifactId>
-			<version>1.18.8</version>
+			<version>${lombok.version}</version>
 			<scope>provided</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.json</groupId>
 			<artifactId>json</artifactId>
 			<version>20190722</version>
+		</dependency>
+		<dependency>
+			<groupId>org.junit.jupiter</groupId>
+			<artifactId>junit-jupiter-api</artifactId>
+			<version>5.5.1</version>
+			<scope>test</scope>
 		</dependency>
 	</dependencies>
 </project>
