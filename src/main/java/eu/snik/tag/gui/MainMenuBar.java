@@ -6,6 +6,7 @@ import java.io.FileInputStream;
 import java.io.FileWriter;
 import java.net.URI;
 import java.util.Properties;
+import eu.snik.tag.Clazz;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Menu;
@@ -30,87 +31,114 @@ public class MainMenuBar
 	{
 		Menu fileMenu = new Menu("_Datei");
 		{
-		MenuItem openDocxItem = new MenuItem("_DOCX Datei Öffnen");
-		fileMenu.getItems().add(openDocxItem);
-		openDocxItem.setAccelerator(new KeyCodeCombination(KeyCode.D,KeyCombination.CONTROL_DOWN));
-		var openChooser = new FileChooser();
-		openChooser.getExtensionFilters().add(new ExtensionFilter("DOCX", "*.docx"));
-		openDocxItem.setOnAction(e->
-		{
-			try
+			MenuItem openDocxItem = new MenuItem("_DOCX Datei Öffnen");
+			fileMenu.getItems().add(openDocxItem);
+			openDocxItem.setAccelerator(new KeyCodeCombination(KeyCode.D,KeyCombination.CONTROL_DOWN));
+			var openChooser = new FileChooser();
+			openChooser.getExtensionFilters().add(new ExtensionFilter("DOCX", "*.docx"));
+			openDocxItem.setOnAction(e->
 			{
-				File file = openChooser.showOpenDialog(main.stage);
-				if(file!=null) {main.openDocx(file);}
-			}
-			catch(Exception ex) {new ExceptionAlert(ex).show();}
-		});
+				try
+				{
+					File file = openChooser.showOpenDialog(main.stage);
+					if(file!=null) {main.openDocx(file);}
+				}
+				catch(Exception ex) {new ExceptionAlert(ex).show();}
+			});
 		}
 		{
-		MenuItem openTaggedItem = new MenuItem("Ann_otierte Datei Öffnen");
-		fileMenu.getItems().add(openTaggedItem);
-		openTaggedItem.setAccelerator(new KeyCodeCombination(KeyCode.O,KeyCombination.CONTROL_DOWN));
-		var openChooser = new FileChooser();
-		openChooser.getExtensionFilters().add(new ExtensionFilter("SNIKT", "*.snikt"));
-		openTaggedItem.setOnAction(e->
-		{
-			try
+			MenuItem openTaggedItem = new MenuItem("Ann_otierte Datei Öffnen");
+			fileMenu.getItems().add(openTaggedItem);
+			openTaggedItem.setAccelerator(new KeyCodeCombination(KeyCode.O,KeyCombination.CONTROL_DOWN));
+			var openChooser = new FileChooser();
+			openChooser.getExtensionFilters().add(new ExtensionFilter("SNIKT", "*.snikt"));
+			openTaggedItem.setOnAction(e->
 			{
-				File file = openChooser.showOpenDialog(main.stage);
-				if(file!=null) {main.openSnikt(new FileInputStream(file));}
-			}
-			catch(Exception ex) {new ExceptionAlert(ex).show();}
-		});
+				try
+				{
+					File file = openChooser.showOpenDialog(main.stage);
+					if(file!=null) {main.openSnikt(new FileInputStream(file));}
+				}
+				catch(Exception ex) {new ExceptionAlert(ex).show();}
+			});
 		}
 
 		{
-		MenuItem saveTaggedItem = new MenuItem("Annotierte Datei _Speichern");
-		fileMenu.getItems().add(saveTaggedItem);
-		saveTaggedItem.setAccelerator(new KeyCodeCombination(KeyCode.S,KeyCombination.CONTROL_DOWN));
-		var saveChooser = new FileChooser();
-		saveChooser.getExtensionFilters().add(new ExtensionFilter("SNIKT", "*.snikt"));
-		saveTaggedItem.setOnAction(e->
-		{
-			try
+			MenuItem saveTaggedItem = new MenuItem("Annotierte Datei _Speichern");
+			fileMenu.getItems().add(saveTaggedItem);
+			saveTaggedItem.setAccelerator(new KeyCodeCombination(KeyCode.S,KeyCombination.CONTROL_DOWN));
+			var saveChooser = new FileChooser();
+			saveChooser.getExtensionFilters().add(new ExtensionFilter("SNIKT", "*.snikt"));
+			saveTaggedItem.setOnAction(e->
 			{
-				File f = saveChooser.showSaveDialog(main.stage);
-				if(!f.getName().contains(".")) {f = new File(f.getAbsolutePath() + ".snikt");}
-				
-				if(f!=null) {main.saveSnikt(f);}
-			}
-			catch(Exception ex) {new ExceptionAlert(ex).show();}
-		});
-		}
-		
-		MenuItem saveRdfItem = new MenuItem("_RDF Turtle Datei Exportieren");
-		fileMenu.getItems().add(saveRdfItem);
-		saveRdfItem.setAccelerator(new KeyCodeCombination(KeyCode.R,KeyCombination.CONTROL_DOWN));
-		var saveRdfChooser = new FileChooser();
-		saveRdfChooser.getExtensionFilters().add(new ExtensionFilter("Turtle", "*.ttl"));
-		saveRdfItem.setOnAction(e->
-		{
-			File file = saveRdfChooser.showSaveDialog(main.stage);
-			if(file!=null)
-			{
-				try(FileWriter writer = new FileWriter(file))
+				try
 				{
-					{
-						RDFArea.rdfModel(main.classes).write(writer,"TURTLE");
-					}
+					File f = saveChooser.showSaveDialog(main.stage);
+					if(!f.getName().contains(".")) {f = new File(f.getAbsolutePath() + ".snikt");}
+
+					if(f!=null) {main.saveSnikt(f);}
 				}
 				catch(Exception ex) {new ExceptionAlert(ex).show();}
-			}
-		});
+			});
+		}
+
+		{
+			MenuItem saveRdfItem = new MenuItem("_RDF Turtle Datei Exportieren");
+			fileMenu.getItems().add(saveRdfItem);
+			saveRdfItem.setAccelerator(new KeyCodeCombination(KeyCode.R,KeyCombination.CONTROL_DOWN));
+			var saveRdfChooser = new FileChooser();
+			saveRdfChooser.getExtensionFilters().add(new ExtensionFilter("Turtle", "*.ttl"));
+			saveRdfItem.setOnAction(e->
+			{
+				File f = saveRdfChooser.showSaveDialog(main.stage);
+				if(!f.getName().contains(".")) {f = new File(f.getAbsolutePath() + ".ttl");}
+				if(f!=null)
+				{
+					try(FileWriter writer = new FileWriter(f))
+					{
+						{
+							RDFArea.rdfModel(main.classes).write(writer,"TURTLE");
+						}
+					}
+					catch(Exception ex) {new ExceptionAlert(ex).show();}
+				}
+			});
+		}
+
+		{
+			MenuItem saveJsonItem = new MenuItem("Cytoscape _JSON Exportieren");
+			fileMenu.getItems().add(saveJsonItem);
+			saveJsonItem.setAccelerator(new KeyCodeCombination(KeyCode.J,KeyCombination.CONTROL_DOWN));
+			var saveJsonChooser = new FileChooser();
+			saveJsonChooser.getExtensionFilters().add(new ExtensionFilter("JSON", "*.json"));
+			saveJsonItem.setOnAction(e->
+			{
+				File f = saveJsonChooser.showSaveDialog(main.stage);
+				if(!f.getName().contains(".")) {f = new File(f.getAbsolutePath() + ".json");}
+				if(f!=null)
+				{
+					try(FileWriter writer = new FileWriter(f))
+					{
+						{
+							writer.write(Clazz.cytoscapeElements(main.classes).toString(2));
+						}
+					}
+					catch(Exception ex) {new ExceptionAlert(ex).show();}
+				}
+			});
+		}
+		
 		return fileMenu;
 	}
-	
-//	static Menu optionsMenu()
-//	{
-//		Menu optionsMenu = new Menu("_Optionen");
-//		MenuItem developerItem = new CheckMenuItem("Developer Mode");		
-//		
-//		optionsMenu.getItems().addAll(developerItem);
-//		return optionsMenu;
-//	}
+
+	//	static Menu optionsMenu()
+	//	{
+	//		Menu optionsMenu = new Menu("_Optionen");
+	//		MenuItem developerItem = new CheckMenuItem("Developer Mode");		
+	//		
+	//		optionsMenu.getItems().addAll(developerItem);
+	//		return optionsMenu;
+	//	}
 
 
 	@SneakyThrows

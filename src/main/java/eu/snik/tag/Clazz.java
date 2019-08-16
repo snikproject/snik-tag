@@ -1,6 +1,7 @@
 package eu.snik.tag;
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -11,6 +12,8 @@ import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.rdf.model.ResourceFactory;
 import org.apache.jena.vocabulary.OWL;
 import org.apache.jena.vocabulary.RDFS;
+import org.json.JSONArray;
+import org.json.JSONObject;
 import eu.snik.tag.gui.CollectionStringConverter;
 import lombok.Getter;
 import lombok.NonNull;
@@ -35,20 +38,20 @@ public class Clazz implements Serializable
 		this.localName=localName;
 		this.subtop=subtop;
 	}
-	
+
 	@Override
 	public boolean equals(Object obj)
 	{
 		if(!(obj instanceof Clazz)) {return false;}
 		return (((Clazz)(obj)).localName).equals(this.localName);
 	}
-	
+
 	@Override
 	public int hashCode()
 	{
 		return localName.hashCode();
 	}
-	
+
 	// Set would be better but for some reason State.load throws an error then when calling hashCode of Clazz where localName is null 
 	final List<Triple> triples = new ArrayList<>();
 
@@ -81,7 +84,7 @@ public class Clazz implements Serializable
 	public Model rdfModel()
 	{
 		var model = ModelFactory.createDefaultModel();
-		Resource clazz = model.createResource(Snik.BB2+localName, OWL.Class);
+		Resource clazz = model.createResource(uri(), OWL.Class);
 		model.add(clazz, RDFS.subClassOf, subtop.resource);
 		for(String label: labels ) {model.add(clazz, RDFS.label, model.createLiteral(label, "en"));}
 
@@ -92,10 +95,53 @@ public class Clazz implements Serializable
 		return model;
 	}
 
+	String uri() {return Snik.BB2+localName;}
+
 	/** @return create a non-model-backed resource with the classe's local name in the SNIK bb2 namespace.*/
 	public Resource resource()
 	{
 		return ResourceFactory.createResource(Snik.BB2+localName);
 	}
 
+	public JSONObject cytoscapeNode()
+	{
+		var l = new JSONObject()		
+				.put("en", this.labels);
+		
+		var data = new JSONObject()
+				.put("id", uri())
+				.put("l", l)
+				.put("st", subtop.toString().substring(0, 1).toUpperCase())
+				.put("prefix", "bb");
+
+		var position = new JSONObject()
+				.put("x", Math.random()*100)
+				.put("y", Math.random()*100);
+
+		return new JSONObject()
+				.put("group", "nodes")
+				.put("data",data)
+				.put("position",position);
+				//.append("classes",subtop.toString());
+	}
+
+	public static JSONArray cytoscapeElements(Collection<Clazz> classes)
+	{
+		var elements = new ArrayList<JSONObject>();
+
+		// nodes first, edges second
+		for(Clazz c: classes)
+		{
+			elements.add(c.cytoscapeNode());
+		}
+		for(Clazz c: classes)
+		{		
+			for(Triple t: c.triples)
+			{
+				elements.add(t.cytoscapeEdge());
+			}
+		}		
+		return new JSONArray(elements);
+	}
+	
 }
