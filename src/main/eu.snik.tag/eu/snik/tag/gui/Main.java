@@ -3,9 +3,6 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.InputStream;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import java.util.ArrayList;
 import eu.snik.tag.Clazz;
 import eu.snik.tag.Extractor;
 import eu.snik.tag.State;
@@ -21,7 +18,6 @@ import javafx.scene.control.TabPane;
 import javafx.scene.control.TabPane.TabDragPolicy;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
-import lombok.SneakyThrows;
 
 /** GUI entry point. Run with Maven via javafx:run. */
 public class Main extends Application
@@ -49,15 +45,17 @@ public class Main extends Application
 	}
 
 	/** @param file DOCX file with tagged entity types (italic), roles (bold) and functions (function).*/
-	@SneakyThrows
 	void openDocx(File file)
 	{
-		classes.clear();
-		classes.addAll(Extractor.extract(new FileInputStream(file)));
-		this.text = Extractor.extractText(new FileInputStream(file));
-		textArea.setText(this.text);
-
-		refresh();		
+		try
+		{
+			classes.clear();
+			classes.addAll(Extractor.extract(new FileInputStream(file)));
+			this.text = Extractor.extractText(new FileInputStream(file));
+			textArea.setText(this.text);
+			refresh();
+		}
+		catch(Exception e) {new ExceptionAlert(e).show();}
 	}
 
 	private class UnclosableTab extends Tab
@@ -118,11 +116,13 @@ public class Main extends Application
 		refresh();		
 	}
 
-	@SneakyThrows
 	public void saveSnikt(File f)
 	{
-		new State(this.text,this.classes).save(new FileOutputStream(f));		
+		try
+		{
+			new State(this.text,this.classes).save(new FileOutputStream(f));
+		}
+		catch(Exception e) {throw new RuntimeException(e);}
 	}
-
 
 }

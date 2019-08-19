@@ -144,7 +144,7 @@ public class ClassTable extends VBox
 		localNameCol.setMinWidth(300);
 		localNameCol.setOnEditCommit(e->
 		{
-			e.getRowValue().setLocalName(e.getNewValue());
+			e.getRowValue().localName=e.getNewValue();
 			update.run();
 		});
 
@@ -155,7 +155,7 @@ public class ClassTable extends VBox
 		subtopCol.setMinWidth(300);
 		subtopCol.setOnEditCommit(e->
 		{
-			e.getRowValue().setSubtop(e.getNewValue());
+			e.getRowValue().subtop=e.getNewValue();
 			update.run();
 		});
 

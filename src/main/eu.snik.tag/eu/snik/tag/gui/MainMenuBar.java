@@ -4,6 +4,7 @@ import java.awt.Desktop;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileWriter;
+import java.io.IOException;
 import java.net.URI;
 import java.util.Properties;
 import eu.snik.tag.Clazz;
@@ -18,11 +19,8 @@ import javafx.scene.input.KeyCombination;
 import javafx.scene.layout.Region;
 import javafx.stage.FileChooser;
 import javafx.stage.FileChooser.ExtensionFilter;
-import lombok.SneakyThrows;
-import lombok.extern.java.Log;
 
 /** File and Help menu. */
-@Log
 public class MainMenuBar
 {
 	private MainMenuBar() {};
@@ -38,12 +36,8 @@ public class MainMenuBar
 			openChooser.getExtensionFilters().add(new ExtensionFilter("DOCX", "*.docx"));
 			openDocxItem.setOnAction(e->
 			{
-				try
-				{
-					File file = openChooser.showOpenDialog(main.stage);
-					if(file!=null) {main.openDocx(file);}
-				}
-				catch(Exception ex) {new ExceptionAlert(ex).show();}
+				File file = openChooser.showOpenDialog(main.stage);
+				if(file!=null) {main.openDocx(file);}
 			});
 		}
 		{
@@ -127,7 +121,7 @@ public class MainMenuBar
 				}
 			});
 		}
-		
+
 		return fileMenu;
 	}
 
@@ -140,28 +134,34 @@ public class MainMenuBar
 	//		return optionsMenu;
 	//	}
 
-
-	@SneakyThrows
 	static MenuItem about()
 	{
 		MenuItem about = new MenuItem("Ü_ber");
-		Properties git = new Properties();
-		git.load(MainMenuBar.class.getClassLoader().getResourceAsStream("git.properties"));
 
-		Alert alert = new Alert(AlertType.INFORMATION);
-		alert.getDialogPane().setMinHeight(Region.USE_PREF_SIZE);
-		alert.getDialogPane().setMinWidth(1000);
-		about.setOnAction(e->alert.show());
-		alert.setTitle("Über");
-		alert.setHeaderText("SNIK Tag "+git.getProperty("git.build.version"));
-		alert.setContentText("JavaFX "+ System.getProperty("javafx.version") + ", running on Java " + System.getProperty("java.version") + ".\n"+
-				"Built "+git.getProperty("git.build.time")+"\n"+
-				"Commited "+git.getProperty("git.commit.time")+" ID "+git.getProperty("git.commit.id")+"\n"+
-				"Commit Message "+git.getProperty("git.commit.message.short")+"\n"+
-				"Committer "+git.getProperty("git.build.user.name")+" "+git.getProperty("git.build.user.email")+"\n"+
-				"Nearest Tag "+git.getProperty("git.closest.tag.name")
-				);
+		try
+		{
+			Properties git = new Properties();			
+			git.load(MainMenuBar.class.getClassLoader().getResourceAsStream("git.properties"));
+
+			Alert alert = new Alert(AlertType.INFORMATION);
+			alert.getDialogPane().setMinHeight(Region.USE_PREF_SIZE);
+			alert.getDialogPane().setMinWidth(1000);
+			about.setOnAction(e->alert.show());
+			alert.setTitle("Über");
+			alert.setHeaderText("SNIK Tag "+git.getProperty("git.build.version"));
+			alert.setContentText("JavaFX "+ System.getProperty("javafx.version") + ", running on Java " + System.getProperty("java.version") + ".\n"+
+					"Built "+git.getProperty("git.build.time")+"\n"+
+					"Commited "+git.getProperty("git.commit.time")+" ID "+git.getProperty("git.commit.id")+"\n"+
+					"Commit Message "+git.getProperty("git.commit.message.short")+"\n"+
+					"Committer "+git.getProperty("git.build.user.name")+" "+git.getProperty("git.build.user.email")+"\n"+
+					"Nearest Tag "+git.getProperty("git.closest.tag.name")
+					);
+		}
+		catch(IOException e) {System.err.println("Couldn't load GIT information.");}
+
 		return about;
+
+
 	}
 
 	static void browse(String uri)
@@ -169,7 +169,7 @@ public class MainMenuBar
 		if(!(Desktop.isDesktopSupported()&&Desktop.getDesktop().isSupported(Desktop.Action.BROWSE)))
 		{
 			new Alert(AlertType.WARNING, "Kann Website nicht öffnen, nicht unterstützt.").show();;
-			log.warning("Cannot open Website, not supported.");
+			System.err.println("Cannot open Website, not supported.");
 			return;
 		};
 		// Using the JavaFX thread for desktop hangs the program.
@@ -178,7 +178,6 @@ public class MainMenuBar
 		}).start();
 	}
 
-	@SneakyThrows
 	static Menu helpMenu()
 	{
 		Menu helpMenu = new Menu("_Hilfe");

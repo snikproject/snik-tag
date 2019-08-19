@@ -2,9 +2,7 @@ package eu.snik.tag;
 
 import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.rdf.model.ResourceFactory;
-import lombok.AllArgsConstructor;
 
-@AllArgsConstructor
 /** Direct subclass of meta:Top, called subtop class. */
 public enum Subtop
 {

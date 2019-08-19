@@ -15,23 +15,23 @@ import org.apache.jena.vocabulary.RDFS;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import eu.snik.tag.gui.CollectionStringConverter;
-import lombok.Getter;
-import lombok.NonNull;
-import lombok.Setter;
 
 /** An RDF class following the SNIK meta model. Fields can be modified. */
-@Getter // used by cell PropertyValueFactory 
-@Setter
 public class Clazz implements Serializable
 {
 	/** rdfs:label*/
 	public final Set<String> labels = new LinkedHashSet<>();
+	public Set<String> getLabels() {return Collections.unmodifiableSet(labels);} // for table view
+	
 	/** the URI part after the prefix*/
 	public String localName;
+	public String getLocalName() {return localName;} // for table view
+	
 	/** whether the class is a function, role or entity type.*/
 	public Subtop subtop;
+	public Subtop getSubtop() {return subtop;} // for table view
 
-	public Clazz(@NonNull String label,@NonNull String localName,@NonNull Subtop subtop)
+	public Clazz(String label,String localName,Subtop subtop)
 	{
 		this.labels.add(label);
 		if(Math.random()>0.5) this.labels.add("schm"+label.substring(1)); // testing

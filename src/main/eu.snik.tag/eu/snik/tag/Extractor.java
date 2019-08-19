@@ -9,7 +9,6 @@ import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.text.WordUtils;
-import org.apache.jena.rdfxml.xmlinput.states.StartStateRDForDescription;
 import org.docx4j.Docx4J;
 import org.docx4j.TextUtils;
 import org.docx4j.jaxb.Context;
@@ -55,8 +54,10 @@ public class Extractor
 }
 	
 	/** @return 	the complete text from the DOCX file without any formatting */
-	public static String extractText(InputStream in) throws Docx4JException, JAXBException
+	public static String extractText(InputStream in)
 	{		
+		try
+		{
 		var wordMLPackage =	Docx4J.load(in);
 
 		var doc = wordMLPackage.getMainDocumentPart();
@@ -83,11 +84,15 @@ public class Extractor
     	 return a+'\n'+b;
      }).get();
 		//return TextUtils.getText(doc.getContents());
+		}
+		catch(Docx4JException e) {throw new RuntimeException(e);}
 	}
 
 	/**	@return all classes extracted from the tagged parts of the DOCX document*/
-	public static Collection<Clazz> extract(InputStream in) throws Docx4JException, JAXBException
-	{		
+	public static Collection<Clazz> extract(InputStream in)
+	{
+		try
+		{
 		var wordMLPackage =	Docx4J.load(in);
 		var doc = wordMLPackage.getMainDocumentPart();
 		List<Comment> comments = doc.getCommentsPart().getContents().getComment();
@@ -148,5 +153,7 @@ public class Extractor
 		System.err.println(warnings.stream().reduce("", (a,b)->a+"\n"+b));
 		System.out.println(classes.size()+" classes extracted.");
 		return classes;
+		}
+		catch(Docx4JException|JAXBException e) {throw new RuntimeException(e);}
 	}
 }

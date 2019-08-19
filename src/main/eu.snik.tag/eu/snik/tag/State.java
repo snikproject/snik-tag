@@ -1,22 +1,19 @@
 package eu.snik.tag;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Collection;
-import lombok.EqualsAndHashCode;
-import lombok.SneakyThrows;
 
-@EqualsAndHashCode
 public class State
 {
 	public final String text;
 	public final ArrayList<Clazz> classes;	
 	
 	@SuppressWarnings("unchecked")
-	@SneakyThrows
 	public State(InputStream in)
 	{
 		try(var oin = new ObjectInputStream(in))
@@ -24,6 +21,7 @@ public class State
 			this.text = (String) oin.readObject();
 			this.classes = (ArrayList<Clazz>)oin.readObject();
 		}
+		catch(IOException|ClassNotFoundException e) {throw new RuntimeException(e);}
 	}	
 	
 	public State(String text, Collection<Clazz> classes)
@@ -32,7 +30,6 @@ public class State
 		this.classes = new ArrayList<>(classes);
 	}
 	
-	@SneakyThrows
 	public void save(OutputStream out)
 	{
 		try(var oout = new ObjectOutputStream(out))
@@ -40,6 +37,7 @@ public class State
 			oout.writeObject(text);
 			oout.writeObject(classes);
 		}
+		catch(IOException e) {throw new RuntimeException(e);}
 	}
 
 }

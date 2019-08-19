@@ -6,28 +6,17 @@
 	<artifactId>snik-tag</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<properties>
-		<lombok.version>1.18.2</lombok.version>
-		<maven.compiler.source>1.10</maven.compiler.source>
-		<maven.compiler.target>1.10</maven.compiler.target>
+		<maven.compiler.release>12</maven.compiler.release>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 	</properties>
 	<build>
-		<sourceDirectory>src/main/java</sourceDirectory>
+		<sourceDirectory>src/main/eu.snik.tag</sourceDirectory>
 		<plugins>
 			<plugin>
 				<artifactId>maven-compiler-plugin</artifactId>
 				<version>3.8.0</version>
 				<configuration>
-					<source>${maven.compiler.source}</source>
-					<target>${maven.compiler.target}</target>
-					<!-- If you remove annotationProcessorPaths, it will not process SneakyThrows as a module 
-						and abort with "unreported exception java.io.IOException" -->
-					<annotationProcessorPaths>
-						<path>
-							<groupId>org.projectlombok</groupId>
-							<artifactId>lombok</artifactId>
-							<version>${lombok.version}</version>
-						</path>
-					</annotationProcessorPaths>
+					<release>${maven.compiler.release}</release>
 				</configuration>
 			</plugin>
 			<plugin>
@@ -36,17 +25,6 @@
 				<version>0.0.3</version>
 				<configuration>
 					<mainClass>eu.snik.tag.gui.Main</mainClass>
-					<!-- If you remove annotationProcessorPaths as a module, it will not process SneakyThrows 
-						and abort with "unreported exception java.io.IOException" -->
-					<!-- 
-					<annotationProcessorPaths>
-						<path>
-							<groupId>org.projectlombok</groupId>
-							<artifactId>lombok</artifactId>
-							<version>${lombok.version}</version>
-						</path>
-					</annotationProcessorPaths>
-					 -->					
 				</configuration>
 			</plugin>
 			<plugin>
@@ -128,12 +106,6 @@
 			<groupId>org.openjfx</groupId>
 			<artifactId>javafx-web</artifactId>
 			<version>12.0.1</version>
-		</dependency>
-		<dependency>
-			<groupId>org.projectlombok</groupId>
-			<artifactId>lombok</artifactId>
-			<version>${lombok.version}</version>
-			<scope>provided</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.json</groupId>
