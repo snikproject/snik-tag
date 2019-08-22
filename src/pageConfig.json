@@ -1,0 +1,72 @@
+{
+  "appName": "SNIK TAG Tool",
+  "headerNavigation": [
+    {
+      "name": "Dokumentation",
+      "path": "/Dokumentation"
+    }
+  ],
+  "landingPage": "/Dokumentation",
+  "topics": [
+  	"news"
+  ],
+  "pages": [
+    {
+      "route": "/Dokumentation",
+      "name": "Dokumentation",
+      "description": "Hier finden Sie die Dokumentation für das SNIK Tag Tool",
+      "icon": "address-book",
+      "children": [
+        {
+          "route": "/whatsNew",
+          "name": "Was gibts neues?",
+          "description": "Neue Entwicklungen, Versionen und Visionen",
+          "icon": "bullhorn",
+          "topics": ["News"],
+          "markdown" : "/static/markdown/whatsnew/Current.md"
+        },
+        {
+          "route": "/process",
+          "name": "Prozess Dokumentation",
+          "description": "Alles über das Arbeiten mit dem SNIK Tag Tool",
+          "icon": "project-diagram",
+          "topics": ["Prozesse"],
+          "children": [
+            {
+              "route": "/introduction",
+              "name": "Einführung",
+              "description": "Wie Sie diese Dokumentation lesen sollten",
+              "icon": "play-circle",
+              "topics": ["Prozesse"],
+              "markdown" : "/static/markdown/process/Introduction.md"
+            },
+            {
+              "route": "/StepByStep",
+              "name": "Schritt für Schritt",
+              "description": "Ein Rundgang durch das SNIK TAG Tool",
+              "icon": "shoe-prints",
+              "topics": ["Prozesse"],
+              "markdown" : "/static/markdown/process/StepByStep.md"
+            }
+          ]
+        },
+        {
+          "route": "/links",
+          "name": "Hilfreiche Links",
+          "description": "Wie gehts von hier aus weiter ?",
+          "topics": [],
+          "icon": "link",
+          "markdown" : "/static/markdown/Links.md"
+        },
+        {
+          "route": "/faq",
+          "name": "FAQs",
+          "description": "Häufig gestellte Fragen sind hier gesammelt",
+          "topics": [],
+          "icon": "question-circle",
+          "markdown" : "/static/markdown/FAQ.md"
+        }
+      ]
+    }
+  ]
+}
