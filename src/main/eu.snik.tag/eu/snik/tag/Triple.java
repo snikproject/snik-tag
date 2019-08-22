@@ -1,6 +1,7 @@
 package eu.snik.tag;
 
 import java.io.Serializable;
+import java.util.Collections;
 import java.util.concurrent.atomic.AtomicInteger;
 import org.apache.jena.rdf.model.ResourceFactory;
 import org.apache.jena.rdf.model.Statement;
@@ -19,8 +20,8 @@ public class Triple implements Serializable
 	/**@throws IllegalArgumentException if domain or range of the predicate are violated by the subtop of the subject or object, respectively.	 */
 	public Triple(Clazz subject, Relation predicate, Clazz object) throws IllegalArgumentException
 	{		
-		if(predicate.domain!=subject.subtop) {throw new IllegalArgumentException("Domain of "+predicate+" is "+predicate.domain+" but subject subtop is "+subject.subtop);}
-		if(predicate.range!=object.subtop) {throw new IllegalArgumentException("Range of "+predicate+" is "+predicate.range+" but object subtop is "+object.subtop);}
+		if(!predicate.domain.contains(subject.subtop)) {throw new IllegalArgumentException("Domain of "+predicate+" is "+predicate.domain+" but subject subtop is "+subject.subtop);}
+		if(!predicate.range.contains(object.subtop)) {throw new IllegalArgumentException("Range of "+predicate+" is "+predicate.range+" but object subtop is "+object.subtop);}
 		
 		cytoscapeId = count.getAndIncrement();
 		

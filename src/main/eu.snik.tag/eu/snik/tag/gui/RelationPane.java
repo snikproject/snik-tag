@@ -34,7 +34,7 @@ public class RelationPane extends VBox
 		predicateBox.setItems(FXCollections.observableArrayList(
 				Arrays
 				.stream(Relation.values())
-				.filter(r->r.domain==subjectBox.getValue().subtop&&r.range==objectBox.getValue().subtop)
+				.filter(r->r.domain.contains(subjectBox.getValue().subtop)&&r.range.contains(objectBox.getValue().subtop))
 				.collect(Collectors.toList())
 				));
 	}
