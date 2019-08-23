@@ -1,7 +1,6 @@
 package eu.snik.tag;
 
 import java.io.Serializable;
-import java.util.Collections;
 import java.util.concurrent.atomic.AtomicInteger;
 import org.apache.jena.rdf.model.ResourceFactory;
 import org.apache.jena.rdf.model.Statement;

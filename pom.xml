@@ -118,5 +118,10 @@
 			<version>5.5.1</version>
 			<scope>test</scope>
 		</dependency>
+		<dependency>
+			<groupId>org.controlsfx</groupId>
+			<artifactId>controlsfx</artifactId>
+			<version>11.0.0</version>
+		</dependency>
 	</dependencies>
 </project>

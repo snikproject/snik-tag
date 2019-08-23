@@ -12,9 +12,10 @@ import javafx.scene.layout.Priority;
 public class ExceptionAlert extends Alert
 {
 	
-	public ExceptionAlert(Exception ex)
+	public ExceptionAlert(String title, Exception ex)
 	{
 		super(AlertType.ERROR);
+		this.setTitle(title);
 		
 		StringWriter sw = new StringWriter();
 		PrintWriter pw = new PrintWriter(sw);

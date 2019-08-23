@@ -5,6 +5,8 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Optional;
+import java.util.function.Consumer;
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
 import org.apache.commons.lang3.StringUtils;
@@ -53,11 +55,10 @@ public class Extractor
     return result;
 }
 	
-	/** @return 	the complete text from the DOCX file without any formatting */
-	public static String extractText(InputStream in)
+	/** @return 	the complete text from the DOCX file without any formatting 
+	 * @throws Docx4JException */
+	public static String extractText(InputStream in) throws Docx4JException
 	{		
-		try
-		{
 		var wordMLPackage =	Docx4J.load(in);
 
 		var doc = wordMLPackage.getMainDocumentPart();
@@ -85,11 +86,10 @@ public class Extractor
      }).get();
 		//return TextUtils.getText(doc.getContents());
 		}
-		catch(Docx4JException e) {throw new RuntimeException(e);}
-	}
+
 
 	/**	@return all classes extracted from the tagged parts of the DOCX document*/
-	public static Collection<Clazz> extract(InputStream in)
+	public static Collection<Clazz> extract(InputStream in, Optional<Consumer<String>> warningCallback)
 	{
 		try
 		{
@@ -150,8 +150,9 @@ public class Extractor
 			}
 		}		
 
-		System.err.println(warnings.stream().reduce("", (a,b)->a+"\n"+b));
+		warningCallback.ifPresent(c->c.accept(warnings.stream().reduce("", (a,b)->a+"\n"+b)));
 		System.out.println(classes.size()+" classes extracted.");
+		
 		return classes;
 		}
 		catch(Docx4JException|JAXBException e) {throw new RuntimeException(e);}

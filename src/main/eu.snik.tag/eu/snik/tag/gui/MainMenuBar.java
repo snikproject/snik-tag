@@ -3,10 +3,12 @@ package eu.snik.tag.gui;
 import java.awt.Desktop;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.net.URI;
 import java.util.Properties;
+import org.docx4j.openpackaging.exceptions.Docx4JException;
 import eu.snik.tag.Clazz;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
@@ -37,7 +39,10 @@ public class MainMenuBar
 			openDocxItem.setOnAction(e->
 			{
 				File file = openChooser.showOpenDialog(main.stage);
-				if(file!=null) {main.openDocx(file);}
+				if(file==null) {return;}
+
+				try{main.openDocx(file);} catch (FileNotFoundException|Docx4JException ex) {Log.error("Fehler beim Öffnen eines DOCX documents", ex);}
+				
 			});
 		}
 		{
@@ -51,9 +56,11 @@ public class MainMenuBar
 				try
 				{
 					File file = openChooser.showOpenDialog(main.stage);
-					if(file!=null) {main.openSnikt(new FileInputStream(file));}
+					if(file==null) {return;}
+
+					main.openSnikt(new FileInputStream(file));
 				}
-				catch(Exception ex) {new ExceptionAlert(ex).show();}
+				catch(Exception ex) {Log.error("Fehler beim Öffnen einer annotierten Datei", ex);}
 			});
 		}
 
@@ -67,12 +74,16 @@ public class MainMenuBar
 			{
 				try
 				{
-					File f = saveChooser.showSaveDialog(main.stage);
-					if(!f.getName().contains(".")) {f = new File(f.getAbsolutePath() + ".snikt");}
+					File file = saveChooser.showSaveDialog(main.stage);
+					if(file==null) {return;}
 
-					if(f!=null) {main.saveSnikt(f);}
+					if(!file.getName().contains("."))
+					{
+						file = new File(file.getAbsolutePath() + ".snikt");
+					}
+					main.saveSnikt(file);
 				}
-				catch(Exception ex) {new ExceptionAlert(ex).show();}
+				catch(Exception ex) {Log.error("Fehler beim Speichern einer annotierten Datei", ex);}
 			});
 		}
 
@@ -84,18 +95,20 @@ public class MainMenuBar
 			saveRdfChooser.getExtensionFilters().add(new ExtensionFilter("Turtle", "*.ttl"));
 			saveRdfItem.setOnAction(e->
 			{
-				File f = saveRdfChooser.showSaveDialog(main.stage);
-				if(!f.getName().contains(".")) {f = new File(f.getAbsolutePath() + ".ttl");}
-				if(f!=null)
+				File file = saveRdfChooser.showSaveDialog(main.stage);
+				if(file==null) {return;}
+
+				if(!file.getName().contains(".")) {file = new File(file.getAbsolutePath() + ".ttl");}
+
+
+				try(FileWriter writer = new FileWriter(file))
 				{
-					try(FileWriter writer = new FileWriter(f))
 					{
-						{
-							RDFArea.rdfModel(main.classes).write(writer,"TURTLE");
-						}
+						RDFArea.rdfModel(main.classes).write(writer,"TURTLE");
 					}
-					catch(Exception ex) {new ExceptionAlert(ex).show();}
 				}
+				catch(Exception ex) {Log.error("Fehler beim Exportieren nach RDF/Turtle", ex);}
+
 			});
 		}
 
@@ -117,7 +130,7 @@ public class MainMenuBar
 							writer.write(Clazz.cytoscapeElements(main.classes).toString(2));
 						}
 					}
-					catch(Exception ex) {new ExceptionAlert(ex).show();}
+					catch(Exception ex) {Log.error("Fehler beim Exportieren nach JSON", ex);}
 				}
 			});
 		}

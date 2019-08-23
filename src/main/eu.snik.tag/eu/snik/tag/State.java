@@ -14,14 +14,14 @@ public class State
 	public final ArrayList<Clazz> classes;	
 	
 	@SuppressWarnings("unchecked")
-	public State(InputStream in)
+	public State(InputStream in) throws IOException
 	{
 		try(var oin = new ObjectInputStream(in))
 		{
 			this.text = (String) oin.readObject();
 			this.classes = (ArrayList<Clazz>)oin.readObject();
 		}
-		catch(IOException|ClassNotFoundException e) {throw new RuntimeException(e);}
+		catch(ClassNotFoundException e) {throw new RuntimeException(e);}
 	}	
 	
 	public State(String text, Collection<Clazz> classes)
@@ -30,14 +30,13 @@ public class State
 		this.classes = new ArrayList<>(classes);
 	}
 	
-	public void save(OutputStream out)
+	public void save(OutputStream out) throws IOException
 	{
 		try(var oout = new ObjectOutputStream(out))
 		{
 			oout.writeObject(text);
 			oout.writeObject(classes);
-		}
-		catch(IOException e) {throw new RuntimeException(e);}
+	}
 	}
 
 }

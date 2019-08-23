@@ -4,7 +4,6 @@ import java.util.Comparator;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
-import java.util.stream.Collectors;
 import org.apache.jena.ext.com.google.common.collect.LinkedListMultimap;
 import org.apache.jena.ext.com.google.common.collect.Multimap;
 import org.javatuples.Triplet;
@@ -130,6 +129,7 @@ public class ClassTextPane extends ScrollPane
 		{
 			final String restTextFinal = restText;
 
+			@SuppressWarnings("unchecked")
 			var minOpt = restClasses.stream().flatMap(c->(c.labels.stream()
 					.map(l->new Triplet<Clazz,Integer,Integer>(c,restTextFinal.indexOf(l),l.length()))))
 					.filter(t->t.getValue1()!=-1) // only with labels found in the text

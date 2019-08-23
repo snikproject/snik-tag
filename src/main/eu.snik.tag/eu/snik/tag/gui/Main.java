@@ -1,12 +1,17 @@
 package eu.snik.tag.gui;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
+import java.util.Optional;
+import org.docx4j.openpackaging.exceptions.Docx4JException;
 import eu.snik.tag.Clazz;
 import eu.snik.tag.Extractor;
 import eu.snik.tag.State;
 import javafx.application.Application;
+import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.geometry.Pos;
@@ -18,6 +23,7 @@ import javafx.scene.control.TabPane;
 import javafx.scene.control.TabPane.TabDragPolicy;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
+import javafx.stage.Window;
 
 /** GUI entry point. Run with Maven via javafx:run. */
 public class Main extends Application
@@ -37,6 +43,8 @@ public class Main extends Application
 
 	public Stage stage;
 
+	private Window window;
+
 	/** Refresh the different visualizations of the RDF classes. Use after classes are modified.*/
 	public void refresh()
 	{		
@@ -44,19 +52,24 @@ public class Main extends Application
 		rdfText.refresh();
 	}
 
-	/** @param file DOCX file with tagged entity types (italic), roles (bold) and functions (function).*/
-	void openDocx(File file)
+	/** @param file DOCX file with tagged entity types (italic), roles (bold) and functions (function).
+	 * @throws FileNotFoundException 
+	 * @throws Docx4JException */
+	void openDocx(File file) throws FileNotFoundException, Docx4JException
 	{
-		try
+		var newClasses = Extractor.extract(new FileInputStream(file),Optional.of(s->Log.warn(s, window)));
+		var newText = Extractor.extractText(new FileInputStream(file));
+		this.text = newText;				
+				
+		Platform.runLater(()->
 		{
-			classes.clear();
-			classes.addAll(Extractor.extract(new FileInputStream(file)));
-			this.text = Extractor.extractText(new FileInputStream(file));
+			this.classes.clear();
+			this.classes.addAll(newClasses);
 			textArea.setText(this.text);
 			refresh();
-		}
-		catch(Exception e) {new ExceptionAlert(e).show();}
-	}
+		});
+	}		
+
 
 	private class UnclosableTab extends Tab
 	{
@@ -82,6 +95,7 @@ public class Main extends Application
 			stage.setScene(scene);
 			stage.setMaximized(true);
 			stage.show();
+			this.window = scene.getWindow();
 		}		
 		pane.getChildren().add(MainMenuBar.create(this));
 
@@ -102,18 +116,22 @@ public class Main extends Application
 
 			pane.getChildren().add(tabPane);
 		}
-		openDocx(new File("src/main/resources/eu/snik/tag/benchmark.docx")); // use resource after finished refactoring  
+
+		//openDocx(new File("src/main/resources/eu/snik/tag/benchmark.docx")); // use resource after finished refactoring  
 	}
 
 	public static void main(String[] args) {launch();} // Running this directly may fail. Use "mvn javafx:run" instead. 
 
-	public void openSnikt(InputStream in)
+	public void openSnikt(InputStream in) throws IOException
 	{
-		State state = new State(in); 
+		State state = new State(in);
+		Platform.runLater(()->
+		{
 		textArea.setText(state.text);
 		classes.clear();
 		classes.addAll(state.classes);
-		refresh();		
+		refresh();
+		});
 	}
 
 	public void saveSnikt(File f)

@@ -16,5 +16,6 @@ module eu.snik.tag
 	requires org.apache.jena.ext.com.google;
 	requires org.docx4j.core;
 	requires org.docx4j.openxml_objects;
-	requires org.json;	
+	requires org.json;
+	requires org.controlsfx.controls;	
 }
