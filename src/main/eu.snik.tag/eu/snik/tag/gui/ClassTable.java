@@ -130,7 +130,7 @@ public class ClassTable extends VBox
 		labelCol.setCellValueFactory(new PropertyValueFactory<>("labels"));
 		labelCol.setCellFactory(TextFieldTableCell.<Clazz,Set<String>>forTableColumn(CollectionStringConverter.INSTANCE));
 
-		labelCol.setMinWidth(300);
+		labelCol.setMinWidth(600);
 		labelCol.setOnEditCommit(e->
 		{
 			e.getRowValue().labels.clear();
@@ -141,7 +141,7 @@ public class ClassTable extends VBox
 		var localNameCol = new TableColumn<Clazz,String>("Local Name");
 		localNameCol.setCellValueFactory(new PropertyValueFactory<>("localName"));
 		localNameCol.setCellFactory(TextFieldTableCell.<Clazz>forTableColumn());
-		localNameCol.setMinWidth(300);
+		localNameCol.setMinWidth(350);
 		localNameCol.setOnEditCommit(e->
 		{
 			e.getRowValue().localName=e.getNewValue();
@@ -162,12 +162,9 @@ public class ClassTable extends VBox
 		var removeCol = buttonCol("Entfernen", "x", classes::remove);
 		
 		var mergeCol = buttonCol("Zusammenführen", "Zusammenführen", this::merge);
+		mergeCol.setMinWidth(150);
 		
-		var relationCol = new TableColumn<Clazz,Collection<Triple>>("Relations");
-		relationCol.setCellValueFactory(new PropertyValueFactory<>("triples"));
-		relationCol.setMinWidth(300);		
-
-		table.getColumns().addAll(labelCol,localNameCol,subtopCol,removeCol,mergeCol,relationCol);
+		table.getColumns().addAll(labelCol,localNameCol,subtopCol,removeCol,mergeCol);
 	}
 
 }

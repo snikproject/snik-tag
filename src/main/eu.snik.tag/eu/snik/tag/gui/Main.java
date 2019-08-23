@@ -40,6 +40,7 @@ public class Main extends Application
 	private ClassTextPane textArea = new ClassTextPane(classes,textRelationPane);
 
 	private final ClassTable tableView = new ClassTable(classes, this::refresh);
+	private final TripleTable tripleTable = new TripleTable(classes, this::refresh);
 
 	public Stage stage;
 
@@ -60,7 +61,7 @@ public class Main extends Application
 		var newClasses = Extractor.extract(new FileInputStream(file),Optional.of(s->Log.warn(s, window)));
 		var newText = Extractor.extractText(new FileInputStream(file));
 		this.text = newText;				
-				
+
 		Platform.runLater(()->
 		{
 			this.classes.clear();
@@ -112,9 +113,11 @@ public class Main extends Application
 			tabPane.getTabs().addAll(
 					new UnclosableTab("Text", textPane),
 					new UnclosableTab("Klassen", tableView),
+					new UnclosableTab("Verbindungen", tripleTable),
 					new UnclosableTab("RDF", rdfText));
 
-			pane.getChildren().add(tabPane);
+
+pane.getChildren().add(tabPane);
 		}
 
 		//openDocx(new File("src/main/resources/eu/snik/tag/benchmark.docx")); // use resource after finished refactoring  
@@ -127,10 +130,10 @@ public class Main extends Application
 		State state = new State(in);
 		Platform.runLater(()->
 		{
-		textArea.setText(state.text);
-		classes.clear();
-		classes.addAll(state.classes);
-		refresh();
+			textArea.setText(state.text);
+			classes.clear();
+			classes.addAll(state.classes);
+			refresh();
 		});
 	}
 
