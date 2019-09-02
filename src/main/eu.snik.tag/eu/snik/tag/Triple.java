@@ -7,12 +7,17 @@ import org.apache.jena.rdf.model.Statement;
 import org.json.JSONObject;
 
 /** A triple connecting two SNIK classes using a meta model relation.*/
+@SuppressWarnings("serial")
 public class Triple implements Serializable
 {
-	public final	Clazz subject;
-	public 				Clazz object; // needs to be changed on merge
+	public final Clazz subject;
+	public final Clazz object;
 	public final Relation predicate;
 
+	public Clazz getSubject() {return subject;}
+	public Clazz getObject() {return object;}
+	public Relation getPredicate() {return predicate;}
+	
 	public static final AtomicInteger count = new AtomicInteger(0);
 	public final int cytoscapeId;
 	

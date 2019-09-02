@@ -1,13 +1,7 @@
 package eu.snik.tag.gui;
 
-import java.util.Collections;
-import java.util.List;
 import java.util.Set;
-import java.util.stream.Collectors;
-import eu.snik.tag.Clazz;
 import eu.snik.tag.Triple;
-import javafx.collections.FXCollections;
-import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 import javafx.scene.control.SelectionMode;
 import javafx.scene.control.TableColumn;
@@ -19,30 +13,29 @@ import javafx.scene.layout.VBox;
 /** Table of RDF classes with a filter search bar. */
 public class TripleTable extends VBox
 {
-	final ObservableList<Clazz> classes;
-	final ObservableList<Triple> triples = FXCollections.observableArrayList();
+	final ObservableList<Triple> triples;
 	//final Runnable update;
 	final TableView<Triple> table;
 
 	private TextField filterField = new TextField();
 		
-	public void refresh()
-	{
-		var triples = classes.stream().flatMap(c->c.getTriples().stream()).collect(Collectors.toList());
-		this.triples.setAll(triples);
-		System.out.println(triples);
-	}
+//	public void refresh()
+//	{
+////		var triples = classes.stream().flatMap(c->c.getTriples().stream()).collect(Collectors.toList());
+////		this.triples.setAll(triples);
+////		System.out.println(triples);
+//	}
 	
 	/** @param classes may still be empty at constructor call time
 	 * @param update	 callback that is run when the user changes a class.
 	 * This is necessary because an observable list's change listeners only fire when a class is added or removed, not changed.*/
-	public TripleTable(final ObservableList<Clazz> classes,final Runnable update)
+	public TripleTable(final ObservableList<Triple> triples, final Runnable update)
 	{
-		this.classes = classes;
-		refresh();
-		this.classes.addListener((ListChangeListener)x->{refresh();});
+		this.triples = triples;
+//		refresh();
+//		this.classes.addListener((ListChangeListener)x->{refresh();});
 		//this.update = update;
-		this.table = new TableView<Triple>(); 
+		this.table = new TableView<Triple>(triples); 
 		
 		table.setEditable(true);
 		table.setMinHeight(1000);
@@ -63,11 +56,11 @@ public class TripleTable extends VBox
 //			});
 //		});
 
-		var subjectCol = new TableColumn<Triple,Set<String>>("Label");
+		var subjectCol = new TableColumn<Triple,Set<String>>("Subject");
 		subjectCol.setCellValueFactory(new PropertyValueFactory<>("subject"));
 		//subjectCol.setCellFactory(TextFieldTableCell.<Triple,Set<String>>forTableColumn(CollectionStringConverter.INSTANCE));
-
-//		subjectCol.setMinWidth(600);
+		subjectCol.setMinWidth(400);
+		
 //		subjectCol.setOnEditCommit(e->
 //		{
 //			e.getRowValue().labels.clear();
@@ -75,6 +68,17 @@ public class TripleTable extends VBox
 //			update.run();
 //		});
 //
+		
+		var predicateCol = new TableColumn<Triple,Set<String>>("Relation");
+		predicateCol.setCellValueFactory(new PropertyValueFactory<>("predicate"));
+		//subjectCol.setCellFactory(TextFieldTableCell.<Triple,Set<String>>forTableColumn(CollectionStringConverter.INSTANCE));
+		predicateCol.setMinWidth(400);
+
+		var objectCol = new TableColumn<Triple,Set<String>>("Object");
+		objectCol.setCellValueFactory(new PropertyValueFactory<>("object"));
+		//subjectCol.setCellFactory(TextFieldTableCell.<Triple,Set<String>>forTableColumn(CollectionStringConverter.INSTANCE));
+		objectCol.setMinWidth(400);
+
 //		var localNameCol = new TableColumn<Triple,String>("Local Name");
 //		localNameCol.setCellValueFactory(new PropertyValueFactory<>("localName"));
 //		localNameCol.setCellFactory(TextFieldTableCell.<Triple>forTableColumn());
@@ -88,7 +92,7 @@ public class TripleTable extends VBox
 
 		var removeCol = new RemoveColumn<Triple>("Entfernen", "x", triples::remove, ()->{});
 		
-		table.getColumns().addAll(subjectCol,removeCol);
+		table.getColumns().addAll(subjectCol,predicateCol,objectCol,removeCol);
 	}
 
 }

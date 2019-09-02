@@ -1,10 +1,7 @@
 package eu.snik.tag;
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.LinkedHashSet;
-import java.util.List;
 import java.util.Set;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.ModelFactory;
@@ -12,7 +9,6 @@ import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.rdf.model.ResourceFactory;
 import org.apache.jena.vocabulary.OWL;
 import org.apache.jena.vocabulary.RDFS;
-import org.json.JSONArray;
 import org.json.JSONObject;
 import eu.snik.tag.gui.CollectionStringConverter;
 
@@ -52,20 +48,20 @@ public class Clazz implements Serializable
 		return localName.hashCode();
 	}
 
-	// Set would be better but for some reason State.load throws an error then when calling hashCode of Clazz where localName is null 
-	final List<Triple> triples = new ArrayList<>();
-
-	/** an unmodifiable copy of the triples */
-	public List<Triple> getTriples() {return Collections.unmodifiableList(triples);}
-
-	/** Add a SNIK meta model conforming triple.
-	  @param predicate a SNIK meta model relation  
-	  @param object another SNIK class	 
-	 */
-	public void addTriple(Relation predicate,Clazz object)
-	{		
-		triples.add(new Triple(this,predicate,object));
-	}
+//	// Set would be better but for some reason State.load throws an error then when calling hashCode of Clazz where localName is null 
+//	final List<Triple> triples = new ArrayList<>();
+//
+//	/** an unmodifiable copy of the triples */
+//	public List<Triple> getTriples() {return Collections.unmodifiableList(triples);}
+//
+//	/** Add a SNIK meta model conforming triple.
+//	  @param predicate a SNIK meta model relation  
+//	  @param object another SNIK class	 
+//	 */
+//	public void addTriple(Relation predicate,Clazz object)
+//	{		
+//		triples.add(new Triple(this,predicate,object));
+//	}
 
 	public String labelString()
 	{
@@ -75,7 +71,7 @@ public class Clazz implements Serializable
 	@Override
 	public String toString()
 	{
-		return labelString()+", "+subtop;
+		return localName+" ("+subtop+')';
 		//return label+','+localName+','+subtop; // Too technical for users. If needed in detail more often, encapsulate this where the simple form is needed, e.g. in the relation pane.  
 	}
 
@@ -88,10 +84,6 @@ public class Clazz implements Serializable
 		model.add(clazz, RDFS.subClassOf, subtop.resource);
 		for(String label: labels ) {model.add(clazz, RDFS.label, model.createLiteral(label, "en"));}
 
-		for(Triple triple: triples)
-		{
-			model.add(triple.statement());
-		}
 		return model;
 	}
 
@@ -123,25 +115,6 @@ public class Clazz implements Serializable
 				.put("data",data)
 				.put("position",position);
 				//.append("classes",subtop.toString());
-	}
-
-	public static JSONArray cytoscapeElements(Collection<Clazz> classes)
-	{
-		var elements = new ArrayList<JSONObject>();
-
-		// nodes first, edges second
-		for(Clazz c: classes)
-		{
-			elements.add(c.cytoscapeNode());
-		}
-		for(Clazz c: classes)
-		{		
-			for(Triple t: c.triples)
-			{
-				elements.add(t.cytoscapeEdge());
-			}
-		}		
-		return new JSONArray(elements);
 	}
 	
 }

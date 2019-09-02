@@ -1,12 +1,10 @@
 package eu.snik.tag.gui;
 
-import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.function.Consumer;
 import eu.snik.tag.Clazz;
 import eu.snik.tag.Subtop;
-import eu.snik.tag.Triple;
 import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.collections.ObservableList;
 import javafx.collections.transformation.FilteredList;
@@ -76,24 +74,24 @@ public class ClassTable extends VBox
 		selected.remove(clazz);
 		// Move triples where a selected class is subject  
 		
-		for(Clazz sel: selected)
-		{
-			clazz.labels.addAll(sel.labels);
-			for(Triple t: sel.getTriples())
-			{
-				clazz.addTriple(t.predicate, t.object);				
-			}
-		}
-		
-		// Move triples where a selected class is object
-		
-		for(Clazz c: classes)
-		{
-			for(Triple t: c.getTriples())
-			{
-				if(selected.contains(t.object)) {t.object = clazz;}
-			}
-		}
+//		for(Clazz sel: selected)
+//		{
+//			clazz.labels.addAll(sel.labels);
+//			for(Triple t: triples)
+//			{
+//				clazz.addTriple(t.predicate, t.object);				
+//			}
+//		}
+//		
+//		// Move triples where a selected class is object
+//		
+//		for(Clazz c: classes)
+//		{
+//			for(Triple t: c.getTriples())
+//			{
+//				if(selected.contains(t.object)) {t.object = clazz;}
+//			}
+//		}
 		
 		classes.removeAll(selected);
 	}

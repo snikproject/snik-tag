@@ -1,10 +1,10 @@
 package eu.snik.tag.gui;
 
 import java.io.StringWriter;
-import java.util.Collection;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.ModelFactory;
 import eu.snik.tag.Clazz;
+import eu.snik.tag.Triple;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 import javafx.scene.control.TextArea;
@@ -12,28 +12,30 @@ import javafx.scene.control.TextArea;
 /** Displays all extracted RDF classes and relations as RDF turtle. */
 public class RDFArea extends TextArea
 {
-	final ObservableList<Clazz> classes;
+	final State state;
 	
-	public RDFArea(final ObservableList<Clazz> classes)
+	public RDFArea(final State state)
 	{
-		this.classes=classes;
-		classes.addListener((ListChangeListener<Clazz>)(l)->{refresh();});
+		this.state=state;
+		this.state.classes.addListener((ListChangeListener<Clazz>)(l)->{refresh();});
+		this.state.triples.addListener((ListChangeListener<Triple>)(l)->{refresh();});
 		this.setEditable(false);
 	}
 
 		/** @param classes SNIK classes with triples
 	@return a Jena model of all triples with the classes as subjects. */
-	public static Model rdfModel(Collection<Clazz> classes)
+	public static Model rdfModel(State state)
 	{
 		Model model = ModelFactory.createDefaultModel();
-		classes.stream().map(Clazz::rdfModel).forEach(model::add);
+		state.classes.stream().map(Clazz::rdfModel).forEach(model::add);
+		state.triples.stream().map(Triple::statement).forEach(model::add);
 		return model;
 	}
 	
 	public void refresh()
 	{
 		var writer = new StringWriter();
-		RDFArea.rdfModel(classes).write(writer,"Turtle");
+		RDFArea.rdfModel(state).write(writer,"Turtle");
 		setText(writer.toString());
 	}
 

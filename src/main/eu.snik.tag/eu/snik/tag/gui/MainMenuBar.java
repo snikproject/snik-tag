@@ -9,7 +9,6 @@ import java.io.IOException;
 import java.net.URI;
 import java.util.Properties;
 import org.docx4j.openpackaging.exceptions.Docx4JException;
-import eu.snik.tag.Clazz;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Menu;
@@ -104,7 +103,7 @@ public class MainMenuBar
 				try(FileWriter writer = new FileWriter(file))
 				{
 					{
-						RDFArea.rdfModel(main.classes).write(writer,"TURTLE");
+						RDFArea.rdfModel(main.state).write(writer,"TURTLE");
 					}
 				}
 				catch(Exception ex) {Log.error("Fehler beim Exportieren nach RDF/Turtle", ex);}
@@ -127,7 +126,7 @@ public class MainMenuBar
 					try(FileWriter writer = new FileWriter(f))
 					{
 						{
-							writer.write(Clazz.cytoscapeElements(main.classes).toString(2));
+							writer.write(main.state.cytoscapeElements().toString(2));
 						}
 					}
 					catch(Exception ex) {Log.error("Fehler beim Exportieren nach JSON", ex);}

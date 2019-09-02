@@ -9,9 +9,7 @@ import org.apache.jena.ext.com.google.common.collect.Multimap;
 import org.javatuples.Triplet;
 import eu.snik.tag.Clazz;
 import eu.snik.tag.Subtop;
-import javafx.application.Platform;
 import javafx.collections.ListChangeListener;
-import javafx.collections.ObservableList;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
@@ -21,65 +19,55 @@ import javafx.scene.text.TextFlow;
 /** Uneditable HTML text area with the DOCX text and highlighted classes.*/
 public class ClassTextPane extends ScrollPane
 {
-
-	private final ObservableList<Clazz> classes;
-	//private final Map<Clazz,Text> texts = new HashMap<>(); needs to be multi map but is it actually needed?
-	private final RelationPane relationPane;
 	private final TextFlow flow = new TextFlow();
 
-	private Clazz subject = null;
-	private Clazz object = null;
-
 	Multimap<Clazz, Text> texts = LinkedListMultimap.create();
+	
+	final State state;
 
 
-	public void highlightSubject(Clazz clazz)
+	public void highlightSubject(Clazz old, Clazz neww)
 	{
-		if(subject!=null)
-		{
-			texts.get(subject).forEach(f->f.getStyleClass().remove("subject"));
-		}
-		subject = clazz;
-
-		texts.get(subject).forEach(f->f.getStyleClass().add("subject"));
+		if(old!=null) {texts.get(old).forEach(f->{f.getStyleClass().remove("subject");});}
+		
+		if(neww!=null) {texts.get(neww).forEach(f->{f.getStyleClass().add("subject");});}
+		
 		//System.out.println(texts.get(subject).stream().map(t->t.getStyleClass()).collect(Collectors.toSet()));
 	}
 
-	public void highlightObject(Clazz clazz)
+	public void highlightObject(Clazz old, Clazz neww)
 	{
-		if(object!=null)
-		{
-			texts.get(object).forEach(f->f.getStyleClass().remove("object"));
-		}
-		object = clazz;
+		if(old!=null) {texts.get(old).forEach(f->{f.getStyleClass().remove("object");});}
+		
+		if(neww!=null) {texts.get(neww).forEach(f->{f.getStyleClass().add("object");});}
 
-		texts.get(object).forEach(f->f.getStyleClass().add("object"));
 		//System.out.println(texts.get(object).stream().map(t->t.getStyleClass()).collect(Collectors.toSet()));
 	}
 
-	private String text;
-
 	/** @param classes added or removed classes will automatically be shown. 
 	 * @param relationPane */
-	public ClassTextPane(ObservableList<Clazz> classes, RelationPane relationPane)
+	public ClassTextPane(State state, RelationPane relationPane)
 	{
+		this.state=state;
 		this.setContent(flow);
 		this.setVbarPolicy(ScrollBarPolicy.AS_NEEDED);
 		this.setHbarPolicy(ScrollBarPolicy.NEVER);
-		this.classes=classes;
-		this.relationPane=relationPane;
-		this.relationPane.classTextPane=this;
 		this.setMinWidth(700);		
 		flow.prefWidthProperty().bind(this.widthProperty());
-		classes.addListener((ListChangeListener<Clazz>)(c)->{refresh();});
-	}
-
-	/** Keeps the classes and highlights them in a new text. */
-	public void setText(String text)
-	{
-		this.text=text;		
-		Platform.runLater(()->refresh());
-	}
+		state.classes.addListener((ListChangeListener<Clazz>)(c)->{refresh();});
+		state.text.addListener((obs,old,neww)->{refresh();});
+		
+		state.selectedSubject.addListener((ov,old,neww)->
+		{
+			highlightObjectCandidates(neww);
+			highlightSubject(old,neww);
+		});
+		
+		state.selectedObject.addListener((ov,old,neww)->
+		{
+			highlightObject(old,neww);
+		});		
+	}				
 
 	private final Map<Subtop,String> cssClass = Map.of
 			(
@@ -92,6 +80,7 @@ public class ClassTextPane extends ScrollPane
 	{		
 		var reset = "-entity-type-fill: darkred; -function-fill: darkgreen; -role-fill: darkblue;";
 		flow.getChildren().stream().forEach(t->{t.setStyle(reset);});
+		
 		if(subject==null) {return;} // occurs when resetting after an added triple
 		// applying the style to the flow or the scroll pane does not work
 		// ~420 children in test case, in case of performance problems optimize this
@@ -101,29 +90,13 @@ public class ClassTextPane extends ScrollPane
 		});
 	}
 
-	void setSubject(Clazz clazz, Object caller)
-	{
-		if(this.subject==clazz) {return;} // no change
-		if(caller!=relationPane) {relationPane.setSubject(clazz);} // prevent infinite loop
-		highlightObjectCandidates(clazz);
-		highlightSubject(clazz);
-	}
-
-	void setObject(Clazz clazz, Object caller)
-	{
-		if(this.object==clazz) {return;}
-		if(caller!=relationPane) {relationPane.setObject(clazz);} // prevent infinite loop
-		highlightObject(clazz);
-	}
-
-
 	/** Call when a class has changed its label. Also called automatically when a class is removed or added. */
 	public void refresh()
 	{
 		flow.getChildren().clear();
 
-		String restText = text;
-		Set<Clazz> restClasses = new HashSet<>(classes);
+		String restText = state.text.get();
+		Set<Clazz> restClasses = new HashSet<>(state.classes);
 
 		while(restText!=null&&!restText.isEmpty())
 		{
@@ -138,15 +111,11 @@ public class ClassTextPane extends ScrollPane
 							);
 
 
-			//restClasses.retainAll(indices.entrySet().stream().filter(e->e.getValue()>-1).map(Entry::getKey).collect(Collectors.toSet()));
-			// minimize position, maximize label length if tied. for example choose "hospital's" over "hospital"
-			//Optional<Clazz> firstOpt = restClasses.stream().min(Comparator.comparing(indices::get).thenComparing(c->-((Clazz)c).label.length()));
 			if(minOpt.isEmpty()) {break;}
 			var min = minOpt.get();
 			var clazz = min.getValue0();
 			int pos = min.getValue1();
 			int labelLength = min.getValue2(); 
-
 
 			if(pos>0)
 			{
@@ -164,11 +133,11 @@ public class ClassTextPane extends ScrollPane
 			{				
 				if(e.getButton()==MouseButton.PRIMARY)
 				{
-					setSubject(clazz,this);
+					state.selectedSubject.set(clazz);
 				}
 				else
 				{
-					setObject(clazz,this);
+					state.selectedObject.set(clazz);
 				}
 			});
 			switch(clazz.subtop)
@@ -184,7 +153,11 @@ public class ClassTextPane extends ScrollPane
 		
 		Text rest = new Text(restText);
 		rest.getStyleClass().add("text-class");
-		if(restText!=null&&!restText.isBlank()) {flow.getChildren().add(rest);}		
+		if(restText!=null&&!restText.isBlank()) {flow.getChildren().add(rest);}
+		
+		highlightSubject(null, state.selectedSubject.get());
+		highlightObjectCandidates(state.selectedSubject.get());
+		highlightObject(null, state.selectedObject.get());
 	}
 
 }

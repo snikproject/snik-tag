@@ -7,13 +7,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Optional;
 import org.docx4j.openpackaging.exceptions.Docx4JException;
-import eu.snik.tag.Clazz;
 import eu.snik.tag.Extractor;
-import eu.snik.tag.State;
 import javafx.application.Application;
 import javafx.application.Platform;
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.Scene;
@@ -28,19 +24,17 @@ import javafx.stage.Window;
 /** GUI entry point. Run with Maven via javafx:run. */
 public class Main extends Application
 {
-	private String text = "";
-
-	public final ObservableList<Clazz> classes = FXCollections.observableArrayList();	
+	public final State state = new State();
 
 	private final SplitPane textPane = new SplitPane();
 
-	private final RDFArea rdfText = new RDFArea(classes);
+	private final RDFArea rdfText = new RDFArea(state);
 
-	RelationPane textRelationPane = new RelationPane(classes,this::refresh);
-	private ClassTextPane textArea = new ClassTextPane(classes,textRelationPane);
+	RelationPane textRelationPane = new RelationPane(state,this::refresh);
+	private ClassTextPane textArea = new ClassTextPane(state,textRelationPane);
 
-	private final ClassTable tableView = new ClassTable(classes, this::refresh);
-	private final TripleTable tripleTable = new TripleTable(classes, this::refresh);
+	private final ClassTable tableView = new ClassTable(state.classes, this::refresh);
+	private final TripleTable tripleTable = new TripleTable(state.triples, this::refresh);
 
 	public Stage stage;
 
@@ -60,13 +54,12 @@ public class Main extends Application
 	{
 		var newClasses = Extractor.extract(new FileInputStream(file),Optional.of(s->Log.warn(s, window)));
 		var newText = Extractor.extractText(new FileInputStream(file));
-		this.text = newText;				
 
 		Platform.runLater(()->
 		{
-			this.classes.clear();
-			this.classes.addAll(newClasses);
-			textArea.setText(this.text);
+			this.state.classes.setAll(newClasses);
+			this.state.triples.clear();
+			this.state.text.set(newText);
 			refresh();
 		});
 	}		
@@ -117,7 +110,7 @@ public class Main extends Application
 					new UnclosableTab("RDF", rdfText));
 
 
-pane.getChildren().add(tabPane);
+			pane.getChildren().add(tabPane);
 		}
 
 		//openDocx(new File("src/main/resources/eu/snik/tag/benchmark.docx")); // use resource after finished refactoring  
@@ -130,9 +123,10 @@ pane.getChildren().add(tabPane);
 		State state = new State(in);
 		Platform.runLater(()->
 		{
-			textArea.setText(state.text);
-			classes.clear();
-			classes.addAll(state.classes);
+			//textArea.setText(state.text.get());
+			this.state.text.set(state.text.get());
+			this.state.classes.setAll(state.classes);
+			this.state.triples.setAll(state.triples);
 			refresh();
 		});
 	}
@@ -141,7 +135,7 @@ pane.getChildren().add(tabPane);
 	{
 		try
 		{
-			new State(this.text,this.classes).save(new FileOutputStream(f));
+			this.state.save(new FileOutputStream(f));
 		}
 		catch(Exception e) {throw new RuntimeException(e);}
 	}
