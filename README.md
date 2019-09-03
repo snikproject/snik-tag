@@ -20,9 +20,9 @@ A .docx word document where meta model subtop classes are annotated using format
 The extracted classes and their relations as an RDF Turtle file.
 
 ## Build
-* Run 'mvn compile'
-* Run 'mvn javafx:compile'
-* Run 'mvn javafx:run'
+* Run  `mvn compile`
+* Run  `mvn javafx:compile`
+* Run  `mvn javafx:run`
 
 ## Documentation
 A brief documentation of SNIK Tag is found at [gh-pages](https://imise.github.io/snik-tag/#/Dokumentation)
