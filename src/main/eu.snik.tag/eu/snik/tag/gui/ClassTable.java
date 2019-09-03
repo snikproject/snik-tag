@@ -3,10 +3,10 @@ package eu.snik.tag.gui;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.function.Consumer;
+import java.util.stream.Collectors;
 import eu.snik.tag.Clazz;
 import eu.snik.tag.Subtop;
 import javafx.beans.property.ReadOnlyObjectWrapper;
-import javafx.collections.ObservableList;
 import javafx.collections.transformation.FilteredList;
 import javafx.scene.control.Button;
 import javafx.scene.control.SelectionMode;
@@ -22,7 +22,7 @@ import javafx.scene.layout.VBox;
 /** Table of RDF classes with a filter search bar. */
 public class ClassTable extends VBox
 {
-	final ObservableList<Clazz> classes;
+	final State state;
 	final Runnable update;
 	final TableView<Clazz> table;
 
@@ -59,58 +59,53 @@ public class ClassTable extends VBox
 		return removeCol;
 	}
 
-	/** Merges all selected classes into the specified one.
-	 *  @param clazz the target class which will still exist at the end*/
-	private void merge(Clazz clazz)
+	/** Merges all selected classes minus if included the class where the button is clicked (the mergees) into the specified one (the merger).
+	 *  @param merger the target class which will still exist at the end*/
+	private void merge(Clazz merger)
 	{
-		var selected = new HashSet<>(table.getSelectionModel().getSelectedItems());
-		
-		if(selected.stream().filter(s->s.subtop!=clazz.subtop).findAny().isPresent())
+		var mergees = new HashSet<>(table.getSelectionModel().getSelectedItems());
+		mergees.remove(merger);
+
+		if(mergees.stream().filter(mergee->mergee.subtop!=merger.subtop).findAny().isPresent())
 		{
-			System.err.println("Zusammenführen nicht möglich: Unterschiedliche Typen.");
+			Log.warn("Zusammenführen nicht möglich: Unterschiedliche Typen.",this.getScene().getWindow());
 			return;
 		}
-		
-		selected.remove(clazz);
-		// Move triples where a selected class is subject  
-		
-//		for(Clazz sel: selected)
-//		{
-//			clazz.labels.addAll(sel.labels);
-//			for(Triple t: triples)
-//			{
-//				clazz.addTriple(t.predicate, t.object);				
-//			}
-//		}
-//		
-//		// Move triples where a selected class is object
-//		
-//		for(Clazz c: classes)
-//		{
-//			for(Triple t: c.getTriples())
-//			{
-//				if(selected.contains(t.object)) {t.object = clazz;}
-//			}
-//		}
-		
-		classes.removeAll(selected);
+		{
+			var invalidSubjectTriples = state.triples.stream().filter(t->mergees.contains(t.subject));
+			var validSubjectTriples = invalidSubjectTriples.map(t->t.replaceSubject(merger)).collect(Collectors.toList());
+
+			state.triples.remove(invalidSubjectTriples);
+			state.triples.addAll(validSubjectTriples);
+		}
+		{
+			var invalidObjectTriples = state.triples.stream().filter(t->mergees.contains(t.object));
+			var validObjectTriples = invalidObjectTriples.map(t->t.replaceObject(merger)).collect(Collectors.toList());
+
+			state.triples.remove(invalidObjectTriples);
+			state.triples.addAll(validObjectTriples);
+		}
+				
+		for(Clazz mergee: mergees) {merger.labels.addAll(mergee.labels);}
+
+		state.classes.removeAll(mergees);
 	}
-		
+
 	/** @param classes may still be empty at constructor call time
 	 * @param update	 callback that is run when the user changes a class.
 	 * This is necessary because an observable list's change listeners only fire when a class is added or removed, not changed.*/
-	public ClassTable(final ObservableList<Clazz> classes,final Runnable update)
+	public ClassTable(final State state,final Runnable update)
 	{
-		this.classes = classes;
+		this.state = state;
 		this.update = update;
 		this.table = new TableView<Clazz>(); 
-		
+
 		table.setEditable(true);
 		table.setMinHeight(1000);
 		table.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
 		this.getChildren().addAll(filterField,table);
 
-		final var filteredClasses = new FilteredList<Clazz>(classes);
+		final var filteredClasses = new FilteredList<Clazz>(state.classes);
 		table.setItems(filteredClasses);
 		//this.getItems().addAll(filteredClasses);
 
@@ -157,11 +152,11 @@ public class ClassTable extends VBox
 			update.run();
 		});
 
-		var removeCol = buttonCol("Entfernen", "x", classes::remove);
-		
+		var removeCol = buttonCol("Entfernen", "x", state.classes::remove);
+
 		var mergeCol = buttonCol("Zusammenführen", "Zusammenführen", this::merge);
 		mergeCol.setMinWidth(150);
-		
+
 		table.getColumns().addAll(labelCol,localNameCol,subtopCol,removeCol,mergeCol);
 	}
 

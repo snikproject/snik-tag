@@ -33,7 +33,7 @@ public class Main extends Application
 	RelationPane textRelationPane = new RelationPane(state,this::refresh);
 	private ClassTextPane textArea = new ClassTextPane(state,textRelationPane);
 
-	private final ClassTable tableView = new ClassTable(state.classes, this::refresh);
+	private final ClassTable tableView = new ClassTable(state, this::refresh);
 	private final TripleTable tripleTable = new TripleTable(state.triples, this::refresh);
 
 	public Stage stage;

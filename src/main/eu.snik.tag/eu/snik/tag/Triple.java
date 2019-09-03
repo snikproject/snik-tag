@@ -59,5 +59,11 @@ public class Triple implements Serializable
 				.put("group", "edges")
 				.put("data",data);
 	}
+	
+	/** @return returns a modified copy with a new subject */
+	public Triple replaceSubject(Clazz newSubject) {return new Triple(newSubject, this.predicate, this.object);}
+	
+	/** @return returns a modified copy with a new object */
+	public Triple replaceObject(Clazz newObject) {return new Triple(this.subject, this.predicate, newObject);}
 
 }
