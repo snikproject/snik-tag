@@ -110,7 +110,11 @@ public class MainMenuBar
 
 			});
 		}
-
+		{
+			MenuItem loadJsonItem = new MenuItem("Cytoscape JSON In SNIK _Graph Öffnen");
+			fileMenu.getItems().add(loadJsonItem);
+			loadJsonItem.setOnAction(event->{browse("https://www.snik.eu/graph?empty=true");});
+		}
 		{
 			MenuItem saveJsonItem = new MenuItem("Cytoscape _JSON Exportieren");
 			fileMenu.getItems().add(saveJsonItem);
