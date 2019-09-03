@@ -35,7 +35,7 @@
             {
               "route": "/introduction",
               "name": "Einführung",
-              "description": "Wie Sie diese Dokumentation lesen sollten",
+              "description": "Wichtiges und Wissenswertes vorab",
               "icon": "play-circle",
               "topics": ["Prozesse"],
               "markdown" : "/static/markdown/process/Introduction.md"
