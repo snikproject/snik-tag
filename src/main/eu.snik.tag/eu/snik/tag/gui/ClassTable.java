@@ -27,6 +27,7 @@ public class ClassTable extends VBox
 	final TableView<Clazz> table;
 
 	private TextField filterField = new TextField();
+	{filterField.setPromptText("Klassen durchsuchen");}
 
 	TableColumn<Clazz,Clazz> buttonCol(String columnText, String buttonText, final Consumer<Clazz> classOperation)
 	{

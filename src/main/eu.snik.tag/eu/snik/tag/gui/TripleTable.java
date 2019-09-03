@@ -18,6 +18,7 @@ public class TripleTable extends VBox
 	final TableView<Triple> table;
 
 	private TextField filterField = new TextField();
+	{filterField.setPromptText("Verbindungen durchsuchen");}
 		
 //	public void refresh()
 //	{
