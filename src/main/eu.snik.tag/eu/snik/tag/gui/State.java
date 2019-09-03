@@ -7,6 +7,7 @@ import java.io.ObjectOutputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashSet;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import eu.snik.tag.Clazz;
@@ -34,10 +35,14 @@ public class State
 		{
 			while(change.next())
 			{
-				if(change.getRemoved().contains(selectedSubject.get())) {selectedSubject.set(null);}
-				if(change.getRemoved().contains(selectedObject.get())) {selectedObject.set(null);}
+				var removed = new HashSet<>(change.getRemoved());
+				
+				if(removed.contains(selectedSubject.get())) {selectedSubject.set(null);}
+				if(removed.contains(selectedObject.get())) {selectedObject.set(null);}
+				
+				triples.removeIf(t->removed.contains(t.subject)||removed.contains(t.object));
 			}
-		});
+		});		
 	}
 
 	@SuppressWarnings("unchecked")

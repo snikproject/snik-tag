@@ -22,7 +22,6 @@ public class RelationPane extends VBox
 	private final ComboBox<Relation> predicateBox = new ComboBox<>();
 	
 	public ClassTextPane classTextPane = null;
-	
 
 	void determinePredicates()
 	{
