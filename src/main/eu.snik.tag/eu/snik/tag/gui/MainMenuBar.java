@@ -9,6 +9,8 @@ import java.io.IOException;
 import java.net.URI;
 import java.util.Properties;
 import org.docx4j.openpackaging.exceptions.Docx4JException;
+import org.eclipse.jetty.server.Server;
+import eu.snik.tag.JsonServer;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Menu;
@@ -41,7 +43,7 @@ public class MainMenuBar
 				if(file==null) {return;}
 
 				try{main.openDocx(file);} catch (FileNotFoundException|Docx4JException ex) {Log.error("Fehler beim Öffnen eines DOCX documents", ex);}
-				
+
 			});
 		}
 		{
@@ -111,9 +113,26 @@ public class MainMenuBar
 			});
 		}
 		{
+			MenuItem openSnikGraphItem = new MenuItem("SNIK _Graph Öffnen");
+			fileMenu.getItems().add(openSnikGraphItem);
+			openSnikGraphItem.setOnAction(event->{browse("https://www.snik.eu/graph?empty=true");});
+		}
+		{
 			MenuItem loadJsonItem = new MenuItem("Cytoscape JSON In SNIK _Graph Öffnen");
 			fileMenu.getItems().add(loadJsonItem);
-			loadJsonItem.setOnAction(event->{browse("https://www.snik.eu/graph?empty=true");});
+			loadJsonItem.setOnAction(event->
+			{				
+				try
+				{
+					Server server = new JsonServer(main.state.cytoscapeElements());
+					server.start();
+					browse("https://www.snik.eu/graph?load=http://localhost:1234");
+				}
+				catch (Exception e)
+				{				
+					Log.error("Error calling SNIK Graph", e);
+				}
+			});
 		}
 		{
 			MenuItem saveJsonItem = new MenuItem("Cytoscape _JSON Exportieren");
