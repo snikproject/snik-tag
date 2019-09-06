@@ -126,7 +126,7 @@ public class MainMenuBar
 				{
 					Server server = new JsonServer(main.state.cytoscapeElements());
 					server.start();
-					browse("https://www.snik.eu/graph?load=http://localhost:1234");
+					browse("https://www.snik.eu/graph?json=http://localhost:1234");
 				}
 				catch (Exception e)
 				{				
