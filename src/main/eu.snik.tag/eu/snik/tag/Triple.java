@@ -66,4 +66,7 @@ public class Triple implements Serializable
 	/** @return returns a modified copy with a new object */
 	public Triple replaceObject(Clazz newObject) {return new Triple(this.subject, this.predicate, newObject);}
 
+	/** @return returns a modified copy with a new predicate*/
+	public Triple replacePredicate(Relation newPredicate) {return new Triple(this.subject, newPredicate, this.object);}
+
 }

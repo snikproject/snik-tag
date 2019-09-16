@@ -1,11 +1,14 @@
 package eu.snik.tag.gui;
 
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 import eu.snik.tag.Clazz;
+import eu.snik.tag.Relation;
 import eu.snik.tag.Subtop;
+import eu.snik.tag.Triple;
 import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.collections.transformation.FilteredList;
 import javafx.scene.control.Button;
@@ -138,7 +141,13 @@ public class ClassTable extends VBox
 		localNameCol.setMinWidth(350);
 		localNameCol.setOnEditCommit(e->
 		{
-			e.getRowValue().localName=e.getNewValue();
+			Clazz newClass = e.getRowValue().replaceLocalName(e.getNewValue());
+			state.classes.add(newClass);
+
+			Clazz oldClass = e.getRowValue();
+			state.triples.filtered((t)->t.subject==oldClass).forEach(t->{state.triples.add(t.replaceSubject(newClass));});
+			state.triples.filtered((t)->t.object==oldClass).forEach(t->{state.triples.add(t.replaceObject(newClass));});			
+			state.classes.remove(oldClass); // deletes the old triples
 			update.run();
 		});
 
@@ -149,7 +158,39 @@ public class ClassTable extends VBox
 		subtopCol.setMinWidth(300);
 		subtopCol.setOnEditCommit(e->
 		{
-			e.getRowValue().subtop=e.getNewValue();
+			Clazz newClass = e.getRowValue().replaceSubtop(e.getNewValue());
+			state.classes.add(newClass);
+			Clazz oldClass = e.getRowValue();
+			
+			var remove = new ArrayList<Triple>();
+			var add = new ArrayList<Triple>();
+			
+			for(Triple t: state.triples)
+			{
+				boolean changed = false;
+				Clazz subject = t.subject;
+				Clazz object = t.object;
+				Relation predicate = t.predicate;
+				
+				if(t.subject==oldClass) {changed=true;subject=newClass;}
+				if(t.object==oldClass) {changed=true;object=newClass;}
+				if(!(predicate.domain.contains(subject.subtop)&&predicate.range.contains(object.subtop)))
+				{
+					changed=true;
+					Log.warn("Relation "+t.predicate+" had to be changed to isAssociatedWith in triple "+t+" due to subtop change of class "+oldClass+" to "+e.getNewValue(),this.getScene().getWindow());
+					} 
+				if(changed)
+				{
+					remove.add(t);
+					add.add(new Triple(subject,predicate,object));
+				}
+			}
+			
+			state.classes.remove(oldClass);
+			
+			state.triples.removeAll(remove);
+			state.triples.addAll(add);
+
 			update.run();
 		});
 

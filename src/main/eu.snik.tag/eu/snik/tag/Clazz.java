@@ -1,5 +1,6 @@
 package eu.snik.tag;
 import java.io.Serializable;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.Set;
@@ -20,20 +21,25 @@ public class Clazz implements Serializable
 	public Set<String> getLabels() {return Collections.unmodifiableSet(labels);} // for table view
 	
 	/** the URI part after the prefix*/
-	public String localName;
+	public final String localName;
 	public String getLocalName() {return localName;} // for table view
 	
 	/** whether the class is a function, role or entity type.*/
 	public Subtop subtop;
 	public Subtop getSubtop() {return subtop;} // for table view
 
-	public Clazz(String label,String localName,Subtop subtop)
+	public Clazz(Collection<String> labels,String localName,Subtop subtop)
 	{
-		this.labels.add(label);
-		if(Math.random()>0.5) this.labels.add("schm"+label.substring(1)); // testing
+		this.labels.addAll(labels);
 		this.localName=localName;
 		this.subtop=subtop;
 	}
+
+	public Clazz(String label,String localName,Subtop subtop)
+	{
+		this(Collections.singletonList(label),localName,subtop);
+	}
+	
 
 	@Override
 	public boolean equals(Object obj)
@@ -116,5 +122,11 @@ public class Clazz implements Serializable
 				.put("position",position);
 				//.append("classes",subtop.toString());
 	}
+
+	/** @return returns a modified copy with a new local name */
+	public Clazz replaceLocalName(String newLocalName) {return new Clazz(this.labels,newLocalName,this.subtop);}
+
+	/** @return returns a modified copy with a new subtop*/
+	public Clazz replaceSubtop(Subtop newSubtop) {return new Clazz(this.labels,this.localName,newSubtop);}
 	
 }
