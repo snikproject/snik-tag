@@ -32,8 +32,6 @@ public class State
 	public transient ObjectProperty<Clazz> selectedSubject = new SimpleObjectProperty<>(); 
 	public transient ObjectProperty<Clazz> selectedObject = new SimpleObjectProperty<>();
 	
-	static public final Deque<State> history = new ArrayDeque<State>();
-
 	public State()
 	{
 		classes.addListener((ListChangeListener<Clazz>)(change)->
@@ -48,34 +46,6 @@ public class State
 				triples.removeIf(t->removed.contains(t.subject)||removed.contains(t.object));
 			}
 		});		
-	}
-
-	/** Restore the last saved state. */
-	public void restore()
-	{
-		this.set(history.pop());		
-	}
-	
-	/** Add the current state to the top of the history. */
-	public void save() {history.add(this.copy());} 
-
-	/** Create a new state that is a deep copy of this state. */
-	private State copy()
-	{
-		return new State( 
-				this.text.get(),
-				this.classes,
-				this.triples
-//				this.classes.stream().map(c->c).collect(Collectors.toList()),
-//				this.triples.stream().map(c->c).collect(Collectors.toList())
-				);		
-	}
-	
-	private void set(State state)
-	{
-		text.set(state.text.get());
-		classes.setAll(state.classes);
-		triples.setAll(state.triples);
 	}
 
 	@SuppressWarnings("unchecked")

@@ -1,4 +1,6 @@
 package eu.snik.tag.gui;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -7,9 +9,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayDeque;
 import java.util.Deque;
-import java.util.LinkedList;
 import java.util.Optional;
-import java.util.Stack;
 import org.docx4j.openpackaging.exceptions.Docx4JException;
 import eu.snik.tag.Extractor;
 import javafx.application.Application;
@@ -29,16 +29,16 @@ import javafx.stage.Window;
 public class Main extends Application
 {
 	public final State state = new State();
-	
+
 	private final SplitPane textPane = new SplitPane();
 
 	private final RDFArea rdfText = new RDFArea(state);
 
-	RelationPane textRelationPane = new RelationPane(state,this::refresh);
+	RelationPane textRelationPane = new RelationPane(state,this::createRestorePoint);
 	private ClassTextPane textArea = new ClassTextPane(state,textRelationPane);
 
-	private final ClassTable tableView = new ClassTable(state, this::refresh);
-	private final TripleTable tripleTable = new TripleTable(state.triples, this::refresh);
+	private final ClassTable tableView = new ClassTable(state, this::createRestorePoint);
+	private final TripleTable tripleTable = new TripleTable(state.triples, this::createRestorePoint);
 
 	public Stage stage;
 
@@ -51,6 +51,41 @@ public class Main extends Application
 		rdfText.refresh();
 	}
 
+	static public final Deque<ByteArrayInputStream> history = new ArrayDeque<>();
+
+	/** Restore the last saved state.*/
+	public void restore()
+	{
+		if(history.isEmpty())
+		{
+			Log.warn("Cannot undo. No more restore points.",this.window);
+			return;
+		}
+		try
+		{openSnikt(history.pop());}
+		catch (IOException e)
+		{
+			Log.error("Cannot go back to restore point.",e);
+		}		
+	}
+
+	/** Add the current state to the top of the history. */
+	public void createRestorePoint()
+	{
+		var stream = new ByteArrayOutputStream();
+		try
+		{
+			state.save(stream);
+			history.push(new ByteArrayInputStream(stream.toByteArray()));
+		}
+		catch (IOException e)
+		{
+			Log.error("Could not save undo state", e);
+			throw new RuntimeException(e);			
+		}
+	} 
+
+
 	/** @param file DOCX file with tagged entity types (italic), roles (bold) and functions (function).
 	 * @throws FileNotFoundException 
 	 * @throws Docx4JException */
@@ -61,10 +96,10 @@ public class Main extends Application
 
 		Platform.runLater(()->
 		{
+			createRestorePoint();
 			this.state.classes.setAll(newClasses);
 			this.state.triples.clear();
 			this.state.text.set(newText);
-			refresh();
 		});
 	}		
 

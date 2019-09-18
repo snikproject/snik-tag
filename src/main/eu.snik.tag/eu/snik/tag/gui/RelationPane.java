@@ -41,9 +41,9 @@ public class RelationPane extends VBox
 	/** 
 	 * @param classes selected classes that are removed will automatically be deselected. Added classes are automatically added.
 	 * Modified classes are not updated.  
-	 * @param addCallback will be called when the user adds a new relation. No parameters.
+	 * @param createRestorePoint will be called when the user adds a new relation. No parameters.
 	 */ 
-	RelationPane(State state, Runnable addCallback)
+	RelationPane(State state, Runnable createRestorePoint)
 	{
 		setAlignment(Pos.CENTER);
 		Label l = new Label("Wählen Sie bitte zwei Klassen und eine passende Relation aus.");			
@@ -76,8 +76,8 @@ public class RelationPane extends VBox
 			addButton.setOnAction(e->
 			{
 				if(subjectBox.getValue()==null||objectBox.getValue()==null||predicateBox.getValue()==null) {return;}
-				state.triples.add(new Triple(subjectBox.getValue(),predicateBox.getValue(), objectBox.getValue()));
-				addCallback.run();
+				createRestorePoint.run();
+				state.triples.add(new Triple(subjectBox.getValue(),predicateBox.getValue(), objectBox.getValue()));				
 				subjectBox.setValue(null);
 				objectBox.setValue(null);
 				predicateBox.setValue(null);

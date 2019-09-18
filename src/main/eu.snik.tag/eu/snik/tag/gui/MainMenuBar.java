@@ -44,7 +44,7 @@ public class MainMenuBar
 
 				try{main.openDocx(file);} catch (FileNotFoundException|Docx4JException ex) {Log.error("Fehler beim Öffnen eines DOCX documents", ex);}
 
-			});
+			});				
 		}
 		{
 			MenuItem openTaggedItem = new MenuItem("Ann_otierte Datei Öffnen");
@@ -156,6 +156,16 @@ public class MainMenuBar
 				}
 			});
 		}
+		{
+			MenuItem undoItem = new MenuItem("_Undo");
+			fileMenu.getItems().add(undoItem);
+			undoItem.setAccelerator(new KeyCodeCombination(KeyCode.Z,KeyCombination.CONTROL_DOWN));
+					undoItem.setOnAction(e->
+			{
+				main.restore();		
+			});				
+		}
+
 
 		return fileMenu;
 	}

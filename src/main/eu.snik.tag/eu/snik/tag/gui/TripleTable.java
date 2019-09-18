@@ -14,28 +14,19 @@ import javafx.scene.layout.VBox;
 public class TripleTable extends VBox
 {
 	final ObservableList<Triple> triples;
-	//final Runnable update;
+	final Runnable createRestorePoint;
 	final TableView<Triple> table;
 
 	private TextField filterField = new TextField();
 	{filterField.setPromptText("Verbindungen durchsuchen");}
 		
-//	public void refresh()
-//	{
-////		var triples = classes.stream().flatMap(c->c.getTriples().stream()).collect(Collectors.toList());
-////		this.triples.setAll(triples);
-////		System.out.println(triples);
-//	}
-	
 	/** @param classes may still be empty at constructor call time
 	 * @param update	 callback that is run when the user changes a class.
 	 * This is necessary because an observable list's change listeners only fire when a class is added or removed, not changed.*/
-	public TripleTable(final ObservableList<Triple> triples, final Runnable update)
+	public TripleTable(final ObservableList<Triple> triples, final Runnable createRestorePoint)
 	{
-		this.triples = triples;
-//		refresh();
-//		this.classes.addListener((ListChangeListener)x->{refresh();});
-		//this.update = update;
+		this.triples = triples;	
+		this.createRestorePoint = createRestorePoint;
 		this.table = new TableView<Triple>(triples); 
 		
 		table.setEditable(true);
@@ -91,7 +82,7 @@ public class TripleTable extends VBox
 //		});
 //
 
-		var removeCol = new RemoveColumn<Triple>("Entfernen", "x", triples::remove, ()->{});
+		var removeCol = new RemoveColumn<Triple>("Entfernen", "x", triples::remove, this.createRestorePoint);
 		
 		table.getColumns().addAll(subjectCol,predicateCol,objectCol,removeCol);
 	}

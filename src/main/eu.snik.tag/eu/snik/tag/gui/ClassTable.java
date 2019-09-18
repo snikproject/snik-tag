@@ -26,7 +26,7 @@ import javafx.scene.layout.VBox;
 public class ClassTable extends VBox
 {
 	final State state;
-	final Runnable update;
+	final Runnable createRestorePoint;
 	final TableView<Clazz> table;
 
 	private TextField filterField = new TextField();
@@ -54,9 +54,9 @@ public class ClassTable extends VBox
 				setGraphic(deleteButton);
 				deleteButton.setOnAction(
 						event -> 
-						{							
+						{
+							createRestorePoint.run();
 							classOperation.accept(clazz);
-							update.run();
 						});
 			}
 		});
@@ -67,7 +67,7 @@ public class ClassTable extends VBox
 	 *  @param merger the target class which will still exist at the end*/
 	private void merge(Clazz merger)
 	{
-		state.save();
+		createRestorePoint.run();
 		var mergees = new HashSet<>(table.getSelectionModel().getSelectedItems());
 		mergees.remove(merger);
 
@@ -97,12 +97,12 @@ public class ClassTable extends VBox
 	}
 
 	/** @param classes may still be empty at constructor call time
-	 * @param update	 callback that is run when the user changes a class.
+	 * @param createRestorePoint	 callback that is run when the user changes a class.
 	 * This is necessary because an observable list's change listeners only fire when a class is added or removed, not changed.*/
-	public ClassTable(final State state,final Runnable update)
+	public ClassTable(final State state,final Runnable createRestorePoint)
 	{
 		this.state = state;
-		this.update = update;
+		this.createRestorePoint = createRestorePoint;
 		this.table = new TableView<Clazz>(); 
 
 		table.setEditable(true);
@@ -133,7 +133,7 @@ public class ClassTable extends VBox
 		{
 			e.getRowValue().labels.clear();
 			e.getRowValue().labels.addAll(e.getNewValue());
-			update.run();
+			createRestorePoint.run();
 		});
 
 		var localNameCol = new TableColumn<Clazz,String>("Local Name");
@@ -142,6 +142,7 @@ public class ClassTable extends VBox
 		localNameCol.setMinWidth(350);
 		localNameCol.setOnEditCommit(e->
 		{
+			createRestorePoint.run();
 			Clazz newClass = e.getRowValue().replaceLocalName(e.getNewValue());
 			state.classes.add(newClass);
 
@@ -149,7 +150,7 @@ public class ClassTable extends VBox
 			state.triples.filtered((t)->t.subject==oldClass).forEach(t->{state.triples.add(t.replaceSubject(newClass));});
 			state.triples.filtered((t)->t.object==oldClass).forEach(t->{state.triples.add(t.replaceObject(newClass));});			
 			state.classes.remove(oldClass); // deletes the old triples
-			update.run();
+			createRestorePoint.run();
 		});
 
 
@@ -159,6 +160,7 @@ public class ClassTable extends VBox
 		subtopCol.setMinWidth(300);
 		subtopCol.setOnEditCommit(e->
 		{
+			createRestorePoint.run();
 			Clazz newClass = e.getRowValue().replaceSubtop(e.getNewValue());
 			state.classes.add(newClass);
 			Clazz oldClass = e.getRowValue();
@@ -192,7 +194,7 @@ public class ClassTable extends VBox
 			state.triples.removeAll(remove);
 			state.triples.addAll(add);
 
-			update.run();
+			createRestorePoint.run();
 		});
 
 		var removeCol = buttonCol("Entfernen", "x", state.classes::remove);

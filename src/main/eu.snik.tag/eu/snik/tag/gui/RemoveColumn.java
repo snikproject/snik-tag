@@ -8,7 +8,7 @@ import javafx.scene.control.TableColumn;
 
 public class RemoveColumn<T> extends TableColumn<T,T>
 {
-	RemoveColumn(String columnText, String buttonText, final Consumer<T> operation, final Runnable update)
+	RemoveColumn(String columnText, String buttonText, final Consumer<T> operation, final Runnable createRestorePoint)
 	{
 		super(columnText);	
 		this.setCellValueFactory(param -> new ReadOnlyObjectWrapper<>(param.getValue()));
@@ -30,9 +30,9 @@ public class RemoveColumn<T> extends TableColumn<T,T>
 				setGraphic(deleteButton);
 				deleteButton.setOnAction(
 						event -> 
-						{							
+						{
+							createRestorePoint.run();
 							operation.accept(T);
-							update.run();
 						});
 			}
 		});
