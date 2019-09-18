@@ -5,7 +5,11 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayDeque;
+import java.util.Deque;
+import java.util.LinkedList;
 import java.util.Optional;
+import java.util.Stack;
 import org.docx4j.openpackaging.exceptions.Docx4JException;
 import eu.snik.tag.Extractor;
 import javafx.application.Application;
@@ -25,7 +29,7 @@ import javafx.stage.Window;
 public class Main extends Application
 {
 	public final State state = new State();
-
+	
 	private final SplitPane textPane = new SplitPane();
 
 	private final RDFArea rdfText = new RDFArea(state);

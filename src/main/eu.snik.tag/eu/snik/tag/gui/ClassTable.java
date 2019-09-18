@@ -67,6 +67,7 @@ public class ClassTable extends VBox
 	 *  @param merger the target class which will still exist at the end*/
 	private void merge(Clazz merger)
 	{
+		state.save();
 		var mergees = new HashSet<>(table.getSelectionModel().getSelectedItems());
 		mergees.remove(merger);
 

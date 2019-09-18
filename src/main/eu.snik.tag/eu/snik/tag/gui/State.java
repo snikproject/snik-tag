@@ -5,9 +5,12 @@ import java.io.InputStream;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.OutputStream;
+import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Deque;
 import java.util.HashSet;
+import java.util.stream.Collectors;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import eu.snik.tag.Clazz;
@@ -21,13 +24,15 @@ import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 
 public class State
-{
+{	
 	public final StringProperty text = new SimpleStringProperty();
 	public final ObservableList<Clazz> classes = FXCollections.observableArrayList();
 	public final ObservableList<Triple> triples  = FXCollections.observableArrayList();
 
 	public transient ObjectProperty<Clazz> selectedSubject = new SimpleObjectProperty<>(); 
 	public transient ObjectProperty<Clazz> selectedObject = new SimpleObjectProperty<>();
+	
+	static public final Deque<State> history = new ArrayDeque<State>();
 
 	public State()
 	{
@@ -36,13 +41,41 @@ public class State
 			while(change.next())
 			{
 				var removed = new HashSet<>(change.getRemoved());
-				
+
 				if(removed.contains(selectedSubject.get())) {selectedSubject.set(null);}
 				if(removed.contains(selectedObject.get())) {selectedObject.set(null);}
-				
+
 				triples.removeIf(t->removed.contains(t.subject)||removed.contains(t.object));
 			}
 		});		
+	}
+
+	/** Restore the last saved state. */
+	public void restore()
+	{
+		this.set(history.pop());		
+	}
+	
+	/** Add the current state to the top of the history. */
+	public void save() {history.add(this.copy());} 
+
+	/** Create a new state that is a deep copy of this state. */
+	private State copy()
+	{
+		return new State( 
+				this.text.get(),
+				this.classes,
+				this.triples
+//				this.classes.stream().map(c->c).collect(Collectors.toList()),
+//				this.triples.stream().map(c->c).collect(Collectors.toList())
+				);		
+	}
+	
+	private void set(State state)
+	{
+		text.set(state.text.get());
+		classes.setAll(state.classes);
+		triples.setAll(state.triples);
 	}
 
 	@SuppressWarnings("unchecked")
