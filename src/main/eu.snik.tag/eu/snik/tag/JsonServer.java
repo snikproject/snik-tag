@@ -2,6 +2,7 @@ package eu.snik.tag;
 
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.concurrent.atomic.AtomicInteger;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -12,14 +13,22 @@ import org.json.JSONArray;
 
 public class JsonServer extends Server
 {
-	static final int PORT = 1234;  
+	//ports lower than 1024 can't be bound without root access in Linux, see https://serverfault.com/questions/268099/bind-to-ports-less-than-1024-without-root-access
+	static AtomicInteger lastPort = new AtomicInteger(1100);
+  public final int port;
 
-	public JsonServer(JSONArray json)
-	{
-		super(PORT);
+	public JsonServer(JSONArray json, int port)
+	{		
+		super(port);
+		this.port = port;
 		setHandler(new JsonHandler(json));
 	}
-	
+
+	public JsonServer(JSONArray json)
+	{		
+		this(json,lastPort.addAndGet(1));
+	}
+
 	public static class JsonHandler extends AbstractHandler
 	{
 		final JSONArray json;

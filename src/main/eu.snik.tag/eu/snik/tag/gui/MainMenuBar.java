@@ -124,9 +124,9 @@ public class MainMenuBar
 			{				
 				try
 				{
-					Server server = new JsonServer(main.state.cytoscapeElements());
+					JsonServer server = new JsonServer(main.state.cytoscapeElements());
 					server.start();
-					browse("https://www.snik.eu/graph?json=http://localhost:1234");
+					browse("https://www.snik.eu/graph?json=http://localhost:"+server.port);
 				}
 				catch (Exception e)
 				{				
