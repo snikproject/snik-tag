@@ -13,6 +13,7 @@ import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.collections.transformation.FilteredList;
 import javafx.scene.control.Button;
 import javafx.scene.control.SelectionMode;
+import javafx.scene.control.Tab;
 import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
@@ -90,10 +91,14 @@ public class ClassTable extends VBox
 			state.triples.remove(invalidObjectTriples);
 			state.triples.addAll(validObjectTriples);
 		}
-				
+
 		for(Clazz mergee: mergees) {merger.labels.addAll(mergee.labels);}
 
 		state.classes.removeAll(mergees);
+		// select and focus merger
+		table.requestFocus();
+		table.getSelectionModel().clearSelection();
+		table.getSelectionModel().select(merger);
 	}
 
 	/** @param classes may still be empty at constructor call time
@@ -131,6 +136,7 @@ public class ClassTable extends VBox
 		labelCol.setMinWidth(600);
 		labelCol.setOnEditCommit(e->
 		{
+			if(e.getOldValue().equals(e.getNewValue())) {return;}
 			e.getRowValue().labels.clear();
 			e.getRowValue().labels.addAll(e.getNewValue());
 			createRestorePoint.run();
@@ -143,15 +149,17 @@ public class ClassTable extends VBox
 		localNameCol.setOnEditCommit(e->
 		{
 			if(e.getOldValue().equals(e.getNewValue())) {return;}
-			createRestorePoint.run();			
-			
+			createRestorePoint.run();
+
 			Clazz newClass = e.getRowValue().replaceLocalName(e.getNewValue());
 			Clazz oldClass = e.getRowValue();
 			state.triples.filtered((t)->t.subject==oldClass).forEach(t->{state.triples.add(t.replaceSubject(newClass));});
 			state.triples.filtered((t)->t.object==oldClass).forEach(t->{state.triples.add(t.replaceObject(newClass));});			
 			state.classes.remove(oldClass); // deletes the old triples
 			state.classes.add(e.getTablePosition().getRow(),newClass);
-			
+			table.getSelectionModel().clearAndSelect(e.getTablePosition().getRow());
+      table.getFocusModel().focus(e.getTablePosition().getRow());
+
 			createRestorePoint.run();
 		});
 
@@ -162,41 +170,41 @@ public class ClassTable extends VBox
 		subtopCol.setMinWidth(300);
 		subtopCol.setOnEditCommit(e->
 		{
+			if(e.getOldValue().equals(e.getNewValue())) {return;}
 			createRestorePoint.run();
-			Clazz newClass = e.getRowValue().replaceSubtop(e.getNewValue());
-			state.classes.add(newClass);
+			Clazz newClass = e.getRowValue().replaceSubtop(e.getNewValue());			
 			Clazz oldClass = e.getRowValue();
-			
+
 			var remove = new ArrayList<Triple>();
 			var add = new ArrayList<Triple>();
-			
+
 			for(Triple t: state.triples)
 			{
 				boolean changed = false;
 				Clazz subject = t.subject;
 				Clazz object = t.object;
 				Relation predicate = t.predicate;
-				
+
 				if(t.subject==oldClass) {changed=true;subject=newClass;}
 				if(t.object==oldClass) {changed=true;object=newClass;}
-				if(!(predicate.domain.contains(subject.subtop)&&predicate.range.contains(object.subtop)))
+				if(changed&&!(predicate.domain.contains(subject.subtop)&&predicate.range.contains(object.subtop)))
 				{
-					changed=true;
 					Log.warn("Relation "+t.predicate+" had to be changed to isAssociatedWith in triple "+t+" due to subtop change of class "+oldClass+" to "+e.getNewValue(),this.getScene().getWindow());
-					} 
+					predicate = Relation.isAssociatedWith;
+				}
 				if(changed)
 				{
 					remove.add(t);
-					add.add(new Triple(subject,predicate,object));
+					add.add(new Triple(subject,predicate,object));					
 				}
 			}
-			
-			state.classes.remove(oldClass);
-			
-			state.triples.removeAll(remove);
-			state.triples.addAll(add);
 
-			createRestorePoint.run();
+			state.triples.removeAll(remove);
+			state.classes.remove(oldClass);
+			state.classes.add(e.getTablePosition().getRow(),newClass);
+			table.getSelectionModel().clearAndSelect(e.getTablePosition().getRow());
+      table.getFocusModel().focus(e.getTablePosition().getRow());
+			state.triples.addAll(add);			
 		});
 
 		var removeCol = buttonCol("Entfernen", "x", state.classes::remove);
