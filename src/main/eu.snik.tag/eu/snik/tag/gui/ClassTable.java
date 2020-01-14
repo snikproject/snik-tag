@@ -142,14 +142,16 @@ public class ClassTable extends VBox
 		localNameCol.setMinWidth(350);
 		localNameCol.setOnEditCommit(e->
 		{
-			createRestorePoint.run();
+			if(e.getOldValue().equals(e.getNewValue())) {return;}
+			createRestorePoint.run();			
+			
 			Clazz newClass = e.getRowValue().replaceLocalName(e.getNewValue());
-			state.classes.add(newClass);
-
 			Clazz oldClass = e.getRowValue();
 			state.triples.filtered((t)->t.subject==oldClass).forEach(t->{state.triples.add(t.replaceSubject(newClass));});
 			state.triples.filtered((t)->t.object==oldClass).forEach(t->{state.triples.add(t.replaceObject(newClass));});			
 			state.classes.remove(oldClass); // deletes the old triples
+			state.classes.add(e.getTablePosition().getRow(),newClass);
+			
 			createRestorePoint.run();
 		});
 
