@@ -6,8 +6,11 @@ import java.io.FileInputStream;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.net.URI;
+import java.util.Arrays;
 import java.util.Properties;
 import org.docx4j.openpackaging.exceptions.Docx4JException;
+import eu.snik.tag.DocxLoader;
+import eu.snik.tag.HtmlLoader;
 import eu.snik.tag.JsonServer;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
@@ -40,7 +43,22 @@ public class MainMenuBar
 				File file = openChooser.showOpenDialog(main.stage);
 				if(file==null) {return;}
 
-				try{main.openDocx(new FileInputStream(file));} catch (Docx4JException | IOException ex) {Log.error("Fehler beim Öffnen eines DOCX documents", ex);}
+				try{main.load(new DocxLoader(new FileInputStream(file)));} catch (IOException ex) {Log.error("Fehler beim Öffnen eines DOCX documents", ex);}
+
+			});				
+		}
+		{
+			MenuItem openHtmlItem = new MenuItem("_HTML Datei Öffnen");
+			fileMenu.getItems().add(openHtmlItem);
+			openHtmlItem.setAccelerator(new KeyCodeCombination(KeyCode.H,KeyCombination.CONTROL_DOWN));
+			var openChooser = new FileChooser();
+			openChooser.getExtensionFilters().add(new ExtensionFilter("HTML", Arrays.asList("*.html","*.htm")));
+			openHtmlItem.setOnAction(e->
+			{
+				File file = openChooser.showOpenDialog(main.stage);
+				if(file==null) {return;}
+
+				try{main.load(new HtmlLoader(new FileInputStream(file)));} catch (IOException ex) {Log.error("Fehler beim Öffnen eines HTML documents", ex);}
 
 			});				
 		}

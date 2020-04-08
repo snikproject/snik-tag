@@ -8,7 +8,7 @@ import java.io.InputStream;
 import java.util.ArrayDeque;
 import java.util.Deque;
 import org.docx4j.openpackaging.exceptions.Docx4JException;
-import eu.snik.tag.DocxLoader;
+import eu.snik.tag.Loader;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.geometry.Pos;
@@ -83,12 +83,9 @@ public class Main extends Application
 	} 
 
 
-	/** @param file DOCX file with tagged entity types (italic), roles (bold) and functions (function).
-	 * @throws Docx4JException 
-	 * @throws IOException */
-	void openDocx(InputStream in) throws Docx4JException, IOException
+	/** Close the current document and replace it with the one from the given loader. */
+	void load(Loader loader)
 	{
-		var loader = new DocxLoader(in); 
 		var newClasses = loader.getClasses();
 		var newText = loader.getText();
 
@@ -111,7 +108,7 @@ public class Main extends Application
 		}
 	}
 
-	/** Setup the GUI. Called automatically with "mvn javafx:run".*/
+	/** Setup the GUI. Called automatically with "mvn javafx:run". */
 	@Override
 	public void start(Stage stage)
 	{		

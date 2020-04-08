@@ -26,11 +26,6 @@ public class DocxLoader extends Loader
 	public DocxLoader(InputStream in) throws IOException
 	{super(in);} 
 	
-	private static String labelToLocalName(String label)
-	{
-		return WordUtils.capitalizeFully(label).replaceAll("[^A-Za-z0-9]","");
-	}
-
 		/** from https://stackoverflow.com/questions/19676282/docx4j-find-and-replace */
 	static List<Object> getAllElementsFromObject(Object obj, Class<?> toSearch) {
     List<Object> result = new ArrayList<Object>();
@@ -111,7 +106,6 @@ public class DocxLoader extends Loader
 			{
 
 				String text = TextUtils.getText(run);
-
 				String label = StringUtils.strip(text,"., ");
 				//label = label.replaceAll("[^A-Za-z0-9 ]", ""); // removing non-alphanumerical characters leads to missing matches in the text tab
 
@@ -135,7 +129,7 @@ public class DocxLoader extends Loader
 				{
 					classes.stream().filter(c->c.subtop!=clazz.subtop).findAny().ifPresent(c->
 					{
-						warnings.add("Typenkonflikt. Klasse \""+label+"\" ist getagged als sowohl "+c.subtop+" als auch "+clazz.subtop+". "
+						System.err.println("Typenkonflikt. Klasse \""+label+"\" ist getagged als sowohl "+c.subtop+" als auch "+clazz.subtop+". "
 								+"Ignoriere "+clazz.subtop+". Bitte beheben Sie den Konflikt im Dokument.");
 					});					
 					continue;
