@@ -6,7 +6,6 @@ import org.apache.jena.rdf.model.ModelFactory;
 import eu.snik.tag.Clazz;
 import eu.snik.tag.Triple;
 import javafx.collections.ListChangeListener;
-import javafx.collections.ObservableList;
 import javafx.scene.control.TextArea;
 
 /** Displays all extracted RDF classes and relations as RDF turtle. */

@@ -1,45 +1,37 @@
 package eu.snik.tag;
+import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
-import java.util.Optional;
-import java.util.function.Consumer;
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.text.WordUtils;
 import org.docx4j.Docx4J;
 import org.docx4j.TextUtils;
-import org.docx4j.jaxb.Context;
 import org.docx4j.openpackaging.exceptions.Docx4JException;
 import org.docx4j.wml.Comments.Comment;
 import org.docx4j.wml.ContentAccessor;
-import org.docx4j.wml.ObjectFactory;
 import org.docx4j.wml.R;
 
 /** Extracts SNIK classes from a tagged DOCX file. */
-public class Extractor
+public class DocxLoader extends Loader
 {
-	private static ObjectFactory factory = Context.getWmlObjectFactory();
-	private static int commentId = 10000;
+	//	private static ObjectFactory factory = Context.getWmlObjectFactory();
+//	private static int commentId = 10000;
 
+	public DocxLoader(InputStream in) throws IOException
+	{super(in);} 
+	
 	private static String labelToLocalName(String label)
 	{
 		return WordUtils.capitalizeFully(label).replaceAll("[^A-Za-z0-9]","");
 	}
 
-		/** Test script that loads an example file and prints the result to the console.*/
-	/*
-	public static void main(String[] args) throws Docx4JException, JAXBException
-	{
-		System.out.println(extract(new File("../benchmark/input.docx")).toString().replaceAll("\\), ", "\\),\n"));
-	}
-	*/
-
-	/** from https://stackoverflow.com/questions/19676282/docx4j-find-and-replace */
+		/** from https://stackoverflow.com/questions/19676282/docx4j-find-and-replace */
 	static List<Object> getAllElementsFromObject(Object obj, Class<?> toSearch) {
     List<Object> result = new ArrayList<Object>();
     if (obj instanceof JAXBElement) obj = ((JAXBElement<?>) obj).getValue();
@@ -55,11 +47,13 @@ public class Extractor
     return result;
 }
 	
-	/** @return 	the complete text from the DOCX file without any formatting 
-	 * @throws Docx4JException */
-	public static String extractText(InputStream in) throws Docx4JException
-	{		
-		var wordMLPackage =	Docx4J.load(in);
+	/** @return the complete text from the DOCX file without any formatting */ 
+	@Override
+	public String getText()
+	{
+		try
+		{
+		var wordMLPackage =	Docx4J.load(in());
 
 		var doc = wordMLPackage.getMainDocumentPart();
 		var parts = new ArrayList<String>();
@@ -84,16 +78,17 @@ public class Extractor
     	 
     	 return a+'\n'+b;
      }).get();
-		//return TextUtils.getText(doc.getContents());
+		}
+		catch(Docx4JException e) {throw new RuntimeException("Error loading Docx File",e);}
 		}
 
-
 	/**	@return all classes extracted from the tagged parts of the DOCX document*/
-	public static Collection<Clazz> extract(InputStream in, Optional<Consumer<String>> warningCallback)
+	@Override
+	public Collection<Clazz> getClasses()
 	{
 		try
 		{
-		var wordMLPackage =	Docx4J.load(in);
+		var wordMLPackage =	Docx4J.load(in());
 		var doc = wordMLPackage.getMainDocumentPart();
 		List<Comment> comments = doc.getCommentsPart().getContents().getComment();
 
@@ -150,7 +145,7 @@ public class Extractor
 			}
 		}		
 
-		warningCallback.ifPresent(c->c.accept(warnings.stream().reduce("", (a,b)->a+"\n"+b)));
+		//warningCallback.ifPresent(c->c.accept(warnings.stream().reduce("", (a,b)->a+"\n"+b)));
 		System.out.println(classes.size()+" classes extracted.");
 		
 		return classes;

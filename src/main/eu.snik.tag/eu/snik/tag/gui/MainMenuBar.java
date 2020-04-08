@@ -3,13 +3,11 @@ package eu.snik.tag.gui;
 import java.awt.Desktop;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.net.URI;
 import java.util.Properties;
 import org.docx4j.openpackaging.exceptions.Docx4JException;
-import org.eclipse.jetty.server.Server;
 import eu.snik.tag.JsonServer;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
@@ -42,7 +40,7 @@ public class MainMenuBar
 				File file = openChooser.showOpenDialog(main.stage);
 				if(file==null) {return;}
 
-				try{main.openDocx(file);} catch (FileNotFoundException|Docx4JException ex) {Log.error("Fehler beim Öffnen eines DOCX documents", ex);}
+				try{main.openDocx(new FileInputStream(file));} catch (Docx4JException | IOException ex) {Log.error("Fehler beim Öffnen eines DOCX documents", ex);}
 
 			});				
 		}

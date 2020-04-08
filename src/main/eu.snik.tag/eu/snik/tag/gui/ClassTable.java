@@ -13,7 +13,6 @@ import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.collections.transformation.FilteredList;
 import javafx.scene.control.Button;
 import javafx.scene.control.SelectionMode;
-import javafx.scene.control.Tab;
 import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
@@ -99,6 +98,16 @@ public class ClassTable extends VBox
 		table.requestFocus();
 		table.getSelectionModel().clearSelection();
 		table.getSelectionModel().select(merger);
+	}
+	
+	private void split(Clazz splitter)
+	{
+		if(splitter.labels.size()<2)
+		{
+			Log.warn("Only "+splitter.labels.size()+" labels. Nothing to split. Aborting.", this.getScene().getWindow());
+			System.out.println(splitter.labels);
+			return;
+		}
 	}
 
 	/** @param classes may still be empty at constructor call time
@@ -211,8 +220,11 @@ public class ClassTable extends VBox
 
 		var mergeCol = buttonCol("Zusammenführen", "Zusammenführen", this::merge);
 		mergeCol.setMinWidth(150);
+		
+		var splitCol = buttonCol("Trennen", "Trennen", this::split);
+		splitCol.setMinWidth(120);
 
-		table.getColumns().addAll(labelCol,localNameCol,subtopCol,removeCol,mergeCol);
+		table.getColumns().addAll(labelCol,localNameCol,subtopCol,removeCol,mergeCol,splitCol);
 	}
 
 }

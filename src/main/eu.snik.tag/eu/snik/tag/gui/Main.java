@@ -2,16 +2,13 @@ package eu.snik.tag.gui;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayDeque;
 import java.util.Deque;
-import java.util.Optional;
 import org.docx4j.openpackaging.exceptions.Docx4JException;
-import eu.snik.tag.Extractor;
+import eu.snik.tag.DocxLoader;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.geometry.Pos;
@@ -87,12 +84,13 @@ public class Main extends Application
 
 
 	/** @param file DOCX file with tagged entity types (italic), roles (bold) and functions (function).
-	 * @throws FileNotFoundException 
-	 * @throws Docx4JException */
-	void openDocx(File file) throws FileNotFoundException, Docx4JException
+	 * @throws Docx4JException 
+	 * @throws IOException */
+	void openDocx(InputStream in) throws Docx4JException, IOException
 	{
-		var newClasses = Extractor.extract(new FileInputStream(file),Optional.of(s->Log.warn(s, window)));
-		var newText = Extractor.extractText(new FileInputStream(file));
+		var loader = new DocxLoader(in); 
+		var newClasses = loader.getClasses();
+		var newText = loader.getText();
 
 		Platform.runLater(()->
 		{
@@ -113,7 +111,7 @@ public class Main extends Application
 		}
 	}
 
-	/** Setup the GUI and load an example tagged DOCX file. Called automatically with "mvn javafx:run".*/
+	/** Setup the GUI. Called automatically with "mvn javafx:run".*/
 	@Override
 	public void start(Stage stage)
 	{		

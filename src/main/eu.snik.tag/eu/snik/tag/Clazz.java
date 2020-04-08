@@ -40,12 +40,12 @@ public class Clazz implements Serializable
 		this(Collections.singletonList(label),localName,subtop);
 	}
 	
-
 	@Override
 	public boolean equals(Object obj)
 	{
 		if(!(obj instanceof Clazz)) {return false;}
-		return (((Clazz)(obj)).localName).equals(this.localName);
+		Clazz other = (Clazz)obj;
+		return (other.localName.equals(this.localName)) && (other.subtop.equals(this.subtop));
 	}
 
 	@Override
