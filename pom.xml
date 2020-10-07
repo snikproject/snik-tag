@@ -8,6 +8,7 @@
 	<properties>
 		<maven.compiler.release>14</maven.compiler.release>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<version.javafx>15</version.javafx>
 	</properties>
 	<build>
 		<sourceDirectory>src/main/eu.snik.tag</sourceDirectory>
@@ -95,17 +96,17 @@
 		<dependency>
 			<groupId>org.openjfx</groupId>
 			<artifactId>javafx-controls</artifactId>
-			<version>12.0.1</version>
+			<version>${version.javafx}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.openjfx</groupId>
 			<artifactId>javafx-fxml</artifactId>
-			<version>12.0.1</version>
+			<version>${version.javafx}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.openjfx</groupId>
 			<artifactId>javafx-web</artifactId>
-			<version>12.0.1</version>
+			<version>${version.javafx}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.json</groupId>
