@@ -6,7 +6,7 @@
 	<artifactId>snik-tag</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<properties>
-		<maven.compiler.release>12</maven.compiler.release>
+		<maven.compiler.release>14</maven.compiler.release>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 	</properties>
 	<build>
