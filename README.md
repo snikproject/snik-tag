@@ -21,7 +21,6 @@ The extracted classes and their relations as an RDF Turtle file.
 
 ## Build
 * Run  `mvn compile`
-* Run  `mvn javafx:compile`
 * Run  `mvn javafx:run`
 
 ## Documentation
