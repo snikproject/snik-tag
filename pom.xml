@@ -6,7 +6,7 @@
 	<artifactId>snik-tag</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<properties>
-		<maven.compiler.release>14</maven.compiler.release>
+		<maven.compiler.release>11</maven.compiler.release>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<version.javafx>15</version.javafx>
 	</properties>
@@ -119,16 +119,25 @@
 			<groupId>org.openjfx</groupId>
 			<artifactId>javafx-controls</artifactId>
 			<version>${version.javafx}</version>
+			<classifier>win</classifier>
 		</dependency>
 		<dependency>
 			<groupId>org.openjfx</groupId>
 			<artifactId>javafx-fxml</artifactId>
 			<version>${version.javafx}</version>
+			<classifier>win</classifier>
+		</dependency>
+		<dependency>
+			<groupId>org.openjfx</groupId>
+			<artifactId>javafx-graphics</artifactId>
+			<version>${version.javafx}</version>
+			<classifier>win</classifier>
 		</dependency>
 		<dependency>
 			<groupId>org.openjfx</groupId>
 			<artifactId>javafx-web</artifactId>
 			<version>${version.javafx}</version>
+			<classifier>win</classifier>
 		</dependency>
 		<dependency>
 			<groupId>org.json</groupId>
@@ -164,3 +173,4 @@
 		</dependency>
 	</dependencies>
 </project>
+
