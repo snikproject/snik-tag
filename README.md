@@ -10,14 +10,18 @@ You need to prepare a SNIK DOCX file where the classes are tagged in the followi
 
 SNIK Tag will display the text with those tagged classes but also show the classes separately and allow you to edit them and add links between them.
 
-## Java
-Uses project lombok and may require [setup for your IDE](https://projectlombok.org/setup/overview). For now removed
-
 ## Input
 A .docx word document where meta model subtop classes are annotated using formatting as **Role**, *Entity Type* and <u>Function</u>.
 
 ## Output
 The extracted classes and their relations as an RDF Turtle file.
+
+# Development
+
+## Requirements
+* Java 14 or higher
+* Maven 3
+
 
 ## Build
 * Run  `mvn compile`
