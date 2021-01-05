@@ -16,12 +16,15 @@ A .docx word document where meta model subtop classes are annotated using format
 ## Output
 The extracted classes and their relations as an RDF Turtle file.
 
+# Windows Release
+
+Download the latest portable Windows release [here](https://github.com/IMISE/snik-tag/releases/download/0.2.1/sniktag.zip).
+
 # Development
 
 ## Requirements
 * Java 14 or higher
 * Maven 3
-
 
 ## Build
 * Run  `mvn compile`
