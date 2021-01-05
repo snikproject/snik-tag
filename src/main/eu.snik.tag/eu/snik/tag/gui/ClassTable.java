@@ -111,20 +111,18 @@ public class ClassTable extends VBox
 		}
 		createRestorePoint.run();
 		var splitees = new HashSet<Clazz>();
-		
 		for(String label: splitter.labels)
 		{
-			Clazz splitee = new Clazz(label, CaseUtils.toCamelCase(label,true, new char[] {' ','-','_','.'}).replaceAll("[A-Za-z0-9]", ""), splitter.subtop);
-		
+			var name = CaseUtils.toCamelCase(label,true, new char[] {' ','-','_','.'}).replaceAll("[^A-Za-z0-9]", "");
+			Clazz splitee = new Clazz(label, name, splitter.subtop);
+			splitees.add(splitee);
 		}
 		
-		for(Clazz mergee: mergees) {merger.labels.addAll(mergee.labels);}
-
-		state.classes.removeAll(mergees);
-		// select and focus merger
+		state.classes.removeAll(splitter);
+		state.classes.addAll(splitees);
+		// select and focus splitees
 		table.requestFocus();
 		table.getSelectionModel().clearSelection();
-		table.getSelectionModel().select(splitees);
 
 	}
 
