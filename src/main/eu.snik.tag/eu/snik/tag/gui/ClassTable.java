@@ -5,6 +5,7 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
+import org.apache.commons.text.CaseUtils;
 import eu.snik.tag.Clazz;
 import eu.snik.tag.Relation;
 import eu.snik.tag.Subtop;
@@ -108,6 +109,23 @@ public class ClassTable extends VBox
 			System.out.println(splitter.labels);
 			return;
 		}
+		createRestorePoint.run();
+		var splitees = new HashSet<Clazz>();
+		
+		for(String label: splitter.labels)
+		{
+			Clazz splitee = new Clazz(label, CaseUtils.toCamelCase(label,true, new char[] {' ','-','_','.'}).replaceAll("[A-Za-z0-9]", ""), splitter.subtop);
+		
+		}
+		
+		for(Clazz mergee: mergees) {merger.labels.addAll(mergee.labels);}
+
+		state.classes.removeAll(mergees);
+		// select and focus merger
+		table.requestFocus();
+		table.getSelectionModel().clearSelection();
+		table.getSelectionModel().select(splitees);
+
 	}
 
 	/** @param classes may still be empty at constructor call time
