@@ -5,15 +5,12 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
-
 import org.apache.commons.text.CaseUtils;
-
 import eu.snik.tag.Clazz;
 import eu.snik.tag.Relation;
 import eu.snik.tag.Subtop;
 import eu.snik.tag.Triple;
 import javafx.beans.property.ReadOnlyObjectWrapper;
-import javafx.collections.ListChangeListener;
 import javafx.collections.transformation.FilteredList;
 import javafx.collections.transformation.SortedList;
 import javafx.scene.control.Button;

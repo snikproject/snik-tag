@@ -3,6 +3,8 @@ package eu.snik.tag.gui;
 import eu.snik.tag.Clazz;
 import eu.snik.tag.Triple;
 import javafx.collections.ObservableList;
+import javafx.collections.transformation.FilteredList;
+import javafx.collections.transformation.SortedList;
 import javafx.scene.control.SelectionMode;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
@@ -27,7 +29,23 @@ public class TripleTable extends VBox
 	{
 		this.triples = triples;	
 		this.createRestorePoint = createRestorePoint;
-		this.table = new TableView<Triple>(triples); 
+
+		this.table = new TableView<Triple>(); 
+
+		final var filteredTriples = new FilteredList<Triple>(triples);
+		final var sortedTriples = new SortedList<>(filteredTriples);
+		sortedTriples.comparatorProperty().bind(table.comparatorProperty());
+		table.setItems(sortedTriples);
+		
+		filterField.textProperty().addListener((observable, oldValue, newValue) ->
+		{
+			filteredTriples.setPredicate(triple ->
+			{
+				if (newValue == null || newValue.isEmpty()) {return true;}
+				String rowText = triple.subject.toString()+" "+triple.predicate.toString()+" "+triple.object.toString();
+				return rowText.toLowerCase().contains(newValue.toLowerCase());
+			});
+		});
 
 		table.setEditable(true);
 		table.setMinHeight(1000);
