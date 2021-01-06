@@ -28,7 +28,7 @@ public class State
 
 	public transient ObjectProperty<Clazz> selectedSubject = new SimpleObjectProperty<>(); 
 	public transient ObjectProperty<Clazz> selectedObject = new SimpleObjectProperty<>();
-	
+
 	public State()
 	{
 		classes.addListener((ListChangeListener<Clazz>)(change)->

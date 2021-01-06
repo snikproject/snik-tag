@@ -5,13 +5,17 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
+
 import org.apache.commons.text.CaseUtils;
+
 import eu.snik.tag.Clazz;
 import eu.snik.tag.Relation;
 import eu.snik.tag.Subtop;
 import eu.snik.tag.Triple;
 import javafx.beans.property.ReadOnlyObjectWrapper;
+import javafx.collections.ListChangeListener;
 import javafx.collections.transformation.FilteredList;
+import javafx.collections.transformation.SortedList;
 import javafx.scene.control.Button;
 import javafx.scene.control.SelectionMode;
 import javafx.scene.control.TableCell;
@@ -100,7 +104,7 @@ public class ClassTable extends VBox
 		table.getSelectionModel().clearSelection();
 		table.getSelectionModel().select(merger);
 	}
-	
+
 	private void split(Clazz splitter)
 	{
 		if(splitter.labels.size()<2)
@@ -117,7 +121,7 @@ public class ClassTable extends VBox
 			Clazz splitee = new Clazz(label, name, splitter.subtop);
 			splitees.add(splitee);
 		}
-		
+
 		state.classes.removeAll(splitter);
 		state.classes.addAll(splitees);
 		// select and focus splitees
@@ -133,7 +137,7 @@ public class ClassTable extends VBox
 	{
 		this.state = state;
 		this.createRestorePoint = createRestorePoint;
-		this.table = new TableView<Clazz>(); 
+		this.table = new TableView<Clazz>();
 
 		table.setEditable(true);
 		table.setMinHeight(1000);
@@ -141,7 +145,10 @@ public class ClassTable extends VBox
 		this.getChildren().addAll(filterField,table);
 
 		final var filteredClasses = new FilteredList<Clazz>(state.classes);
-		table.setItems(filteredClasses);
+		final var sortedClasses = new SortedList<>(filteredClasses);
+		sortedClasses.comparatorProperty().bind(table.comparatorProperty());
+		table.setItems(sortedClasses);
+		//table.setItems(state.classes);
 		//this.getItems().addAll(filteredClasses);
 
 		filterField.textProperty().addListener((observable, oldValue, newValue) ->
@@ -183,7 +190,7 @@ public class ClassTable extends VBox
 			state.classes.remove(oldClass); // deletes the old triples
 			state.classes.add(e.getTablePosition().getRow(),newClass);
 			table.getSelectionModel().clearAndSelect(e.getTablePosition().getRow());
-      table.getFocusModel().focus(e.getTablePosition().getRow());
+			table.getFocusModel().focus(e.getTablePosition().getRow());
 
 			createRestorePoint.run();
 		});
@@ -228,7 +235,7 @@ public class ClassTable extends VBox
 			state.classes.remove(oldClass);
 			state.classes.add(e.getTablePosition().getRow(),newClass);
 			table.getSelectionModel().clearAndSelect(e.getTablePosition().getRow());
-      table.getFocusModel().focus(e.getTablePosition().getRow());
+			table.getFocusModel().focus(e.getTablePosition().getRow());
 			state.triples.addAll(add);			
 		});
 
@@ -236,12 +243,12 @@ public class ClassTable extends VBox
 
 		var mergeCol = buttonCol("Zusammenführen", "Zusammenführen", this::merge);
 		mergeCol.setMinWidth(150);
-		
+
 		var splitCol = buttonCol("Trennen", "Trennen", this::split);
 		splitCol.setMinWidth(120);
 
-		table.getColumns().addAll(labelCol,localNameCol,subtopCol,removeCol,mergeCol,splitCol);
+		table.getColumns().addAll(labelCol,localNameCol,subtopCol,removeCol,mergeCol,splitCol);		
+		this.table.getSortOrder().addAll(subtopCol,localNameCol,labelCol);
 	}
 
 }
-
