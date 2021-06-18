@@ -34,7 +34,7 @@ public class RDFArea extends TextArea
 	public void refresh()
 	{
 		var writer = new StringWriter();
-		RDFArea.rdfModel(state).write(writer,"Turtle");
+		RDFArea.rdfModel(state).write(writer,"N-TRIPLE");
 		setText(writer.toString());
 	}
 
