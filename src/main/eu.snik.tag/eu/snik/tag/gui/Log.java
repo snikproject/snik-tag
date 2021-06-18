@@ -5,7 +5,7 @@ import javafx.application.Platform;
 import javafx.stage.Window;
 import javafx.util.Duration;
 
-public class Log
+public final class Log
 {
 	public static void warn(String message, Window window)
 	{	

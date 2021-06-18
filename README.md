@@ -23,7 +23,7 @@ Download the latest portable Windows release [here](https://github.com/IMISE/sni
 # Development
 
 ## Requirements
-* Java 14 or higher
+* Java 16 or higher
 * Maven 3
 
 ## Build

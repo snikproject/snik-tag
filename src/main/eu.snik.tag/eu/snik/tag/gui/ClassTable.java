@@ -5,7 +5,9 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
+
 import org.apache.commons.text.CaseUtils;
+
 import eu.snik.tag.Clazz;
 import eu.snik.tag.Relation;
 import eu.snik.tag.Subtop;
@@ -73,27 +75,27 @@ public class ClassTable extends VBox
 		var mergees = new HashSet<>(table.getSelectionModel().getSelectedItems());
 		mergees.remove(merger);
 
-		if(mergees.stream().filter(mergee->mergee.subtop!=merger.subtop).findAny().isPresent())
+		if(mergees.stream().filter(mergee->mergee.subtop()!=merger.subtop()).findAny().isPresent())
 		{
 			Log.warn("Zusammenführen nicht möglich: Unterschiedliche Typen.",this.getScene().getWindow());
 			return;
 		}
 		{
-			var invalidSubjectTriples = state.triples.stream().filter(t->mergees.contains(t.subject));
+			var invalidSubjectTriples = state.triples.stream().filter(t->mergees.contains(t.subject()));
 			var validSubjectTriples = invalidSubjectTriples.map(t->t.replaceSubject(merger)).collect(Collectors.toList());
 
 			state.triples.remove(invalidSubjectTriples);
 			state.triples.addAll(validSubjectTriples);
 		}
 		{
-			var invalidObjectTriples = state.triples.stream().filter(t->mergees.contains(t.object));
+			var invalidObjectTriples = state.triples.stream().filter(t->mergees.contains(t.object()));
 			var validObjectTriples = invalidObjectTriples.map(t->t.replaceObject(merger)).collect(Collectors.toList());
 
 			state.triples.remove(invalidObjectTriples);
 			state.triples.addAll(validObjectTriples);
 		}
 
-		for(Clazz mergee: mergees) {merger.labels.addAll(mergee.labels);}
+		for(Clazz mergee: mergees) {merger.labels().addAll(mergee.labels());}
 
 		state.classes.removeAll(mergees);
 		// select and focus merger
@@ -104,18 +106,18 @@ public class ClassTable extends VBox
 
 	private void split(Clazz splitter)
 	{
-		if(splitter.labels.size()<2)
+		if(splitter.labels().size()<2)
 		{
-			Log.warn("Only "+splitter.labels.size()+" labels. Nothing to split. Aborting.", this.getScene().getWindow());
-			System.out.println(splitter.labels);
+			Log.warn("Only "+splitter.labels().size()+" labels. Nothing to split. Aborting.", this.getScene().getWindow());
+			System.out.println(splitter.labels());
 			return;
 		}
 		createRestorePoint.run();
 		var splitees = new HashSet<Clazz>();
-		for(String label: splitter.labels)
+		for(String label: splitter.labels())
 		{
 			var name = CaseUtils.toCamelCase(label,true, new char[] {' ','-','_','.'}).replaceAll("[^A-Za-z0-9]", "");
-			Clazz splitee = new Clazz(label, name, splitter.subtop);
+			Clazz splitee = new Clazz(label, name, splitter.subtop());
 			splitees.add(splitee);
 		}
 
@@ -153,7 +155,7 @@ public class ClassTable extends VBox
 			filteredClasses.setPredicate(clazz ->
 			{
 				if (newValue == null || newValue.isEmpty()) {return true;}
-				String rowText = clazz.labelString()+" "+clazz.localName+" "+clazz.subtop.name().replace('_',' ');
+				String rowText = clazz.labelString()+" "+clazz.localName()+" "+clazz.subtop().name().replace('_',' ');
 				return rowText.toLowerCase().contains(newValue.toLowerCase());
 			});
 		});
@@ -166,8 +168,8 @@ public class ClassTable extends VBox
 		labelCol.setOnEditCommit(e->
 		{
 			if(e.getOldValue().equals(e.getNewValue())) {return;}
-			e.getRowValue().labels.clear();
-			e.getRowValue().labels.addAll(e.getNewValue());
+			e.getRowValue().labels().clear();
+			e.getRowValue().labels().addAll(e.getNewValue());
 			createRestorePoint.run();
 		});
 
@@ -182,8 +184,8 @@ public class ClassTable extends VBox
 
 			Clazz newClass = e.getRowValue().replaceLocalName(e.getNewValue());
 			Clazz oldClass = e.getRowValue();
-			state.triples.filtered((t)->t.subject==oldClass).forEach(t->{state.triples.add(t.replaceSubject(newClass));});
-			state.triples.filtered((t)->t.object==oldClass).forEach(t->{state.triples.add(t.replaceObject(newClass));});			
+			state.triples.filtered((t)->t.subject()==oldClass).forEach(t->{state.triples.add(t.replaceSubject(newClass));});
+			state.triples.filtered((t)->t.object()==oldClass).forEach(t->{state.triples.add(t.replaceObject(newClass));});			
 			state.classes.remove(oldClass); // deletes the old triples
 			state.classes.add(e.getTablePosition().getRow(),newClass);
 			table.getSelectionModel().clearAndSelect(e.getTablePosition().getRow());
@@ -210,15 +212,15 @@ public class ClassTable extends VBox
 			for(Triple t: state.triples)
 			{
 				boolean changed = false;
-				Clazz subject = t.subject;
-				Clazz object = t.object;
-				Relation predicate = t.predicate;
+				Clazz subject = t.subject();
+				Clazz object = t.object();
+				Relation predicate = t.predicate();
 
-				if(t.subject==oldClass) {changed=true;subject=newClass;}
-				if(t.object==oldClass) {changed=true;object=newClass;}
-				if(changed&&!(predicate.domain.contains(subject.subtop)&&predicate.range.contains(object.subtop)))
+				if(t.subject()==oldClass) {changed=true;subject=newClass;}
+				if(t.object()==oldClass) {changed=true;object=newClass;}
+				if(changed&&!(predicate.domain.contains(subject.subtop())&&predicate.range.contains(object.subtop())))
 				{
-					Log.warn("Relation "+t.predicate+" had to be changed to isAssociatedWith in triple "+t+" due to subtop change of class "+oldClass+" to "+e.getNewValue(),this.getScene().getWindow());
+					Log.warn("Relation "+t.predicate()+" had to be changed to isAssociatedWith in triple "+t+" due to subtop change of class "+oldClass+" to "+e.getNewValue(),this.getScene().getWindow());
 					predicate = Relation.isAssociatedWith;
 				}
 				if(changed)

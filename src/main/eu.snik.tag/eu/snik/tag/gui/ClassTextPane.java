@@ -3,10 +3,10 @@ package eu.snik.tag.gui;
 import java.util.Comparator;
 import java.util.HashSet;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import org.apache.jena.ext.com.google.common.collect.LinkedListMultimap;
 import org.apache.jena.ext.com.google.common.collect.Multimap;
-import org.javatuples.Triplet;
 import eu.snik.tag.Clazz;
 import eu.snik.tag.Subtop;
 import javafx.collections.ListChangeListener;
@@ -86,7 +86,7 @@ public class ClassTextPane extends ScrollPane
 		// ~420 children in test case, in case of performance problems optimize this
 		flow.getChildren().stream().forEach(t->
 		{
-			t.setStyle(cssClass.get(subject.subtop));
+			t.setStyle(cssClass.get(subject.subtop()));
 		});
 	}
 
@@ -101,46 +101,42 @@ public class ClassTextPane extends ScrollPane
 		while(restText!=null&&!restText.isEmpty())
 		{
 			final String restTextFinal = restText;
-
-			@SuppressWarnings("unchecked")
-			var minOpt = restClasses.stream().flatMap(c->(c.labels.stream()
-					.map(l->new Triplet<Clazz,Integer,Integer>(c,restTextFinal.indexOf(l),l.length()))))
-					.filter(t->t.getValue1()!=-1) // only with labels found in the text
-					.min(Comparator.comparing(t->((Triplet<Clazz,Integer,Integer>)t).getValue1()) // minimize position
-							.thenComparing(t->-((Triplet<Clazz,Integer,Integer>)t).getValue2()) // tiebreaker: maximize label length 
+			record ClassRef(Clazz clazz, Integer index, Integer length) {};
+			
+			Optional<ClassRef> minOpt = restClasses.stream().flatMap(c->(c.labels().stream()
+					.map(l->new ClassRef(c,restTextFinal.indexOf(l),l.length()))))
+					.filter(t->t.index()!=-1) // only with labels found in the text
+					.min(Comparator.comparing(ClassRef::index) // minimize position
+							.thenComparing(Comparator.comparing(ClassRef::length).reversed()) // tiebreaker: maximize label length, TODO: test					
 							);
-
 
 			if(minOpt.isEmpty()) {break;}
 			var min = minOpt.get();
-			var clazz = min.getValue0();
-			int pos = min.getValue1();
-			int labelLength = min.getValue2(); 
 
-			if(pos>0)
+			if(min.length>0)
 			{
-				var context = new Text(restText.substring(0, pos));
+				var context = new Text(restText.substring(0, min.index));
 				context.getStyleClass().add("text-context");
 				context.getStyleClass().add("highlighted");
 
 				flow.getChildren().add(context);
 			}
 
-			Text classText = new Text(restText.substring(pos,pos+labelLength));
-			texts.put(clazz, classText);
+			Text classText = new Text(restText.substring(min.index,min.index+min.length));
+			texts.put(min.clazz, classText);
 			classText.getStyleClass().add("text-class");
 			classText.addEventHandler(MouseEvent.MOUSE_CLICKED, (e)->
 			{				
 				if(e.getButton()==MouseButton.PRIMARY)
 				{
-					state.selectedSubject.set(clazz);
+					state.selectedSubject.set(min.clazz);
 				}
 				else
 				{
-					state.selectedObject.set(clazz);
+					state.selectedObject.set(min.clazz);
 				}
 			});
-			switch(clazz.subtop)
+			switch(min.clazz.subtop())
 			{
 				case Role: 						classText.getStyleClass().add("text-role");break;
 				case Function:			classText.getStyleClass().add("text-function");break;
@@ -148,7 +144,7 @@ public class ClassTextPane extends ScrollPane
 			}
 			flow.getChildren().add(classText);
 			//texts.put(first, classText);			
-			restText = restText.substring(pos+labelLength);
+			restText = restText.substring(min.index+min.length);
 		}
 		
 		Text rest = new Text(restText);

@@ -40,7 +40,7 @@ public class State
 				if(removed.contains(selectedSubject.get())) {selectedSubject.set(null);}
 				if(removed.contains(selectedObject.get())) {selectedObject.set(null);}
 
-				triples.removeIf(t->removed.contains(t.subject)||removed.contains(t.object));
+				triples.removeIf(t->removed.contains(t.subject())||removed.contains(t.object()));
 			}
 		});		
 	}

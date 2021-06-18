@@ -127,10 +127,10 @@ public class DocxLoader extends Loader
 				Clazz clazz = new Clazz(label,labelToLocalName(label),((Subtop)tc[2]));
 				if(processedLabels.contains(label))
 				{
-					classes.stream().filter(c->c.subtop!=clazz.subtop).findAny().ifPresent(c->
+					classes.stream().filter(c->c.subtop()!=clazz.subtop()).findAny().ifPresent(c->
 					{
-						System.err.println("Typenkonflikt. Klasse \""+label+"\" ist getagged als sowohl "+c.subtop+" als auch "+clazz.subtop+". "
-								+"Ignoriere "+clazz.subtop+". Bitte beheben Sie den Konflikt im Dokument.");
+						System.err.println("Typenkonflikt. Klasse \""+label+"\" ist getagged als sowohl "+c.subtop()+" als auch "+clazz.subtop()+". "
+								+"Ignoriere "+clazz.subtop()+". Bitte beheben Sie den Konflikt im Dokument.");
 					});					
 					continue;
 				}

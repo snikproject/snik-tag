@@ -42,7 +42,7 @@ public class TripleTable extends VBox
 			filteredTriples.setPredicate(triple ->
 			{
 				if (newValue == null || newValue.isEmpty()) {return true;}
-				String rowText = triple.subject.toString()+" "+triple.predicate.toString()+" "+triple.object.toString();
+				String rowText = triple.subject().toString()+" "+triple.predicate().toString()+" "+triple.object().toString();
 				return rowText.toLowerCase().contains(newValue.toLowerCase());
 			});
 		});

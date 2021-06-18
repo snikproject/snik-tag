@@ -1,7 +1,7 @@
 package eu.snik.tag;
 
 /** Static helper fields for SNIK prefixes. */
-public class Snik
+public final class Snik
 {
 	private Snik() {}
 

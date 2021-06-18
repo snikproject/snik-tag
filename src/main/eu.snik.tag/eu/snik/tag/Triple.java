@@ -7,37 +7,26 @@ import org.apache.jena.rdf.model.Statement;
 import org.json.JSONObject;
 
 /** A triple connecting two SNIK classes using a meta model relation.*/
-@SuppressWarnings("serial")
-public class Triple implements Serializable
+public record Triple(Clazz subject, Relation predicate, Clazz object) implements Serializable
 {
-	public final Clazz subject;
-	public final Clazz object;
-	public final Relation predicate;
-
+	/** Getters for JavaFX table view*/
 	public Clazz getSubject() {return subject;}
 	public Clazz getObject() {return object;}
 	public Relation getPredicate() {return predicate;}
-	
+
 	public static final AtomicInteger count = new AtomicInteger(0);
-	public final int cytoscapeId;
 	
 	/**@throws IllegalArgumentException if domain or range of the predicate are violated by the subtop of the subject or object, respectively.	 */
-	public Triple(Clazz subject, Relation predicate, Clazz object) throws IllegalArgumentException
+	public Triple
 	{		
-		if(!predicate.domain.contains(subject.subtop)) {throw new IllegalArgumentException("Domain of "+predicate+" is "+predicate.domain+" but subject subtop is "+subject.subtop);}
-		if(!predicate.range.contains(object.subtop)) {throw new IllegalArgumentException("Range of "+predicate+" is "+predicate.range+" but object subtop is "+object.subtop);}
-		
-		cytoscapeId = count.getAndIncrement();
-		
-		this.subject=subject;
-		this.object=object;
-		this.predicate=predicate;
+		if(!predicate.domain.contains(subject.subtop())) {throw new IllegalArgumentException("Domain of "+predicate+" is "+predicate.domain+" but subject subtop is "+subject.subtop());}
+		if(!predicate.range.contains(object.subtop())) {throw new IllegalArgumentException("Range of "+predicate+" is "+predicate.range+" but object subtop is "+object.subtop());}		
 	}
 
 	@Override
 	public String toString()
 	{		
-		return '('+subject.localName+", "+predicate+", "+object.localName+')';
+		return '('+subject.localName()+", "+predicate+", "+object.localName()+')';
 	}
 	
 	/** @return create a statement that represents this triple. */
@@ -49,7 +38,7 @@ public class Triple implements Serializable
 	public JSONObject cytoscapeEdge()
 	{
 		var data = new JSONObject()
-				.put("id", cytoscapeId)
+				.put("id", hashCode())
 				.put("source", subject.uri())
 				.put("target", object.uri())
 				.put("p",predicate.uri)

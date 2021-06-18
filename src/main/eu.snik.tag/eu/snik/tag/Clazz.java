@@ -1,6 +1,5 @@
 package eu.snik.tag;
 import java.io.Serializable;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.Set;
@@ -11,33 +10,31 @@ import org.apache.jena.rdf.model.ResourceFactory;
 import org.apache.jena.vocabulary.OWL;
 import org.apache.jena.vocabulary.RDFS;
 import org.json.JSONObject;
+
 import eu.snik.tag.gui.CollectionStringConverter;
+import javafx.scene.control.cell.PropertyValueFactory;
 
 /** An RDF class following the SNIK meta model. Fields can be modified. */
-public class Clazz implements Serializable
+public record Clazz(Set<String> labels,String localName,Subtop subtop) implements Serializable
 {
 	/** rdfs:label*/
-	public final Set<String> labels = new LinkedHashSet<>();
 	public Set<String> getLabels() {return Collections.unmodifiableSet(labels);} // for table view
 	
 	/** the URI part after the prefix*/
-	public final String localName;
+	
 	public String getLocalName() {return localName;} // for table view
 	
 	/** whether the class is a function, role or entity type.*/
-	public Subtop subtop;
-	public Subtop getSubtop() {return subtop;} // for table view
+	public Subtop getSubtop() {return subtop;} // expected by PropertyValueFactory<>("localName") in table view  
 
-	public Clazz(Collection<String> labels,String localName,Subtop subtop)
-	{
-		this.labels.addAll(labels);
-		this.localName=localName;
-		this.subtop=subtop;
+	public Clazz
+	{	
+		labels = new LinkedHashSet<>(labels);
 	}
 
 	public Clazz(String label,String localName,Subtop subtop)
 	{
-		this(Collections.singletonList(label),localName,subtop);
+		this(Collections.singleton(label),localName,subtop);
 	}
 	
 	@Override
@@ -53,21 +50,6 @@ public class Clazz implements Serializable
 	{
 		return localName.hashCode();
 	}
-
-//	// Set would be better but for some reason State.load throws an error then when calling hashCode of Clazz where localName is null 
-//	final List<Triple> triples = new ArrayList<>();
-//
-//	/** an unmodifiable copy of the triples */
-//	public List<Triple> getTriples() {return Collections.unmodifiableList(triples);}
-//
-//	/** Add a SNIK meta model conforming triple.
-//	  @param predicate a SNIK meta model relation  
-//	  @param object another SNIK class	 
-//	 */
-//	public void addTriple(Relation predicate,Clazz object)
-//	{		
-//		triples.add(new Triple(this,predicate,object));
-//	}
 
 	public String labelString()
 	{

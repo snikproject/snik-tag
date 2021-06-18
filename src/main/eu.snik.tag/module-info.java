@@ -9,7 +9,6 @@ module sniktag
 	requires javafx.base;
 	requires javafx.controls;
 	requires javafx.graphics;
-	requires javatuples;
 	requires jetty.servlet.api;
 	requires org.apache.commons.lang3;
 	requires org.apache.commons.text;
