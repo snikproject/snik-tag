@@ -84,15 +84,17 @@ public class DocxLoader extends Loader {
 		}
 	}
 
+	record TagClass (String tag, String description, Subtop subtop) {};
+	
 	/**	@return all classes extracted from the tagged parts of the DOCX document*/
 	@Override
 	public Collection<Clazz> getClasses() {
 		try {
 			var wordMLPackage = Docx4J.load(in());
 			var doc = wordMLPackage.getMainDocumentPart();
-			List<Comment> comments = doc.getCommentsPart().getContents().getComment();
-
-			Object[][] tagClasses = { { "w:i", "Entity Type", Subtop.EntityType }, { "w:b", "Role", Subtop.Role }, { "w:u", "Function", Subtop.Function } };
+			//List<Comment> comments = doc.getCommentsPart().getContents().getComment();
+		
+			TagClass[] tagClasses = { new TagClass( "w:i", "Entity Type", Subtop.EntityType ), new TagClass( "w:byxxxxxx", "Role", Subtop.Role ),new TagClass( "w:uxxxxxx", "Function", Subtop.Function ) };
 
 			var classes = new LinkedHashSet<Clazz>();
 			var processedRuns = new HashSet<R>();
@@ -100,25 +102,27 @@ public class DocxLoader extends Loader {
 			var warnings = new HashSet<String>(); // prevent the same warning from showing multiple times
 
 			for (var tc : tagClasses) {
-				String tag = (String) tc[0];
-				var runs = (List<R>) (List<?>) doc.getJAXBNodesViaXPath("//w:r[w:rPr/" + tag + "]", false);
+				String xpath = "//w:r[w:rPr/" + tc.tag + "]";
+				System.out.println(xpath);
+				var runs = (List<R>) (List<?>) doc.getJAXBNodesViaXPath(xpath, false);				
 				runs.removeAll(processedRuns); // we cannot handle overlapping tags right now
 
-				processedRuns.addAll(runs);
+
 
 				for (R run : runs) {
 					String text = TextUtils.getText(run);
 					String label = StringUtils.strip(text, "., ");
+					if(label.length()>80) {continue;} // too long texts seems to be erroneously detected
 					//label = label.replaceAll("[^A-Za-z0-9 ]", ""); // removing non-alphanumerical characters leads to missing matches in the text tab
-
 					String filterLabel = label.replaceAll("[^A-Za-z0-9 ]", "").replaceAll("(the)|(and)|(or)", "");
 					if (filterLabel.length() < 4 && !filterLabel.matches("[A-Z]{3}")) {
-						continue;
 					} // abbreviations with 3 letters are OK
 					if (filterLabel.length() < 3) {
 						continue;
 					} // abbreviations
+					processedRuns.add(run);
 
+										
 					/*
 				Comment comment = factory.createCommentsComment();
 				comments.add(comment);
@@ -130,7 +134,8 @@ public class DocxLoader extends Loader {
 				run.getContent().add(commentRef);
 				commentRef.setId(BigInteger.valueOf(commentId));				
 				 */
-					Clazz clazz = new Clazz(label, labelToLocalName(label), ((Subtop) tc[2]));
+					Clazz clazz = new Clazz(label, labelToLocalName(label), tc.subtop);
+					//System.out.println(text+" "+ clazz);
 					if (processedLabels.contains(label)) {
 						classes
 							.stream()
