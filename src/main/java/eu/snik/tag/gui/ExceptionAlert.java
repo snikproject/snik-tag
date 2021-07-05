@@ -9,14 +9,12 @@ import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Priority;
 
 /** Shows an exception to the user. */
-public class ExceptionAlert extends Alert
-{
-	
-	public ExceptionAlert(String title, Exception ex)
-	{
+public class ExceptionAlert extends Alert {
+
+	public ExceptionAlert(String title, Exception ex) {
 		super(AlertType.ERROR);
 		this.setTitle(title);
-		
+
 		StringWriter sw = new StringWriter();
 		PrintWriter pw = new PrintWriter(sw);
 		ex.printStackTrace(pw);
@@ -38,7 +36,7 @@ public class ExceptionAlert extends Alert
 		expContent.setMinSize(800, 600);
 		expContent.add(label, 0, 0);
 		expContent.add(textArea, 0, 1);
-		
+
 		this.getDialogPane().setContent(expContent);
 	}
 }

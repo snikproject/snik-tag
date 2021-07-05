@@ -1,8 +1,7 @@
 /** @author Konrad Höffner */
-module sniktag
-{
-	exports eu.snik.tag.gui;
-	exports eu.snik.tag;
+module sniktag {
+	exports eu.snik.tag.gui ;
+	exports eu.snik.tag ;
 
 	requires java.desktop;
 	requires java.xml.bind;

@@ -32,3 +32,22 @@ Download the latest portable Windows release [here](https://github.com/IMISE/sni
 
 ## Documentation
 A brief documentation of SNIK Tag is found at [gh-pages](https://imise.github.io/snik-tag/#/Dokumentation)
+
+## Code Formatting
+Install the npm dependencies `prettier` and [`prettier-plugin-java`](https://github.com/jhipster/prettier-java):
+
+    # Local installation
+    npm install prettier-plugin-java --save-dev
+    
+    # Or globally
+    npm install -g prettier prettier-plugin-java
+
+Then reformat all files with:
+
+    # If you have installed the package locally
+    npx prettier --write "src/**/*.java"
+
+    # Or globally
+    prettier --write "src/**/*.java"
+
+Source: [`prettier-plugin-java GitHub page`](https://github.com/jhipster/prettier-java).
