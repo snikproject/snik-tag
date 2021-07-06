@@ -94,7 +94,7 @@ public class DocxLoader extends Loader {
 			var doc = wordMLPackage.getMainDocumentPart();
 			//List<Comment> comments = doc.getCommentsPart().getContents().getComment();
 		
-			TagClass[] tagClasses = { new TagClass( "w:i", "Entity Type", Subtop.EntityType ), new TagClass( "w:byxxxxxx", "Role", Subtop.Role ),new TagClass( "w:uxxxxxx", "Function", Subtop.Function ) };
+			TagClass[] tagClasses = { new TagClass( "w:i", "Entity Type", Subtop.EntityType ), new TagClass( "w:b", "Role", Subtop.Role ),new TagClass( "w:u", "Function", Subtop.Function ) };
 
 			var classes = new LinkedHashSet<Clazz>();
 			var processedRuns = new HashSet<R>();
@@ -102,8 +102,7 @@ public class DocxLoader extends Loader {
 			var warnings = new HashSet<String>(); // prevent the same warning from showing multiple times
 
 			for (var tc : tagClasses) {
-				String xpath = "//w:r[w:rPr/" + tc.tag + "]";
-				System.out.println(xpath);
+				String xpath = "//w:r[w:rPr/" + tc.tag + "[not(@w:val='false')]]";				
 				var runs = (List<R>) (List<?>) doc.getJAXBNodesViaXPath(xpath, false);				
 				runs.removeAll(processedRuns); // we cannot handle overlapping tags right now
 
