@@ -1,0 +1,12 @@
+jlink \
+--module-path javafx-jmods-15/ \
+--add-modules=javafx.base \
+--add-modules=javafx.controls \
+--add-modules=javafx.fxml \
+--add-modules=javafx.graphics \
+--add-modules=javafx.web \
+--add-modules=javafx.media \
+--add-modules=javafx.swing \
+--bind-services \
+--output smalljre
+

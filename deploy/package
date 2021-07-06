@@ -1,0 +1,8 @@
+jpackage --input ../target/ \
+--name SnikTag \
+--main-jar snik-tag-0.3.0-SNAPSHOT-jar-with-dependencies.jar \
+--main-class eu.snik.tag.gui.MainWrapper \
+--type app-image \
+--module-path "javafx-jmods-15" \
+--java-options '--enable-preview' \
+--runtime-image smalljre

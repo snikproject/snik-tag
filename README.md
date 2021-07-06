@@ -30,6 +30,18 @@ Download the latest portable Windows release [here](https://github.com/IMISE/sni
 * Run  `mvn compile`
 * Run  `mvn javafx:run`
 
+## Package
+Create a native package including a stripped down JRE and an installer using jlink and jpackage:
+
+    mvn package
+    cd deploy
+    ./jlink
+    ./package
+
+jlink only needs to be run once for each JRE. Requires the JavaFX JMOD files to be placed in `deploy/javafx-jmods-15 `.
+jpackage does NOT support CROSSCOMPILING, you need to be on Windows to create Windows binaries.
+Then you can compress the contents of `deploy/SnikTag` to `sniktag.zip` and add that archive as an asset to a new release.
+
 ## Documentation
 A brief documentation of SNIK Tag is found at [gh-pages](https://imise.github.io/snik-tag/#/Dokumentation)
 
