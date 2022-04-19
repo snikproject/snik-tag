@@ -1,3 +1,6 @@
+## :warning: **SNIK Tag is not maintained**
+This repository has been archived on 2022-04-19.
+
 # SNIK Tag
 
 Semi-automatic extraction of RDF triples from text based on the SNIK meta model.
