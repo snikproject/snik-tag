@@ -18,7 +18,7 @@ The extracted classes and their relations as an RDF Turtle file.
 
 # Windows Release
 
-Download the latest portable Windows release [here](https://github.com/IMISE/snik-tag/releases/download/0.2.1/sniktag.zip).
+Download the portable Windows release version 0.3.1 [here](https://github.com/IMISE/snik-tag/releases/download/0.3.1/sniktag.zip).
 
 # Development
 
@@ -26,7 +26,7 @@ Download the latest portable Windows release [here](https://github.com/IMISE/sni
 * Java 16 or higher
 * Maven 3
 
-## Build
+## Run
 * Run  `mvn compile`
 * Run  `mvn javafx:run`
 

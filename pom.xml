@@ -5,18 +5,18 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>snik-tag</groupId>
 	<artifactId>snik-tag</artifactId>
-	<version>0.3.0-SNAPSHOT</version>
+	<version>22.05</version>
 	<properties>
 		<maven.compiler.release>16</maven.compiler.release>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<version.javafx>15</version.javafx>
+		<version.javafx>18</version.javafx>
 	</properties>
 	<build>
-		<sourceDirectory>src/main/eu.snik.tag</sourceDirectory>
+		<sourceDirectory>src/main/java</sourceDirectory>
 		<plugins>
 			<plugin>
 				<artifactId>maven-compiler-plugin</artifactId>
-				<version>3.8.0</version>
+				<version>3.10.1</version>
 				<configuration>
 					<release>${maven.compiler.release}</release>
 				</configuration>
@@ -24,7 +24,7 @@
 			<plugin>
 				<groupId>org.openjfx</groupId>
 				<artifactId>javafx-maven-plugin</artifactId>
-				<version>0.0.4</version>
+				<version>0.0.8</version>
 				<configuration>
 					<mainClass>eu.snik.tag.gui.Main</mainClass>
 				</configuration>
@@ -83,17 +83,17 @@
 		<dependency>
 			<groupId>org.slf4j</groupId>
 			<artifactId>slf4j-simple</artifactId>
-			<version>2.0.0-alpha2</version>
+			<version>2.0.0-alpha7</version>
 		</dependency>
 		<dependency>
 			<groupId>org.slf4j</groupId>
 			<artifactId>slf4j-api</artifactId>
-			<version>2.0.0-alpha2</version>
+			<version>2.0.0-alpha7</version>
 		</dependency>
 		<dependency>
 			<groupId>org.docx4j</groupId>
 			<artifactId>docx4j-JAXB-ReferenceImpl</artifactId>
-			<version>11.2.9</version>
+			<version>11.4.6</version>
 			<exclusions>
 				<exclusion>
 					<groupId>org.slf4j</groupId>
@@ -119,7 +119,7 @@
 		<dependency>
 			<groupId>org.apache.jena</groupId>
 			<artifactId>jena-core</artifactId>
-			<version>4.1.0</version>
+			<version>4.4.0</version>
 			<exclusions>
 				<exclusion>
 					<groupId>org.slf4j</groupId>
@@ -154,7 +154,7 @@
 		<dependency>
 			<groupId>org.json</groupId>
 			<artifactId>json</artifactId>
-			<version>20210307</version>
+			<version>20220320</version>
 		</dependency>
 		<dependency>
 			<groupId>org.hamcrest</groupId>
@@ -165,18 +165,18 @@
 		<dependency>
 			<groupId>org.junit.jupiter</groupId>
 			<artifactId>junit-jupiter-api</artifactId>
-			<version>5.7.2</version>
+			<version>5.8.2</version>
 			<scope>test</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.controlsfx</groupId>
 			<artifactId>controlsfx</artifactId>
-			<version>11.1.0</version>
+			<version>11.1.1</version>
 		</dependency>
 		<dependency>
 			<groupId>org.eclipse.jetty</groupId>
 			<artifactId>jetty-server</artifactId>
-			<version>11.0.5</version>
+			<version>11.0.9</version>
 			<exclusions>
 				<exclusion>
 					<groupId>org.slf4j</groupId>
@@ -187,8 +187,18 @@
 		<dependency>
 			<groupId>org.jsoup</groupId>
 			<artifactId>jsoup</artifactId>
-			<version>1.13.1</version>
+			<version>1.14.3</version>
+		</dependency>
+		<dependency>
+			<groupId>javax.xml.bind</groupId>
+			<artifactId>jaxb-api</artifactId>
+			<version>2.3.1</version>
+		</dependency>
+		<dependency>
+			<groupId>org.glassfish.jaxb</groupId>
+			<artifactId>jaxb-runtime</artifactId>
+			<version>3.0.2</version>
+			<scope>runtime</scope>
 		</dependency>
 	</dependencies>
 </project>
-	

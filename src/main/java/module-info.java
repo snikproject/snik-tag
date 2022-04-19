@@ -4,7 +4,7 @@ module sniktag {
 	exports eu.snik.tag ;
 
 	requires java.desktop;
-	requires java.xml.bind;
+	requires jakarta.xml.bind;
 	requires javafx.base;
 	requires javafx.controls;
 	requires javafx.graphics;

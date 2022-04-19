@@ -1,5 +1,7 @@
 package eu.snik.tag;
 
+import jakarta.xml.bind.JAXBElement;
+import jakarta.xml.bind.JAXBException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -7,8 +9,6 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
-import javax.xml.bind.JAXBElement;
-import javax.xml.bind.JAXBException;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.text.WordUtils;
 import org.docx4j.Docx4J;
@@ -84,8 +84,8 @@ public class DocxLoader extends Loader {
 		}
 	}
 
-	record TagClass (String tag, String description, Subtop subtop) {};
-	
+	record TagClass(String tag, String description, Subtop subtop) {}
+
 	/**	@return all classes extracted from the tagged parts of the DOCX document*/
 	@Override
 	public Collection<Clazz> getClasses() {
@@ -93,8 +93,12 @@ public class DocxLoader extends Loader {
 			var wordMLPackage = Docx4J.load(in());
 			var doc = wordMLPackage.getMainDocumentPart();
 			//List<Comment> comments = doc.getCommentsPart().getContents().getComment();
-		
-			TagClass[] tagClasses = { new TagClass( "w:i", "Entity Type", Subtop.EntityType ), new TagClass( "w:b", "Role", Subtop.Role ),new TagClass( "w:u", "Function", Subtop.Function ) };
+
+			TagClass[] tagClasses = {
+				new TagClass("w:i", "Entity Type", Subtop.EntityType),
+				new TagClass("w:b", "Role", Subtop.Role),
+				new TagClass("w:u", "Function", Subtop.Function),
+			};
 
 			var classes = new LinkedHashSet<Clazz>();
 			var processedRuns = new HashSet<R>();
@@ -102,26 +106,24 @@ public class DocxLoader extends Loader {
 			var warnings = new HashSet<String>(); // prevent the same warning from showing multiple times
 
 			for (var tc : tagClasses) {
-				String xpath = "//w:r[w:rPr/" + tc.tag + "[not(@w:val='false')]]";				
-				var runs = (List<R>) (List<?>) doc.getJAXBNodesViaXPath(xpath, false);				
+				String xpath = "//w:r[w:rPr/" + tc.tag + "[not(@w:val='false')]]";
+				var runs = (List<R>) (List<?>) doc.getJAXBNodesViaXPath(xpath, false);
 				runs.removeAll(processedRuns); // we cannot handle overlapping tags right now
-
-
 
 				for (R run : runs) {
 					String text = TextUtils.getText(run);
 					String label = StringUtils.strip(text, "., ");
-					if(label.length()>80) {continue;} // too long texts seems to be erroneously detected
+					if (label.length() > 80) {
+						continue;
+					} // too long texts seems to be erroneously detected
 					//label = label.replaceAll("[^A-Za-z0-9 ]", ""); // removing non-alphanumerical characters leads to missing matches in the text tab
 					String filterLabel = label.replaceAll("[^A-Za-z0-9 ]", "").replaceAll("(the)|(and)|(or)", "");
-					if (filterLabel.length() < 4 && !filterLabel.matches("[A-Z]{3}")) {
-					} // abbreviations with 3 letters are OK
+					if (filterLabel.length() < 4 && !filterLabel.matches("[A-Z]{3}")) {} // abbreviations with 3 letters are OK
 					if (filterLabel.length() < 3) {
 						continue;
 					} // abbreviations
 					processedRuns.add(run);
 
-										
 					/*
 				Comment comment = factory.createCommentsComment();
 				comments.add(comment);
