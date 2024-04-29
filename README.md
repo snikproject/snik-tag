@@ -43,7 +43,7 @@ jpackage does NOT support CROSSCOMPILING, you need to be on Windows to create Wi
 Then you can compress the contents of `deploy/SnikTag` to `sniktag.zip` and add that archive as an asset to a new release.
 
 ## Documentation
-A brief documentation of SNIK Tag is found at [gh-pages](https://imise.github.io/snik-tag/#/Dokumentation)
+A brief documentation of SNIK Tag is found at [gh-pages](https://snikproject.github.io/snik-tag/)
 
 ## Code Formatting
 Install the npm dependencies `prettier` and [`prettier-plugin-java`](https://github.com/jhipster/prettier-java):
