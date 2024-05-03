@@ -1,8 +1,5 @@
 package eu.snik.tag.gui;
 
-import eu.snik.tag.DocxLoader;
-import eu.snik.tag.HtmlLoader;
-import eu.snik.tag.JsonServer;
 import java.awt.Desktop;
 import java.io.File;
 import java.io.FileInputStream;
@@ -11,6 +8,10 @@ import java.io.IOException;
 import java.net.URI;
 import java.util.Arrays;
 import java.util.Properties;
+
+import eu.snik.tag.DocxLoader;
+import eu.snik.tag.HtmlLoader;
+import eu.snik.tag.JsonServer;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Menu;
@@ -22,7 +23,6 @@ import javafx.scene.input.KeyCombination;
 import javafx.scene.layout.Region;
 import javafx.stage.FileChooser;
 import javafx.stage.FileChooser.ExtensionFilter;
-import org.docx4j.openpackaging.exceptions.Docx4JException;
 
 /** File and Help menu. */
 public class MainMenuBar {

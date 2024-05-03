@@ -1,12 +1,12 @@
 package eu.snik.tag.gui;
 
-import eu.snik.tag.Clazz;
-import eu.snik.tag.Triple;
 import java.io.StringWriter;
-import javafx.collections.ListChangeListener;
-import javafx.scene.control.TextArea;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.ModelFactory;
+import eu.snik.tag.Clazz;
+import eu.snik.tag.Triple;
+import javafx.collections.ListChangeListener;
+import javafx.scene.control.TextArea;
 
 /** Displays all extracted RDF classes and relations as RDF turtle. */
 public class RDFArea extends TextArea {

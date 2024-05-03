@@ -34,7 +34,7 @@ Download the portable Windows release version 0.3.1 [here](https://github.com/IM
 # Development
 
 ## Requirements
-* Java 16 or higher
+* Java 22 or higher
 * Maven 3
 
 ## Run

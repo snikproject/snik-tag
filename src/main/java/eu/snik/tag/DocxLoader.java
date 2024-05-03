@@ -1,7 +1,5 @@
 package eu.snik.tag;
 
-import jakarta.xml.bind.JAXBElement;
-import jakarta.xml.bind.JAXBException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -9,14 +7,17 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
+
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.text.WordUtils;
 import org.docx4j.Docx4J;
 import org.docx4j.TextUtils;
 import org.docx4j.openpackaging.exceptions.Docx4JException;
-import org.docx4j.wml.Comments.Comment;
 import org.docx4j.wml.ContentAccessor;
 import org.docx4j.wml.R;
+
+import jakarta.xml.bind.JAXBElement;
+import jakarta.xml.bind.JAXBException;
+
 
 /** Extracts SNIK classes from a tagged DOCX file. */
 public class DocxLoader extends Loader {

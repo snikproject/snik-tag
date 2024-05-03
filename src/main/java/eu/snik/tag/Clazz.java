@@ -1,11 +1,10 @@
 package eu.snik.tag;
 
-import eu.snik.tag.gui.CollectionStringConverter;
 import java.io.Serializable;
 import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.Set;
-import javafx.scene.control.cell.PropertyValueFactory;
+
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.ModelFactory;
 import org.apache.jena.rdf.model.Resource;
@@ -13,6 +12,8 @@ import org.apache.jena.rdf.model.ResourceFactory;
 import org.apache.jena.vocabulary.OWL;
 import org.apache.jena.vocabulary.RDFS;
 import org.json.JSONObject;
+
+import eu.snik.tag.gui.CollectionStringConverter;
 
 /** An RDF class following the SNIK meta model. Fields can be modified. */
 public record Clazz(Set<String> labels, String localName, Subtop subtop) implements Serializable {

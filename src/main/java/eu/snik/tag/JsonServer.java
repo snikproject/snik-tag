@@ -1,19 +1,21 @@
 package eu.snik.tag;
 
-import jakarta.servlet.ServletException;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
-import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.concurrent.atomic.AtomicInteger;
+
+import org.eclipse.jetty.http.HttpHeader;
+import org.eclipse.jetty.io.Content;
+import org.eclipse.jetty.server.Handler;
 import org.eclipse.jetty.server.Request;
+import org.eclipse.jetty.server.Response;
 import org.eclipse.jetty.server.Server;
-import org.eclipse.jetty.server.handler.AbstractHandler;
+import org.eclipse.jetty.util.Callback;
 import org.json.JSONArray;
 
 public class JsonServer extends Server {
 
-	//ports lower than 1024 can't be bound without root access in Linux, see https://serverfault.com/questions/268099/bind-to-ports-less-than-1024-without-root-access
+	// ports lower than 1024 can't be bound without root access in Linux, see
+	// https://serverfault.com/questions/268099/bind-to-ports-less-than-1024-without-root-access
 	static AtomicInteger lastPort = new AtomicInteger(1100);
 	public final int port;
 
@@ -27,7 +29,7 @@ public class JsonServer extends Server {
 		this(json, lastPort.addAndGet(1));
 	}
 
-	public static class JsonHandler extends AbstractHandler {
+	public static class JsonHandler extends Handler.Abstract {
 
 		final JSONArray json;
 
@@ -36,21 +38,32 @@ public class JsonServer extends Server {
 		}
 
 		@Override
-		public void handle(String target, Request baseRequest, HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
-			response.setContentType("application/json; charset=utf-8");
-			response.setStatus(HttpServletResponse.SC_OK);
+		public boolean handle(Request request, Response response, Callback callback) {
+			response.getHeaders().put(HttpHeader.CONTENT_TYPE, "application/json; charset=utf-8");
 
-			try (PrintWriter out = response.getWriter();) {
+			response.setStatus(200);
+
+			response.write(false, null, callback);
+			try (PrintWriter out = new PrintWriter(Content.Sink.asOutputStream(response))) {
 				out.println(json);
 			}
-			baseRequest.setHandled(true);
+			return true;
 		}
 	}
 
-	/** Server test method. Not using JUnit so that users can test it using the browser..*/
-	public static void main(String[] args) throws Exception {
+	/**
+	 * Server test method. Not using JUnit so that users can test it using the
+	 * browser..
+	 * 
+	 * @throws Exception
+	 */
+	public static void main(String[] args) {
 		System.out.println("test");
 		Server server = new JsonServer(new JSONArray("['hello','world']"));
-		server.start();
+		try {
+			server.start();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 	}
 }

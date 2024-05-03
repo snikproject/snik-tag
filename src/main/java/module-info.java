@@ -4,20 +4,18 @@ module sniktag {
 	exports eu.snik.tag ;
 
 	requires java.desktop;
-	requires jakarta.xml.bind;
-	requires javafx.base;
 	requires javafx.controls;
-	requires javafx.graphics;
-	requires jetty.servlet.api;
+	requires org.docx4j.openxml_objects;
 	requires org.apache.commons.lang3;
+	requires org.apache.commons.collections4;
+	requires org.docx4j.core;
+	requires org.jsoup;
+	requires jakarta.xml.bind;
+	requires org.json;
 	requires org.apache.commons.text;
 	requires org.apache.jena.core;
-	requires org.apache.jena.ext.com.google;
+	requires org.apache.jena.base;
+	requires org.apache.jena.iri;
 	requires org.controlsfx.controls;
-	requires org.docx4j.core;
-	requires org.docx4j.openxml_objects;
 	requires org.eclipse.jetty.server;
-	requires org.eclipse.jetty.util;
-	requires org.json;
-	requires org.jsoup;
 }

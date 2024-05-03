@@ -1,27 +1,27 @@
 package eu.snik.tag.gui;
 
-import eu.snik.tag.Clazz;
-import eu.snik.tag.Subtop;
 import java.util.Comparator;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import org.apache.commons.collections4.MultiValuedMap;
+import org.apache.commons.collections4.multimap.ArrayListValuedHashMap;
+import eu.snik.tag.Clazz;
+import eu.snik.tag.Subtop;
 import javafx.collections.ListChangeListener;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextFlow;
-import org.apache.jena.ext.com.google.common.collect.LinkedListMultimap;
-import org.apache.jena.ext.com.google.common.collect.Multimap;
 
 /** Uneditable HTML text area with the DOCX text and highlighted classes.*/
 public class ClassTextPane extends ScrollPane {
 
 	private final TextFlow flow = new TextFlow();
 
-	Multimap<Clazz, Text> texts = LinkedListMultimap.create();
+	MultiValuedMap<Clazz, Text> texts = new ArrayListValuedHashMap<>();
 
 	final State state;
 

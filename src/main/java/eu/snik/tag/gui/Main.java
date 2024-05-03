@@ -1,6 +1,5 @@
 package eu.snik.tag.gui;
 
-import eu.snik.tag.Loader;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -9,6 +8,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayDeque;
 import java.util.Deque;
+
+import eu.snik.tag.Loader;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.geometry.Pos;
@@ -21,7 +22,6 @@ import javafx.scene.control.TabPane.TabDragPolicy;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import javafx.stage.Window;
-import org.docx4j.openpackaging.exceptions.Docx4JException;
 
 /** GUI entry point. Run with Maven via javafx:run. */
 public class Main extends Application {
