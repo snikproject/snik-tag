@@ -16,6 +16,7 @@ module sniktag {
 	requires org.apache.jena.core;
 	requires org.apache.jena.base;
 	requires org.apache.jena.iri;
+	requires org.apache.jena.arq;
 	requires org.controlsfx.controls;
 	requires org.eclipse.jetty.server;
 }

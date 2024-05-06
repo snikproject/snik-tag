@@ -3,6 +3,7 @@ package eu.snik.tag.gui;
 import java.awt.Desktop;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.net.URI;
@@ -23,6 +24,10 @@ import javafx.scene.input.KeyCombination;
 import javafx.scene.layout.Region;
 import javafx.stage.FileChooser;
 import javafx.stage.FileChooser.ExtensionFilter;
+
+import org.apache.jena.riot.RDFDataMgr;
+import org.apache.jena.riot.RDFFormat;
+
 
 /** File and Help menu. */
 public class MainMenuBar {
@@ -137,9 +142,9 @@ public class MainMenuBar {
 						file = new File(file.getAbsolutePath() + ".ttl");
 					}
 
-					try (FileWriter writer = new FileWriter(file)) {
+					try (FileOutputStream fos = new FileOutputStream(file)) {
 						{
-							RDFArea.rdfModel(main.state).write(writer, "TURTLE");
+							RDFDataMgr.write(fos, RDFArea.rdfModel(main.state), RDFFormat.TURTLE);
 						}
 					} catch (Exception ex) {
 						Log.error("Fehler beim Exportieren nach RDF/Turtle", ex);
