@@ -47,8 +47,9 @@ public class RelationPane extends VBox {
 		setAlignment(Pos.CENTER);
 		Label l = new Label("Wählen Sie bitte zwei Klassen und eine passende Relation aus.");
 
-		subjectBox.setItems(state.classes);
-		objectBox.setItems(state.classes);
+		// doesn't work when sorting state.classes beforehand
+		subjectBox.setItems(state.classes.sorted((s1,s2) -> s1.localName().compareToIgnoreCase(s2.getLocalName())));
+		objectBox.setItems(state.classes.sorted((o1,o2) -> o1.localName().compareToIgnoreCase(o2.getLocalName())));
 
 		Button addButton = new Button("Verbindung hinzufügen");
 		{
