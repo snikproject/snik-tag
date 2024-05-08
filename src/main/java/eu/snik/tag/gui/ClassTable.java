@@ -6,15 +6,10 @@ import eu.snik.tag.Subtop;
 import eu.snik.tag.Triple;
 import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.Set;
-import java.util.function.Consumer;
 import java.util.stream.Collectors;
-import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.collections.transformation.FilteredList;
 import javafx.collections.transformation.SortedList;
-import javafx.scene.control.Button;
 import javafx.scene.control.SelectionMode;
-import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
@@ -35,37 +30,6 @@ public class ClassTable extends VBox {
 
 	{
 		filterField.setPromptText("Klassen durchsuchen");
-	}
-
-	TableColumn<Clazz, Clazz> buttonCol(String columnText, String buttonText, final Consumer<Clazz> classOperation) {
-		var removeCol = new TableColumn<Clazz, Clazz>(columnText);
-		removeCol.setCellValueFactory(param -> new ReadOnlyObjectWrapper<>(param.getValue()));
-
-		removeCol.setCellFactory(
-			param ->
-				new TableCell<Clazz, Clazz>() {
-					final Button deleteButton = new Button(buttonText);
-
-					@Override
-					protected void updateItem(Clazz clazz, boolean empty) {
-						super.updateItem(clazz, empty);
-
-						if (clazz == null) {
-							setGraphic(null);
-							return;
-						}
-
-						setGraphic(deleteButton);
-						deleteButton.setOnAction(
-							event -> {
-								createRestorePoint.run();
-								classOperation.accept(clazz);
-							}
-						);
-					}
-				}
-		);
-		return removeCol;
 	}
 
 	/** Merges all selected classes minus if included the class where the button is clicked (the mergees) into the specified one (the merger).
@@ -162,23 +126,15 @@ public class ClassTable extends VBox {
 				}
 			);
 
-		var labelCol = new TableColumn<Clazz, Set<String>>("Label");
-		labelCol.setCellValueFactory(new PropertyValueFactory<>("labels"));
-		labelCol.setCellFactory(TextFieldTableCell.<Clazz, Set<String>>forTableColumn(CollectionStringConverter.INSTANCE));
-
-		labelCol.setMinWidth(600);
-		labelCol.setOnEditCommit(
-			e -> {
-				if (e.getOldValue().equals(e.getNewValue())) {
-					return;
-				}
-				e.getRowValue().labels().clear();
-				e.getRowValue().labels().addAll(e.getNewValue());
-				createRestorePoint.run();
-			}
-		);
-
-		var localNameCol = new TableColumn<Clazz, String>("Local Name");
+		// column for the label(s)
+		var labelCol = FancyColumnFactory.freeTextCol("Label", "labels", 600, createRestorePoint);
+		// column for abbreviations
+		var abbrvCol = FancyColumnFactory.freeTextCol("Abkürzung", "abbreviations", 150, createRestorePoint);
+		// column for the definition
+		var definCol = FancyColumnFactory.freeTextCol("Definition", "definitions", 300, createRestorePoint);
+		
+		// column in which the uri is shown/defined
+		var localNameCol = new TableColumn<Clazz, String>("Local Name (URI)");
 		localNameCol.setCellValueFactory(new PropertyValueFactory<>("localName"));
 		localNameCol.setCellFactory(TextFieldTableCell.<Clazz>forTableColumn());
 		localNameCol.setMinWidth(350);
@@ -214,6 +170,7 @@ public class ClassTable extends VBox {
 			}
 		);
 
+		// column in which the type of the class (function, role, entity type) is shown / selectable
 		var subtopCol = new TableColumn<Clazz, Subtop>("Type");
 		subtopCol.setCellValueFactory(new PropertyValueFactory<>("subtop"));
 		subtopCol.setCellFactory(ComboBoxTableCell.forTableColumn(Subtop.values()));
@@ -272,16 +229,15 @@ public class ClassTable extends VBox {
 				state.triples.addAll(add);
 			}
 		);
-
-		var removeCol = buttonCol("Entfernen", "x", state.classes::remove);
-
-		var mergeCol = buttonCol("Zusammenführen", "Zusammenführen", this::merge);
+		
+		var removeCol = FancyColumnFactory.buttonCol("Entfernen", "x", state.classes::remove, this.createRestorePoint);
+		var mergeCol = FancyColumnFactory.buttonCol("Zusammenführen", "Zusammenführen", this::merge, this.createRestorePoint);
 		mergeCol.setMinWidth(150);
-
-		var splitCol = buttonCol("Trennen", "Trennen", this::split);
+		var splitCol = FancyColumnFactory.buttonCol("Trennen", "Trennen", this::split, this.createRestorePoint);
 		splitCol.setMinWidth(120);
+		
 
-		table.getColumns().addAll(labelCol, localNameCol, subtopCol, removeCol, mergeCol, splitCol);
+		table.getColumns().addAll(labelCol, localNameCol, abbrvCol, subtopCol, removeCol, mergeCol, splitCol, definCol);
 		this.table.getSortOrder().addAll(subtopCol, localNameCol, labelCol);
 	}
 }

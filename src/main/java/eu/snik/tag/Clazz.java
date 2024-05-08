@@ -16,11 +16,35 @@ import org.json.JSONObject;
 import eu.snik.tag.gui.CollectionStringConverter;
 
 /** An RDF class following the SNIK meta model. Fields can be modified. */
-public record Clazz(Set<String> labels, String localName, Subtop subtop) implements Serializable {
+public record Clazz(Set<String> labels, Set<String> abbreviations, Set<String> definitions, String localName, Subtop subtop) implements Serializable {
+	/**
+	 * Getter for all attributes which are of the type Set&lt;String&gt;
+	 * @param name "labels", "abbreviations" or "definitions"
+	 * @return The Set of the requested items; in case the specified String doesn't exist, null is returned
+	 * @todo use enums instead
+	 */
+	public Set<String> get(String name) {
+		switch(name) {
+		case "labels": return this.labels();
+		case "abbreviations": return this.abbreviations();
+		case "definitions": return this.definitions();
+		default: return null;
+		}
+	}
+	
 	/** rdfs:label*/
 	public Set<String> getLabels() {
 		return Collections.unmodifiableSet(labels);
 	} // for table view
+	
+	public Set<String> getAbbreviations() {
+		return Collections.unmodifiableSet(abbreviations);
+	} // for table view
+	
+	public Set<String> getDefinitions() {
+		return Collections.unmodifiableSet(definitions);
+	} // for table view
+	
 
 	/** the URI part after the prefix*/
 
@@ -35,10 +59,12 @@ public record Clazz(Set<String> labels, String localName, Subtop subtop) impleme
 
 	public Clazz {
 		labels = new LinkedHashSet<>(labels);
+		abbreviations = new LinkedHashSet<>(abbreviations);
+		definitions = new LinkedHashSet<>(definitions);
 	}
 
 	public Clazz(String label, String localName, Subtop subtop) {
-		this(Collections.singleton(label), localName, subtop);
+		this(Collections.singleton(label), Collections.singleton(""), Collections.singleton(""), localName, subtop);
 	}
 
 	@Override
@@ -100,11 +126,11 @@ public record Clazz(Set<String> labels, String localName, Subtop subtop) impleme
 
 	/** @return returns a modified copy with a new local name */
 	public Clazz replaceLocalName(String newLocalName) {
-		return new Clazz(this.labels, newLocalName, this.subtop);
+		return new Clazz(this.labels, this.abbreviations, this.definitions, newLocalName, this.subtop);
 	}
 
 	/** @return returns a modified copy with a new subtop*/
 	public Clazz replaceSubtop(Subtop newSubtop) {
-		return new Clazz(this.labels, this.localName, newSubtop);
+		return new Clazz(this.labels, this.abbreviations, this.definitions, this.localName, newSubtop);
 	}
 }
