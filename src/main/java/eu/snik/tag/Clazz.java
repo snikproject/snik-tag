@@ -2,6 +2,7 @@ package eu.snik.tag;
 
 import java.io.Serializable;
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
@@ -11,6 +12,7 @@ import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.rdf.model.ResourceFactory;
 import org.apache.jena.vocabulary.OWL;
 import org.apache.jena.vocabulary.RDFS;
+import org.apache.jena.vocabulary.SKOS;
 import org.json.JSONObject;
 
 import eu.snik.tag.gui.CollectionStringConverter;
@@ -97,9 +99,11 @@ public record Clazz(Set<String> labels, Set<String> abbreviations, Set<String> d
 		var model = ModelFactory.createDefaultModel();
 		Resource clazz = model.createResource(uri(), OWL.Class);
 		model.add(clazz, RDFS.subClassOf, subtop.resource);
-		for (String label : labels) {
-			model.add(clazz, RDFS.label, model.createLiteral(label, "en"));
-		}
+
+		// labels as rdfs:label and skos:altLabel
+		Iterator<String> labelIterator = labels.iterator();
+		model.add(clazz, RDFS.label, model.createLiteral(labelIterator.next(), "en"));
+		labelIterator.forEachRemaining(label -> model.add(clazz, SKOS.altLabel, model.createLiteral(label, "en")));
 
 		return model;
 	}
