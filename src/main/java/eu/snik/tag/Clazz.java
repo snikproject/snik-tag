@@ -13,6 +13,7 @@ import org.apache.jena.rdf.model.ResourceFactory;
 import org.apache.jena.vocabulary.OWL;
 import org.apache.jena.vocabulary.RDFS;
 import org.apache.jena.vocabulary.SKOS;
+import org.apache.jena.vocabulary.SKOSXL;
 import org.json.JSONObject;
 
 import eu.snik.tag.gui.CollectionStringConverter;
@@ -101,10 +102,20 @@ public record Clazz(Set<String> labels, Set<String> abbreviations, Set<String> d
 		model.add(clazz, RDFS.subClassOf, subtop.resource);
 
 		// labels as rdfs:label and skos:altLabel
-		Iterator<String> labelIterator = labels.iterator();
+		Iterator<String> labelIterator = this.labels().iterator();
 		model.add(clazz, RDFS.label, model.createLiteral(labelIterator.next(), "en"));
 		labelIterator.forEachRemaining(label -> model.add(clazz, SKOS.altLabel, model.createLiteral(label, "en")));
 
+		// abbreviations as skos:altLabel
+		for(String abbrv : this.abbreviations()) {
+			model.add(clazz, SKOS.altLabel, model.createLiteral(abbrv, "en"));
+		}
+		
+		// definitions as skos:definition
+		for(String def : this.definitions()) {
+			model.add(clazz, SKOS.definition, model.createLiteral(def, "en"));
+		}
+		
 		return model;
 	}
 
