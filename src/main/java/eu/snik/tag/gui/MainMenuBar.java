@@ -143,9 +143,7 @@ public class MainMenuBar {
 					}
 
 					try (FileOutputStream fos = new FileOutputStream(file)) {
-						{
-							RDFDataMgr.write(fos, RDFArea.rdfModel(main.state), RDFFormat.TURTLE);
-						}
+						RDFDataMgr.write(fos, RDFArea.rdfModel(main.state), RDFFormat.TURTLE);
 					} catch (Exception ex) {
 						Log.error("Fehler beim Exportieren nach RDF/Turtle", ex);
 					}
