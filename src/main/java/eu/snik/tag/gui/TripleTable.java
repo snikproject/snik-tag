@@ -28,6 +28,7 @@ public class TripleTable extends VBox {
 	/** @param classes may still be empty at constructor call time
 	 * @param update	 callback that is run when the user changes a class.
 	 * This is necessary because an observable list's change listeners only fire when a class is added or removed, not changed.*/
+	@SuppressWarnings("unchecked")
 	public TripleTable(final ObservableList<Triple> triples, final Runnable createRestorePoint) {
 		this.triples = triples;
 		this.createRestorePoint = createRestorePoint;

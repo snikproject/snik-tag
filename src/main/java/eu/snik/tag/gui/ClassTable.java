@@ -1,12 +1,15 @@
 package eu.snik.tag.gui;
 
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.stream.Collectors;
+
+import org.apache.commons.text.CaseUtils;
+
 import eu.snik.tag.Clazz;
 import eu.snik.tag.Relation;
 import eu.snik.tag.Subtop;
 import eu.snik.tag.Triple;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.stream.Collectors;
 import javafx.collections.transformation.FilteredList;
 import javafx.collections.transformation.SortedList;
 import javafx.scene.control.SelectionMode;
@@ -17,7 +20,6 @@ import javafx.scene.control.cell.ComboBoxTableCell;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.control.cell.TextFieldTableCell;
 import javafx.scene.layout.VBox;
-import org.apache.commons.text.CaseUtils;
 
 /** Table of RDF classes with a filter search bar. */
 public class ClassTable extends VBox {
@@ -47,14 +49,14 @@ public class ClassTable extends VBox {
 			var invalidSubjectTriples = state.triples.stream().filter(t -> mergees.contains(t.subject()));
 			var validSubjectTriples = invalidSubjectTriples.map(t -> t.replaceSubject(merger)).collect(Collectors.toList());
 
-			state.triples.remove(invalidSubjectTriples);
+			state.triples.removeAll(invalidSubjectTriples.toList());
 			state.triples.addAll(validSubjectTriples);
 		}
 		{
 			var invalidObjectTriples = state.triples.stream().filter(t -> mergees.contains(t.object()));
 			var validObjectTriples = invalidObjectTriples.map(t -> t.replaceObject(merger)).collect(Collectors.toList());
 
-			state.triples.remove(invalidObjectTriples);
+			state.triples.removeAll(invalidObjectTriples.toList());
 			state.triples.addAll(validObjectTriples);
 		}
 
@@ -93,6 +95,7 @@ public class ClassTable extends VBox {
 	/** @param classes may still be empty at constructor call time
 	 * @param createRestorePoint	 callback that is run when the user changes a class.
 	 * This is necessary because an observable list's change listeners only fire when a class is added or removed, not changed.*/
+	@SuppressWarnings("unchecked")
 	public ClassTable(final State state, final Runnable createRestorePoint) {
 		this.state = state;
 		this.createRestorePoint = createRestorePoint;
@@ -236,7 +239,6 @@ public class ClassTable extends VBox {
 		var splitCol = FancyColumnFactory.buttonCol("Trennen", "Trennen", this::split, this.createRestorePoint);
 		splitCol.setMinWidth(120);
 		
-
 		table.getColumns().addAll(labelCol, localNameCol, abbrvCol, subtopCol, removeCol, mergeCol, splitCol, definCol);
 		this.table.getSortOrder().addAll(subtopCol, localNameCol, labelCol);
 	}

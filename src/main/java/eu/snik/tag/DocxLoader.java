@@ -104,10 +104,11 @@ public class DocxLoader extends Loader {
 			var classes = new LinkedHashSet<Clazz>();
 			var processedRuns = new HashSet<R>();
 			var processedLabels = new HashSet<String>();
-			var warnings = new HashSet<String>(); // prevent the same warning from showing multiple times
+			//var warnings = new HashSet<String>(); // prevent the same warning from showing multiple times
 
 			for (var tc : tagClasses) {
 				String xpath = "//w:r[w:rPr/" + tc.tag + "[not(@w:val='false')]]";
+				@SuppressWarnings("unchecked")
 				var runs = (List<R>) (List<?>) doc.getJAXBNodesViaXPath(xpath, false);
 				runs.removeAll(processedRuns); // we cannot handle overlapping tags right now
 
