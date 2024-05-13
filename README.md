@@ -1,4 +1,5 @@
 # SNIK Tag
+[![CI](https://github.com/snikproject/snik-tag/actions/workflows/ci.yml/badge.svg)](https://github.com/snikproject/snik-tag/actions/workflows/ci.yml)
 
 Semi-automatic extraction of RDF triples from text based on the SNIK meta model.
 Support authors of medical informatics textbooks.
