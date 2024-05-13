@@ -13,7 +13,6 @@ import org.apache.jena.rdf.model.ResourceFactory;
 import org.apache.jena.vocabulary.OWL;
 import org.apache.jena.vocabulary.RDFS;
 import org.apache.jena.vocabulary.SKOS;
-import org.apache.jena.vocabulary.SKOSXL;
 import org.json.JSONObject;
 
 import eu.snik.tag.gui.CollectionStringConverter;
