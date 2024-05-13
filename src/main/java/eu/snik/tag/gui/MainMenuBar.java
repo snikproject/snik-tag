@@ -307,7 +307,7 @@ public class MainMenuBar {
 		return helpMenu;
 	}
 
-	public static MenuBar create(Main main) {
+	static MenuBar create(Main main) {
 		return new MenuBar(fileMenu(main), helpMenu());
 	}
 }

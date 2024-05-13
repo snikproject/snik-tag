@@ -26,7 +26,7 @@
 				<artifactId>javafx-maven-plugin</artifactId>
 				<version>0.0.8</version>
 				<configuration>
-					<mainClass>eu.snik.tag.gui.Main</mainClass>
+					<mainClass>sniktag/eu.snik.tag.gui.Main</mainClass>
 				</configuration>
 			</plugin>
 			<plugin>
@@ -138,24 +138,24 @@
 			<version>${version.javafx}</version>
 			<classifier>win</classifier>
 		</dependency>
-		<dependency>
+<!--		<dependency>
 			<groupId>org.openjfx</groupId>
 			<artifactId>javafx-fxml</artifactId>
 			<version>${version.javafx}</version>
 			<classifier>win</classifier>
-		</dependency>
-		<dependency>
+		</dependency>-->
+<!--		<dependency>
 			<groupId>org.openjfx</groupId>
 			<artifactId>javafx-graphics</artifactId>
 			<version>${version.javafx}</version>
 			<classifier>win</classifier>
-		</dependency>
-		<dependency>
+		</dependency>-->
+<!--		<dependency>
 			<groupId>org.openjfx</groupId>
 			<artifactId>javafx-web</artifactId>
 			<version>${version.javafx}</version>
 			<classifier>win</classifier>
-		</dependency>
+		</dependency>-->
 		<dependency>
 			<groupId>org.json</groupId>
 			<artifactId>json</artifactId>
@@ -194,10 +194,10 @@
 			<artifactId>jsoup</artifactId>
 			<version>1.17.2</version>
 		</dependency>
-		<dependency>
+		<!--<dependency>
 			<groupId>jakarta.xml.bind</groupId>
 			<artifactId>jakarta.xml.bind-api</artifactId>
 			<version>4.0.2</version>
-		</dependency>
+		</dependency>-->
 	</dependencies>
 </project>

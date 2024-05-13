@@ -26,7 +26,7 @@ import javafx.stage.Window;
 /** GUI entry point. Run with Maven via javafx:run. */
 public class Main extends Application {
 
-	public final State state = new State();
+	final State state = new State();
 
 	private final SplitPane textPane = new SplitPane();
 
@@ -38,7 +38,7 @@ public class Main extends Application {
 	private final ClassTable tableView = new ClassTable(state, this::createRestorePoint);
 	private final TripleTable tripleTable = new TripleTable(state.triples, this::createRestorePoint);
 
-	public Stage stage;
+	Stage stage;
 
 	private Window window;
 

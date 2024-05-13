@@ -20,7 +20,7 @@ import javafx.collections.ObservableList;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-public class State {
+class State {
 
 	public final StringProperty text = new SimpleStringProperty();
 	public final ObservableList<Clazz> classes = FXCollections.observableArrayList();

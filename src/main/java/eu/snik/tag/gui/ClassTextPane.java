@@ -73,7 +73,7 @@ public class ClassTextPane extends ScrollPane {
 
 	/** @param classes added or removed classes will automatically be shown.
 	 * @param relationPane */
-	public ClassTextPane(State state, RelationPane relationPane) {
+	ClassTextPane(State state, RelationPane relationPane) {
 		this.state = state;
 		this.setContent(flow);
 		this.setVbarPolicy(ScrollBarPolicy.AS_NEEDED);

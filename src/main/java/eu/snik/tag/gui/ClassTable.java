@@ -96,7 +96,7 @@ public class ClassTable extends VBox {
 	 * @param createRestorePoint	 callback that is run when the user changes a class.
 	 * This is necessary because an observable list's change listeners only fire when a class is added or removed, not changed.*/
 	@SuppressWarnings("unchecked")
-	public ClassTable(final State state, final Runnable createRestorePoint) {
+	ClassTable(final State state, final Runnable createRestorePoint) {
 		this.state = state;
 		this.createRestorePoint = createRestorePoint;
 		this.table = new TableView<Clazz>();
