@@ -22,7 +22,14 @@ public abstract class Loader {
 
 	public abstract Collection<Clazz> getClasses();
 
+	/**
+	 * Normalises the capitalisation of the given String.
+	 * Removes all non-alphanumeric characters, so it can be used as a local name/URI.
+	 * @param label String, presumably annotated label, from which a local name is generated
+	 * @return String capitalised at spaces and hyphens with only alphanumeric characters (A-Za-z0-9)
+	 */
 	static String labelToLocalName(String label) {
-		return WordUtils.capitalizeFully(label).replaceAll("[^A-Za-z0-9]", "");
+		var delimiters = new char[] {' ','-'};
+		return WordUtils.capitalizeFully(label, delimiters).replaceAll("[^A-Za-z0-9]", "");
 	}
 }
