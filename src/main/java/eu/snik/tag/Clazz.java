@@ -17,7 +17,14 @@ import org.json.JSONObject;
 
 import eu.snik.tag.gui.CollectionStringConverter;
 
-/** An RDF class following the SNIK meta model. Fields can be modified. */
+/**
+ * An RDF class following the SNIK meta model. Fields can be modified.
+ * @param labels Main label and alternatives of the class (rdfs:label and skos:altLabel)
+ * @param abbreviations Alternative labels of the class
+ * @param definitions One or more definitions of the class
+ * @param localName Unique identifier, without prefix (i.e. {@code "ChiefInformationOfficer"} for class {@code bb:ChiefInformationOfficer}
+ * @param subtop Function, Role or EntityType (which class this one is a child of); cf. the SNIK metamodel for more information
+ */
 public record Clazz(Set<String> labels, Set<String> abbreviations, Set<String> definitions, String localName, Subtop subtop) implements Serializable {
 	/**
 	 * Getter for all attributes which are of the type Set&lt;String&gt;
@@ -34,22 +41,43 @@ public record Clazz(Set<String> labels, Set<String> abbreviations, Set<String> d
 		}
 	}
 	
-	/** rdfs:label*/
+	/**
+	 * Strings representing the rdfs:label and, if more than one, alternatives as skos:altLabel of this class.
+	 * Primarily for table view.
+	 * For more reliant handling of multiple labels, use {@link this#getAbbreviations()}.
+	 * @return Set of Strings representing labels (rdfs:label/skos:altLabel) of this RDF class.
+	 */
 	public Set<String> getLabels() {
 		return Collections.unmodifiableSet(labels);
 	} // for table view
 	
+	/**
+	 * Strings each representing one skos:altLabel of this class.
+	 * Must not be an abbreviation, can be any alternative label.
+	 * Primarily for table view.
+	 * @return Set of Strings representing alternative labels (skos:altLabel) of this RDF class.
+	 */
 	public Set<String> getAbbreviations() {
 		return Collections.unmodifiableSet(abbreviations);
 	} // for table view
 	
+	/**
+	 * Strings each representing one skos:definition of this class.
+	 * Expected is one, but maybe someone wants to enter multiple.
+	 * @return Set of Strings representing definitions (skos:definition) of this RDF class.
+	 */
 	public Set<String> getDefinitions() {
 		return Collections.unmodifiableSet(definitions);
 	} // for table view
 	
 
-	/** the URI part after the prefix*/
-
+	/**
+	 * Gets the unique name in the domain, so the URI part after the prefix.
+	 * For example, if the class is called {@code bb:ChiefInformationOfficer} with the prefix,
+	 * this method returns the String {@code "ChiefInformationOfficer"}.
+	 * The local name should be unique, because SnikTag is for one ontology (with one prefix) at a time.
+	 * @return the URI part after the prefix
+	 */
 	public String getLocalName() {
 		return localName;
 	} // for table view
@@ -59,12 +87,21 @@ public record Clazz(Set<String> labels, Set<String> abbreviations, Set<String> d
 		return subtop;
 	} // expected by PropertyValueFactory<>("localName") in table view
 
+	/**
+	 * Labels, abbreviations and definitions are initially empty.
+	 */
 	public Clazz {
 		labels = new LinkedHashSet<>(labels);
 		abbreviations = new LinkedHashSet<>(abbreviations);
 		definitions = new LinkedHashSet<>(definitions);
 	}
 
+	/**
+	 * Creates a new class, with one main label, a unique local name and a subtop parent class
+	 * @param label Label of the class (rdfs:label)
+	 * @param localName Unique identifier, without prefix (i.e. {@code "ChiefInformationOfficer"} for class {@code bb:ChiefInformationOfficer}
+	 * @param subtop Function, Role or EntityType (which class this one is a child of); cf. the SNIK metamodel for more information
+	 */
 	public Clazz(String label, String localName, Subtop subtop) {
 		this(Collections.singleton(label), Collections.singleton(""), Collections.singleton(""), localName, subtop);
 	}
@@ -83,6 +120,10 @@ public record Clazz(Set<String> labels, Set<String> abbreviations, Set<String> d
 		return localName.hashCode();
 	}
 
+	/**
+	 * Creates a semicolon-separated String of all the labels in the label set
+	 * @return A semicolon-separated String of all the labels in the label set
+	 */
 	public String labelString() {
 		return CollectionStringConverter.INSTANCE.toString(labels);
 	}
@@ -94,7 +135,8 @@ public record Clazz(Set<String> labels, Set<String> abbreviations, Set<String> d
 	}
 
 	/** The RDF model is not cached because local name, label and subtop may all be edited by the user.
-	 * @return a Jena model with all triples where this RDF class is a subject. */
+	 * @return a Jena model with all triples where this RDF class is a subject.
+	 */
 	public Model rdfModel() {
 		var model = ModelFactory.createDefaultModel();
 		Resource clazz = model.createResource(uri(), OWL.Class);
@@ -118,15 +160,25 @@ public record Clazz(Set<String> labels, Set<String> abbreviations, Set<String> d
 		return model;
 	}
 
+	/**
+	 * Creates the URI of the class by concatenating the hardcoded prefix (here: {@link Snik#BB2 Snik.BB2}) and the local name
+	 * @return prefix concatenated with local name of this class
+	 */
 	String uri() {
-		return Snik.BB2 + localName;
+		return Snik.BB2 + this.localName;
 	}
 
 	/** @return create a non-model-backed resource with the classe's local name in the SNIK bb2 namespace.*/
 	public Resource resource() {
-		return ResourceFactory.createResource(Snik.BB2 + localName);
+		return ResourceFactory.createResource(Snik.BB2 + this.localName);
 	}
 
+	/**
+	 * Creates a Cytoscape node from the current class.
+	 * Contains x and y positioning, URI as {@code id} labels with language English and no edges.
+	 * Cytoscape is a JavaScript graph library.
+	 * @return New Cytoscape Node as JSON
+	 */
 	public JSONObject cytoscapeNode() {
 		var l = new JSONObject().put("en", this.labels);
 
@@ -138,12 +190,20 @@ public record Clazz(Set<String> labels, Set<String> abbreviations, Set<String> d
 		//.append("classes",subtop.toString());
 	}
 
-	/** @return returns a modified copy with a new local name */
+	/** 
+	 * Creates a modified copy of this class, but with a different local name.
+	 * @param newLocalName the new local name
+	 * @return A modified copy with a new local name
+	 */
 	public Clazz replaceLocalName(String newLocalName) {
 		return new Clazz(this.labels, this.abbreviations, this.definitions, newLocalName, this.subtop);
 	}
 
-	/** @return returns a modified copy with a new subtop*/
+	/** 
+	 * Creates a modified copy of this class, but with a different Subtop.
+	 * @param newSubtop The new Subtop
+	 * @return A modified copy with a new Subtop
+	 */
 	public Clazz replaceSubtop(Subtop newSubtop) {
 		return new Clazz(this.labels, this.abbreviations, this.definitions, this.localName, newSubtop);
 	}

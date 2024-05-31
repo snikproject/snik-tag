@@ -9,6 +9,8 @@ import java.io.InputStream;
 import java.util.ArrayDeque;
 import java.util.Deque;
 
+import eu.snik.tag.DocxLoader;
+import eu.snik.tag.HtmlLoader;
 import eu.snik.tag.Loader;
 import javafx.application.Application;
 import javafx.application.Platform;
@@ -48,9 +50,17 @@ public class Main extends Application {
 		rdfText.refresh();
 	}
 
+	/**
+	 * History of restore points for Ctrl+Z/Ctrl+Y.
+	 * @see Main#restore()
+	 * @see Main#createRestorePoint()
+	 */
 	public static final Deque<ByteArrayInputStream> history = new ArrayDeque<>();
 
-	/** Restore the last saved state.*/
+	/**
+	 * Restore the last saved state.
+	 * 	@see Main#createRestorePoint()
+	 */
 	public void restore() {
 		if (history.isEmpty()) {
 			Log.warn("Cannot undo. No more restore points.", this.window);
@@ -63,7 +73,10 @@ public class Main extends Application {
 		}
 	}
 
-	/** Add the current state to the top of the history. */
+	/**
+	 * Add the current state to the top of the history.
+	 * @see Main#restore()
+	 */
 	public void createRestorePoint() {
 		var stream = new ByteArrayOutputStream();
 		try {
@@ -75,7 +88,12 @@ public class Main extends Application {
 		}
 	}
 
-	/** Close the current document and replace it with the one from the given loader. */
+	/**
+	 * Close the current document and replace it with the one from the given loader.
+	 * @param loader Loader for HTML/DOCX document to load classes and text from
+	 * @see HtmlLoader
+	 * @see DocxLoader
+	 */
 	void load(Loader loader) {
 		var newClasses = loader.getClasses();
 		var newText = loader.getText();
@@ -140,10 +158,21 @@ public class Main extends Application {
 		//openDocx(new File("src/main/resources/eu/snik/tag/benchmark.docx")); // use resource after finished refactoring
 	}
 
+	/**
+	 * Running this directly may fail. Use "mvn javafx:run" instead.
+	 * @param args cmd arguments
+	 */
 	public static void main(String[] args) {
 		launch();
-	} // Running this directly may fail. Use "mvn javafx:run" instead.
+	}
 
+	/**
+	 * Opens a .snikt-file, loading classes, text and triples from it
+	 * @param in InputStream for a snikt-file
+	 * @throws IOException Passed on from {@link State#State(InputStream) new State(InputStream)}
+	 * 
+	 * @see Main#saveSnikt(File)
+	 */
 	public void openSnikt(InputStream in) throws IOException {
 		State state = new State(in);
 		Platform.runLater(
@@ -157,6 +186,12 @@ public class Main extends Application {
 		);
 	}
 
+	/**
+	 * Saves a .snikt-file, saving classes, text and triples to disk for later use
+	 * @param f File object to save to
+	 * 
+	 * @see Main#openSnikt(InputStream)
+	 */
 	public void saveSnikt(File f) {
 		try {
 			this.state.save(new FileOutputStream(f));

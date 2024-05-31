@@ -11,11 +11,16 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
-/** Extracts SNIK classes from a tagged DOCX file. */
+/** Extracts SNIK classes from a tagged HTML file. */
 public class HtmlLoader extends Loader {
 
 	private final Document doc;
 
+	/**
+	 * Creates a new instance for the HTML loader to load one HTML file
+	 * @param in Input stream for the HTML file to load
+	 * @throws IOException Exceptions while trying to open/read the file
+	 */
 	public HtmlLoader(InputStream in) throws IOException {
 		super(in);
 		this.doc = Jsoup.parse(in(), "UTF-8", "");

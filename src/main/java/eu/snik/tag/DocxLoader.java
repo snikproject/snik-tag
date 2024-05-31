@@ -25,6 +25,11 @@ public class DocxLoader extends Loader {
 	//	private static ObjectFactory factory = Context.getWmlObjectFactory();
 	//	private static int commentId = 10000;
 
+	/**
+	 * Creates a new instance for the DOCX loader to load one DOCX file
+	 * @param in Input stream for the DOCX file to load
+	 * @throws IOException Exceptions while trying to open/read the file
+	 */
 	public DocxLoader(InputStream in) throws IOException {
 		super(in);
 	}
@@ -108,8 +113,10 @@ public class DocxLoader extends Loader {
 
 			for (var tc : tagClasses) {
 				String xpath = "//w:r[w:rPr/" + tc.tag + "[not(@w:val='false')]]";
+				// find next bold/italic/underlined passage
 				@SuppressWarnings("unchecked")
 				var runs = (List<R>) (List<?>) doc.getJAXBNodesViaXPath(xpath, false);
+				// remove previously processed passages
 				runs.removeAll(processedRuns); // we cannot handle overlapping tags right now
 
 				for (R run : runs) {
