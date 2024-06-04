@@ -46,17 +46,19 @@ public class ClassTable extends VBox {
 			return;
 		}
 		{
-			var invalidSubjectTriples = state.triples.stream().filter(t -> mergees.contains(t.subject()));
-			var validSubjectTriples = invalidSubjectTriples.map(t -> t.replaceSubject(merger)).collect(Collectors.toList());
+			// collecting stream here and streaming again in next line to fix IllegalStateException when removing triples from state
+			var invalidSubjectTriples = state.triples.stream().filter(t -> mergees.contains(t.subject())).toList();
+			var validSubjectTriples = invalidSubjectTriples.stream().map(t -> t.replaceSubject(merger)).collect(Collectors.toList());
 
-			state.triples.removeAll(invalidSubjectTriples.toList());
+			state.triples.removeAll(invalidSubjectTriples);
 			state.triples.addAll(validSubjectTriples);
 		}
 		{
-			var invalidObjectTriples = state.triples.stream().filter(t -> mergees.contains(t.object()));
-			var validObjectTriples = invalidObjectTriples.map(t -> t.replaceObject(merger)).collect(Collectors.toList());
+			// collecting stream here and streaming again in next line to fix IllegalStateException when removing triples from state
+			var invalidObjectTriples = state.triples.stream().filter(t -> mergees.contains(t.object())).toList();
+			var validObjectTriples = invalidObjectTriples.stream().map(t -> t.replaceObject(merger)).collect(Collectors.toList());
 
-			state.triples.removeAll(invalidObjectTriples.toList());
+			state.triples.removeAll(invalidObjectTriples);
 			state.triples.addAll(validObjectTriples);
 		}
 
