@@ -3,9 +3,11 @@ package eu.snik.tag.gui;
 import eu.snik.tag.Clazz;
 import eu.snik.tag.Relation;
 import eu.snik.tag.Triple;
+
 import java.util.Arrays;
 import java.util.stream.Collectors;
 import javafx.collections.FXCollections;
+import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
@@ -43,8 +45,18 @@ public class RelationPane extends VBox {
 	 * Modified classes are not updated.
 	 * @param createRestorePoint will be called when the user adds a new relation. No parameters.
 	 */
-	RelationPane(State state, Runnable createRestorePoint) {
-		setAlignment(Pos.CENTER);
+	protected RelationPane(State state, Runnable createRestorePoint) {
+		Label roleLegend = new Label("Role");
+		roleLegend.getStyleClass().add("text-role");
+		Label functionLegend = new Label("Function");
+		functionLegend.getStyleClass().add("text-function");
+		Label entityTypeLegend = new Label("Entity Type");
+		entityTypeLegend.getStyleClass().add("text-entity-type");
+		VBox legend = new VBox(roleLegend, functionLegend, entityTypeLegend);
+		legend.setAlignment(Pos.CENTER);
+		legend.setPadding(new Insets(20, 20, 320, 20));
+		
+		this.setAlignment(Pos.TOP_CENTER);
 		Label l = new Label("Wählen Sie bitte zwei Klassen und eine passende Relation aus.");
 
 		// doesn't work when sorting state.classes beforehand
@@ -92,7 +104,7 @@ public class RelationPane extends VBox {
 				}
 			);
 		}
-		getChildren().addAll(l, subjectBox, objectBox, predicateBox, addButton);
+		getChildren().addAll(legend, l, subjectBox, objectBox, predicateBox, addButton);
 	}
 
 	public void setSubject(Clazz first) {
