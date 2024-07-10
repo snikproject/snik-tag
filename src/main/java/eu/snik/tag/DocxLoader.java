@@ -23,9 +23,6 @@ import jakarta.xml.bind.JAXBException;
 /** Extracts SNIK classes from a tagged DOCX file. */
 public class DocxLoader extends Loader {
 
-	//	private static ObjectFactory factory = Context.getWmlObjectFactory();
-	//	private static int commentId = 10000;
-
 	/**
 	 * Creates a new instance for the DOCX loader to load one DOCX file
 	 * @param in Input stream for the DOCX file to load
@@ -35,11 +32,18 @@ public class DocxLoader extends Loader {
 		super(in);
 	}
 
-	/** from https://stackoverflow.com/questions/19676282/docx4j-find-and-replace */
-	static List<Object> getAllElementsFromObject(Object obj, Class<?>... toSearch) {
+	/**
+	 * Search for any occurences of Docx4J instances from any given node in the document tree.
+	 * Originally from <a href="http://www.smartjava.org/content/create-complex-word-docx-documents-programatically-docx4j/">this blog post</a>.
+	 * @param obj object to search in
+	 * @param toSearch Classes to search for
+	 * @return List of all occurrences of instances of the given classes as self, children or transitive children of the given object.
+	 */
+	private static List<Object> getAllElementsFromObject(Object obj, Class<?>... toSearch) {
 		List<Object> result = new ArrayList<Object>();
 		if (obj instanceof JAXBElement) obj = ((JAXBElement<?>) obj).getValue();
 
+		// only add object to found after processing its children
 		if (obj instanceof ContentAccessor) {
 			List<?> children = ((ContentAccessor) obj).getContent();
 			for (Object child : children) {
@@ -54,7 +58,10 @@ public class DocxLoader extends Loader {
 		return result;
 	}
 
-	/** @return the complete text from the DOCX file without any formatting */
+	/**
+	 * Get the entire unformatted textual content of the document.
+	 * @return the complete text from the DOCX file without any formatting (except line breaks)
+	 */
 	@Override
 	public String getText() {
 		try {
@@ -63,7 +70,10 @@ public class DocxLoader extends Loader {
 			var doc = wordMLPackage.getMainDocumentPart();
 			var parts = new ArrayList<String>();
 
-			List<Object> texts = getAllElementsFromObject(doc, org.docx4j.wml.Text.class, org.docx4j.wml.P.class);
+			// extract all text passages (including paragraph objects for information on line breaks)
+			List<Object> texts = DocxLoader.getAllElementsFromObject(doc, org.docx4j.wml.Text.class, org.docx4j.wml.P.class);
+			
+			// convert org.docx4j.wml.Text-s to Strings (interpret paragraphs as line breaks)
 			for (Object t : texts) {
 				if(t instanceof org.docx4j.wml.P) {
 					parts.add("\n\n");
@@ -72,6 +82,8 @@ public class DocxLoader extends Loader {
 					parts.add(content.getValue());
 				}
 			}
+			
+			// put the parts together
 			return parts
 				.stream()
 				.reduce(
@@ -100,9 +112,15 @@ public class DocxLoader extends Loader {
 		}
 	}
 
-	record TagClass(String tag, String description, Subtop subtop) {}
+	/**
+	 * Local type used for quickly identifying tagged tokens.
+	 */
+	private record TagClass(String tag, String description, Subtop subtop) {}
 
-	/**	@return all classes extracted from the tagged parts of the DOCX document*/
+	/**
+	 * Extract all classes marked in the Docx document, without any duplicates.
+	 * @return all classes extracted from the tagged parts of the DOCX document
+	 */
 	@Override
 	public Collection<Clazz> getClasses() {
 		try {
@@ -142,20 +160,9 @@ public class DocxLoader extends Loader {
 						continue;
 					} // abbreviations
 					processedRuns.add(run);
-
-					/*
-				Comment comment = factory.createCommentsComment();
-				comments.add(comment);
-				comment.setId(BigInteger.valueOf(++commentId));
-				Text commentText = factory.createText();
-				commentText.setValue("this is a comment for "+label);
-				comment.getContent().add(commentText);
-				CommentReference commentRef = factory.createRCommentReference();
-				run.getContent().add(commentRef);
-				commentRef.setId(BigInteger.valueOf(commentId));
-				 */
+					
+					// remove multiply annotated tokens, then add the rest to processedLabels
 					Clazz clazz = new Clazz(label, labelToLocalName(label), tc.subtop);
-					//System.out.println(text+" "+ clazz);
 					if (processedLabels.contains(label)) {
 						classes
 							.stream()
@@ -184,7 +191,6 @@ public class DocxLoader extends Loader {
 				}
 			}
 
-			//warningCallback.ifPresent(c->c.accept(warnings.stream().reduce("", (a,b)->a+"\n"+b)));
 			System.out.println(classes.size() + " classes extracted.");
 
 			return classes;
