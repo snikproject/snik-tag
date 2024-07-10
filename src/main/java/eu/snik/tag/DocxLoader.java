@@ -142,14 +142,14 @@ public class DocxLoader extends Loader {
 				comment.getContent().add(commentText);
 				CommentReference commentRef = factory.createRCommentReference();
 				run.getContent().add(commentRef);
-				commentRef.setId(BigInteger.valueOf(commentId));				
+				commentRef.setId(BigInteger.valueOf(commentId));
 				 */
 					Clazz clazz = new Clazz(label, labelToLocalName(label), tc.subtop);
 					//System.out.println(text+" "+ clazz);
 					if (processedLabels.contains(label)) {
 						classes
 							.stream()
-							.filter(c -> c.subtop() != clazz.subtop())
+							.filter(c -> c.labels().contains(label) && (!c.subtop().equals(clazz.subtop())))
 							.findAny()
 							.ifPresent(
 								c -> {
