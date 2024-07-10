@@ -3,6 +3,7 @@ package eu.snik.tag;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
@@ -35,16 +36,21 @@ public class DocxLoader extends Loader {
 	}
 
 	/** from https://stackoverflow.com/questions/19676282/docx4j-find-and-replace */
-	static List<Object> getAllElementsFromObject(Object obj, Class<?> toSearch) {
+	static List<Object> getAllElementsFromObject(Object obj, Class<?>... toSearch) {
 		List<Object> result = new ArrayList<Object>();
 		if (obj instanceof JAXBElement) obj = ((JAXBElement<?>) obj).getValue();
 
-		if (obj.getClass().equals(toSearch)) result.add(obj); else if (obj instanceof ContentAccessor) {
+		if (obj instanceof ContentAccessor) {
 			List<?> children = ((ContentAccessor) obj).getContent();
 			for (Object child : children) {
 				result.addAll(getAllElementsFromObject(child, toSearch));
 			}
 		}
+		
+		if (Arrays.asList(toSearch).contains(obj.getClass())) {
+			result.add(obj);
+		}
+		
 		return result;
 	}
 
@@ -57,10 +63,14 @@ public class DocxLoader extends Loader {
 			var doc = wordMLPackage.getMainDocumentPart();
 			var parts = new ArrayList<String>();
 
-			List<Object> texts = getAllElementsFromObject(doc, org.docx4j.wml.Text.class);
+			List<Object> texts = getAllElementsFromObject(doc, org.docx4j.wml.Text.class, org.docx4j.wml.P.class);
 			for (Object t : texts) {
-				org.docx4j.wml.Text content = (org.docx4j.wml.Text) t;
-				parts.add(content.getValue());
+				if(t instanceof org.docx4j.wml.P) {
+					parts.add("\n\n");
+				} else {
+					org.docx4j.wml.Text content = (org.docx4j.wml.Text) t;
+					parts.add(content.getValue());
+				}
 			}
 			return parts
 				.stream()
@@ -81,7 +91,7 @@ public class DocxLoader extends Loader {
 							return a + (b.startsWith(" ") ? b : (" " + b));
 						}
 
-						return a + '\n' + b;
+						return a + b;
 					}
 				)
 				.get();
