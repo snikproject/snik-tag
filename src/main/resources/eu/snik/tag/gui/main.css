@@ -20,3 +20,7 @@
 .object			{-fx-border-style: dashed; -fx-border-color: yellow; -fx-stroke:firebrick}
 
 .heading {-fx-font-size: 18pt;}
+
+.mainTextFlow {
+	-fx-text-alignment: justify;
+}

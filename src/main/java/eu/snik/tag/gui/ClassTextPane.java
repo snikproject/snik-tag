@@ -10,6 +10,7 @@ import org.apache.commons.collections4.multimap.ArrayListValuedHashMap;
 import eu.snik.tag.Clazz;
 import eu.snik.tag.Subtop;
 import javafx.collections.ListChangeListener;
+import javafx.geometry.Insets;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
@@ -103,6 +104,9 @@ public class ClassTextPane extends ScrollPane {
 				highlightObject(old, neww);
 			}
 		);
+		
+		this.flow.setPadding(new Insets(50,240,50,320));
+		this.flow.getStyleClass().add("mainTextFlow");
 	}
 
 	private final Map<Subtop, String> cssClass = Map.of(
