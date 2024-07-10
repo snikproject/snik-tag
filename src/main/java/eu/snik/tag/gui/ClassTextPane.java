@@ -105,7 +105,7 @@ public class ClassTextPane extends ScrollPane {
 			}
 		);
 		
-		this.flow.setPadding(new Insets(50,240,50,320));
+		this.flow.setPadding(new Insets(50,240,0,320));
 		this.flow.getStyleClass().add("mainTextFlow");
 	}
 
