@@ -11,6 +11,7 @@ import org.apache.jena.rdf.model.ModelFactory;
 import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.rdf.model.ResourceFactory;
 import org.apache.jena.vocabulary.OWL;
+import org.apache.jena.vocabulary.RDF;
 import org.apache.jena.vocabulary.RDFS;
 import org.apache.jena.vocabulary.SKOS;
 import org.json.JSONObject;
@@ -140,7 +141,8 @@ public record Clazz(Set<String> labels, Set<String> abbreviations, Set<String> d
 	public Model rdfModel() {
 		var model = ModelFactory.createDefaultModel();
 		Resource clazz = model.createResource(uri(), OWL.Class);
-		model.add(clazz, RDFS.subClassOf, subtop.resource);
+		// Theoretically a subclass, but we use it like this for better compatibility
+		model.add(clazz, RDF.type, subtop.resource);
 
 		// labels as rdfs:label and skos:altLabel
 		Iterator<String> labelIterator = this.labels().iterator();
