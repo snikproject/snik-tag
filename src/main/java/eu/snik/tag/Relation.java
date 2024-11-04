@@ -15,7 +15,7 @@ import org.apache.jena.vocabulary.RDFS;
 public enum Relation {
 	
 	isInvolvedIn(Role, Function),
-	isReponsibleForFunction(Role, Function),
+	isResponsibleForFunction(Role, Function),
 	approvesFunction(Role, Function),
 	uses(Function, EntityType),
 	updates(Function, EntityType),
